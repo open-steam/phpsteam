@@ -7,7 +7,6 @@
  *
  * PHP versions 5
  *
- * @version     CVS: $Id: steam_calendar.class.php,v 1.3 2010/07/25 12:28:04 nicke Exp $
  * @package     PHPsTeam
  * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author      Alexander Roth <aroth@it-roth.de>

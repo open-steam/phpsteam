@@ -8,7 +8,6 @@
  *
  * PHP versions 5
  *
- * @version CVS: $Id: steam_connector.class.php,v 1.3 2010/07/24 23:22:53 nicke Exp $
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author  Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
