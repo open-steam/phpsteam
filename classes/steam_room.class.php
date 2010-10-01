@@ -5,7 +5,6 @@
  *
  * PHP versions 5
  *
- * @version     $id$
  * @package     PHPsTeam
  * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author      Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>

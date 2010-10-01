@@ -5,7 +5,7 @@
  * COAL-protocol.
  *
  * PHP versions 5
- * @version	CVS: $Id: steam_request.class.php,v 1.5 2010/07/21 15:36:51 nicke Exp $
+ * 
  * @package 	PHPsTeam
  * @license	http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author	Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>

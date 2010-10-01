@@ -5,7 +5,6 @@
  *
  * PHP versions 5
  *
- * @version     $id$
  * @package     PHPsTeam
  * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author      Daniel Büse <dbuese@upb.de>, Domink Niehus <nicke@upb.de>
