@@ -17,20 +17,11 @@
  */
 class steam_link extends steam_object
 {
-
-	/**
-	 * constructor of steam_link:
-	 *
-	 * @param $pSteamConnector
-	 * @param $pID
-	 */
-	public function __construct( $pSteamConnectorID, $pID = 0 )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID  );
-		$this->type = CLASS_LINK;
+	
+	public function get_type() {
+		return CLASS_LINK | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function get_link_object:
 	 *

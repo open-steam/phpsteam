@@ -17,20 +17,11 @@
   */
 class steam_docextern extends steam_object
 {
-
-	/**
-	 * constructor of steam_docextern:
-	 * 
-	 * @param $pID
-	 * @param $pSteamConnector
-	 */	
-	public function __construct($pSteamConnectorID, $pID = 0)
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct($pSteamConnectorID, $pID);
-		$this->type = CLASS_DOCEXTERN;
+	
+	public function get_type() {
+		return CLASS_DOCEXTERN | CLASS_OBJECT;
 	}
-
+	
 	/**
  	* function get_url:
  	* 

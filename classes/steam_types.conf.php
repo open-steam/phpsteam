@@ -100,4 +100,9 @@
   define("SANCTION_POSITIVE",   0xffff0000);
   define("SANCTION_NEGATIVE",   0x0000ffff);
   define("SANCTION_USER",       0x00010000);
+  
+  // define persistence type
+  define("PERSISTENCE_STEAM",		0x00000000);
+  define("PERSISTENCE_FILESYSTEM_RANDOM",	0x00000001);
+  define("PERSISTENCE_FILESYSTEM_HASH",	0x00000002);
 ?>

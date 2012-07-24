@@ -73,20 +73,11 @@ function sort_documents( $pDocA, $pDocB )
 
 class steam_container extends steam_object
 {
-
-	/**
-	 * Construtor for steam_container:
-	 *
-	 * @param steam_connector $pSteamConnector The connection to a sTeam-server
-	 * @param integer $pID unique object ID inside the virtual space (optional)
-	 */
-	public function __construct( $pSteamConnectorID, $pID = "0" )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_CONTAINER;
+	
+	public function get_type() {
+		return CLASS_CONTAINER | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function insert:
 	 *

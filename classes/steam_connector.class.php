@@ -13,6 +13,17 @@
  * @author  Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
  */
 
+
+defined("LOW_API_CACHE") or define("LOW_API_CACHE", true);
+defined("API_DEBUG") or define("API_DEBUG", false);
+
+defined("ENABLE_FILESYTEM_PERSISTENCE") or define("ENABLE_FILESYTEM_PERSISTENCE", false);
+
+//sub-directories: uuid, hash
+defined("FILESYTEM_PERSISTENCE_BASE_PATH") or define("FILESYTEM_PERSISTENCE_BASE_PATH", false);
+defined("DEFAULT_FILESYTEM_PERSISTENCE_TYPE") or define("DEFAULT_FILESYTEM_PERSISTENCE_TYPE", "RANDOM");
+
+
 require_once( "steam_factory.class.php" );
 require_once( "steam_connection.class.php" );
 
@@ -29,7 +40,7 @@ require_once( "steam_connection.class.php" );
  * Insofar, an object of steam_connector can be seen as the key to
  * access all other steam_objects. PHPsTeam is so easy like this:
  * <code>
- * $steam = new steam_connector(
+ * $steam = steam_connector::connect(
  * 		"steam.open-steam.org",
  *		1900, "aroth",
  *		"secret_pw"
@@ -56,14 +67,14 @@ class steam_connector implements Serializable
 	 * Arguments are all optional. If arguments are given, steam_connector
 	 * tries to connect to the defined sTeam-server.
 	 * Examples:
-	 * - <code>$steam = new steam_connector( "steam.upb.de", 1900, "aroth", "secret" );</code>
+	 * - <code>$steam = steam_connector::connect( "steam.upb.de", 1900, "aroth", "secret" );</code>
 	 *
 	 * @param string  $pServerIP	IP or hostname of a sTeam-server
 	 * @param integer $pServerPort	server's port for COAL-protocol
 	 * @param string  $pLogin	    user's login
 	 * @param string  $pPassword	user's password
 	 */
-	public function __construct( $pServerIp, $pServerPort, $pLoginName, $pLoginPassword)
+	private function __construct($pServerIp, $pServerPort, $pLoginName, $pLoginPassword)
 	{
 		if ( ! is_string( $pServerIp ) ) throw new ParameterException( "pServerIp", "string" );
 		if ( ! is_integer( $pServerPort ) ) throw new ParameterException( "pServerPort", "integer" );
@@ -76,6 +87,14 @@ class steam_connector implements Serializable
 		steam_connection::init($pServerIp, $pServerPort, $pLoginName, $pLoginPassword);
 	}
 
+	public static function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword) {
+		if (!isset(self::$instances[$pLoginName . "@" . $pServerIp])) {
+			return new self($pServerIp, $pServerPort, $pLoginName, $pLoginPassword);
+		} else {
+			return self::$instances[$pLoginName . "@" . $pServerIp];
+		}
+	}
+	
 	public static function get_instance($id) {
 		if (!is_string($id)) throw new ParameterException( "id", "string" );
 		if (isset(self::$instances[$id])) {
@@ -201,6 +220,39 @@ class steam_connector implements Serializable
 	{
 		return steam_connection::get_instance($this->get_id())->get_root_room();
 	}
+	
+	/**
+	 * function get_server_module:
+	 * 
+	 * Returns server module
+	 *
+	 * @param string $pServerModule Name of the module 
+	 * @return steam_object
+	 */
+	/*public function get_server_module( $pServerModule )
+	{
+		//True
+    if (!isset( $this->login_arguments[ 8 ][ $pServerModule ] )){
+    	echo "hund";die;
+    	return 0;
+    }
+    
+    switch ( $pServerModule ) {
+      case "package:searchsupport":
+          return new searchsupport( $this->login_arguments[ 8 ][ $pServerModule ] );
+          break;
+      case "groups":
+          return new module_groups( $this->login_arguments[ 8 ][ $pServerModule ] );
+          break;
+      case "searching":
+      	//compare_versions doesn't exist, login_arguments doesn't exist, 
+      	// if ( $this->compare_versions( $this->server_version, '2.9.4' ) < 0 ) break;
+          return new searching(steam_connection::get_instance($this->get_id())->get_module($pServerModule));
+          break;
+    }
+
+		return $this->login_arguments[ 8 ][ $pServerModule ];
+	}*/
 
 	/**
 	 * function get_module:
@@ -212,7 +264,7 @@ class steam_connector implements Serializable
 	 */
 	public function get_module( $pServerModule )
 	{
-		return steam_connection::get_instance($this->get_id())->get_module($pServerModule);
+		return steam_connection::get_instance($this->get_id())->get_module($pServerModule); 
 	}
 
 	public function get_service_manager()
@@ -286,6 +338,10 @@ class steam_connector implements Serializable
 		return steam_connection::get_instance($this->get_id())->get_pike_version();
 	}
 
+	public function set_socket_timeout($timeout) {
+		steam_connection::get_instance($this->get_id())->set_socket_timeout($timeout);
+	}
+
 	/**
 	 * function get_server_version:
 	 *
@@ -309,6 +365,19 @@ class steam_connector implements Serializable
 	{
 		return steam_connection::get_instance($this->get_id())->get_sentrequests();
 	}
+	
+	public function get_globalrequest_count() {
+		return steam_connection::get_instance($this->get_id())->get_globalrequests();
+	}
+	
+	public function get_globalrequest_map() {
+		return steam_connection::get_instance($this->get_id())->get_globalrequestsmap();
+	}
+	
+	public function get_globalrequest_time() {
+		return steam_connection::get_instance($this->get_id())->get_globalrequeststime();
+	}
+	
 
 	/**
 	 * function upload:
@@ -444,5 +513,13 @@ class steam_connector implements Serializable
   	public function buffer_attributes_request( $pObject, $pAttributes, $pSourceObjectID = 0 ){
   		return steam_connection::get_instance($this->get_id())->buffer_attributes_request( $pObject, $pAttributes, $pSourceObjectID);
   	}
+  	public function get_transaction_id(){
+  		return steam_connection::get_instance($this->get_id())->get_transaction_id();
+  	}
+  	public function command($pRequest){
+  		return steam_connection::get_instance($this->get_id())->command($pRequest);
+  	}
+  	public function read_socket($pLength) {
+  		return steam_connection::get_instance($this->get_id())->read_socket($pLength);
+  	}
 } 
-?>

@@ -17,20 +17,11 @@
  */
 class steam_room extends steam_container
 {
-
-	/**
-	 * constructor of steam_room:
-	 *
-	 * @param $pID
-	 * @param $pSteamConnector
-	 */
-	public function __construct($pSteamConnectorID,  $pID = "0")
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct($pSteamConnectorID, $pID);
-		$this->type = CLASS_ROOM;
+	
+	public function get_type() {
+		return CLASS_ROOM | CLASS_CONTAINER | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function get_visitors:
 	 *

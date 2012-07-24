@@ -21,49 +21,26 @@
 
 class steam_document extends steam_object
 {
-
-	/**
-	 * Construtor for steam_document
-	 *
-	 * @param steam_connector $pSteamConnector The connection to a sTeam-server
-	 * @param integer $pID unique object ID inside the virtual space (optional)
-	 */
-	public function __construct( $pSteamConnectorID, $pID = "0" )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_DOCUMENT;
+	public function get_type() {
+		return CLASS_DOCUMENT | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 *function download:
 	 *
 	 * @return
 	 */
-	public function download()
-	{
-		//first run server request
-		$request = new steam_request( $this->get_steam_connector(), $this->get_steam_connector()->get_transaction_id(), $this, 0, COAL_FILE_DOWNLOAD );
-		$command = $this->get_steam_connector()->command( $request );
-		$buffer = "";
-		$size = 0;
-		$args = $command->get_arguments();
-		 
-		//then get data
-		while ( $size < $args[ 0 ] )
-		{
-			$buffer .= $this->get_steam_connector()->read_socket( $args[ 0 ] );
-			$size = strlen( $buffer );
-		}
-
-		//if no error send headers
-		header( "Pragma: private\n" );
-		header( "Cache-Control: must-revalidate, post-check=0, pre-check=0\n" );
-		header( "Content-Type: " . $this->get_attribute( "DOC_MIME_TYPE" ) . "\n");
-		header( "Content-Disposition: attachment; filename=\"" . $this->get_name() . "\"\n" );
-		header( "Content-Length: " . $this->get_content_size() . "\n");
-		//return data
-		return $buffer;
+	public function download() {		
+		$download = new DirectDownload();
+		
+		$document->attributes["mimetype"]		= $this->get_attribute("DOC_MIME_TYPE");
+		$document->attributes["lastmodified"]	= $this->get_attribute("DOC_LAST_MODIFIED");
+		$document->attributes["name"]			= $this->get_name();
+		$document->attributes["contentsize"]	= $this->get_content_size();
+		
+		$download->document = $this;
+		
+		$download->download();
 	}
 
 	/**
@@ -75,7 +52,7 @@ class steam_document extends steam_object
 	 */
 	public function get_reader( $pBuffer = 0 )
 	{
-		$module_read_doc = $this->get_steam_connector()->get__module( "table:read_documents" );
+		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
 		return $this->steam_command(
 		$module_read_doc,
 			"get_reader",
@@ -110,16 +87,30 @@ class steam_document extends steam_object
 	 * Sets the content of this document
 	 * @param string $pContent document's content
 	 * @param Boolean $pBuffer send now or buffer request?
+         * @param int $persistence_type
 	 * @return boolean TRUE|FALSE
 	 */
-	public function set_content( $pContent, $pBuffer = 0 )
+	public function set_content( $pContent, $pBuffer = 0 , $persistence_type = false)
 	{
-		return $this->steam_command(
-		$this,
-			"set_content",
-		array( $pContent ),
-		$pBuffer
-		);
+            if($persistence_type === false){
+                $persistence_type = DEFAULT_FILESYTEM_PERSISTENCE_TYPE;
+            } 
+
+            $persistence = PersistenceFactory::getInstance()->create_file_persistence($persistence_type);
+			
+            $uuid = $persistence->save($this, $pContent);
+
+            if(($persistence_type != PERSISTENCE_STEAM) && $uuid){
+                $this->steam_command(
+                        $this,
+                        "set_content",
+                        array( $uuid ),
+                        0
+                );
+                $this->set_attribute(DOC_PERSISTENCE_TYPE, $persistence_type);
+            } else {
+                return false;
+            }
 	}
 
 	/**
@@ -137,21 +128,14 @@ class steam_document extends steam_object
 	 */
 	public function get_content_size( $pBuffer = 0 )
 	{
-		$result = $this->steam_command(
-		$this,
-			"get_content_size",
-		array(),
-		$pBuffer
-		);
-		if ( $pBuffer == 0 )
-		{
-			$this->attributes[ "DOC_SIZE" ] = $result;
-		}
-		return $result;
+		$persistence_type = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+
+		$persistence = PersistenceFactory::getInstance()->create_file_persistence($persistence_type);
+		return $persistence->get_file_size($this, $pBuffer);
 	}
 
 	/**
-	 * function get_content_size:
+	 * function get_content_id:
 	 *
 	 * This function returns the content id
 	 *Example:
@@ -192,15 +176,35 @@ class steam_document extends steam_object
 	 * @return String content of the document
 	 *
 	 */
-	public function get_content( $pBuffer = 0 )
+	public function get_content( $pBuffer = 0 , $loadSteamContent = false)
 	{
-		return $this->steam_command(
-		$this,
-			"get_content",
-		array(),
-		$pBuffer
-		);
+            if($loadSteamContent) {
+                return $this->steam_command(
+                        $this,
+                        "get_content",
+                        array(),
+                        $pBuffer
+                );
+            } else {
+                $persistence_type = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+
+                $persistence = PersistenceFactory::getInstance()->create_file_persistence($persistence_type);
+                return $persistence->load($this);
+            }
 	}
+	
+	public function delete($pBuffer = 0 )
+	{
+		$persistence_type = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+
+		$persistence = PersistenceFactory::getInstance()->create_file_persistence($persistence_type);
+		$persistence->delete($this);
+			
+		parent::delete(0);
+			
+	}
+
+
 
 	/**
 	 * function delete_thumbnail:

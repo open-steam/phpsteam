@@ -43,6 +43,24 @@ require_once( "steam_attributes.conf.php" );
  */
 class steam_factory
 {
+    private static $objectCache = array();
+	private static $userLookupCache = array();
+	private static $groupLookupCache = array();
+	private static $pathLookupCache = array();
+
+    private static $instance;
+
+    private function __construct() {
+
+    }
+
+    public static function get_instance() {
+        if (!self::$instance) {
+             self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
 	/**
 	 * function get_object:
 	 *
@@ -60,10 +78,24 @@ class steam_factory
 	 */
 	public static function get_object( $pSteamConnectorID, $pID = 0, $pType = FALSE )
 	{
+		if (intval($pID) <= 0) { return 0; }
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
+		
+		$globalID = $pID . ":" . $pSteamConnectorID;
+		if (LOW_API_CACHE && isset(self::$objectCache[$globalID])) {
+			$object = self::$objectCache[$globalID];
+			if ($pType !== FALSE) {
+				if (($object->get_type() & $pType)) {
+					//error_log("wrong object type. expected $pType got {$object->get_type()} (id: {$pID})");
+					//throw new Exception("wrong object type. expected $pType got {$object->get_type()} (id: {$pID})");
+					return $object;
+				}
+			}
+		}
+		
 		if ( $pType === FALSE )
 		{
-			$obj = new steam_object( $pSteamConnectorID, $pID );
+			$obj = new steam_object(self::get_instance(), $pSteamConnectorID, $pID);
 			$pType = steam_connection::get_instance($pSteamConnectorID)->predefined_command(
 			$obj,
 				"get_object_class",
@@ -74,52 +106,82 @@ class steam_factory
 		switch( TRUE )
 		{
 			case ( ( $pType  & CLASS_USER )  == CLASS_USER ):
-				$obj = new steam_user( $pSteamConnectorID, $pID );
+				$obj = new steam_user( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_GROUP ) == CLASS_GROUP ):
-				$obj = new steam_group( $pSteamConnectorID, $pID );
+				$obj = new steam_group( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_CALENDAR ) == CLASS_CALENDAR ):
-				$obj = new steam_calendar( $pSteamConnectorID, $pID );
+				$obj = new steam_calendar( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_ROOM ) == CLASS_ROOM ):
-				$obj = new steam_room( $pSteamConnectorID, $pID );
+				$obj = new steam_room( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_TRASHBIN ) == CLASS_TRASHBIN ):
-				$obj = new steam_trashbin( $pSteamConnectorID, $pID );
+				$obj = new steam_trashbin( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType  & CLASS_CONTAINER ) == CLASS_CONTAINER ):
-				$obj = new steam_container( $pSteamConnectorID, $pID );
+				$obj = new steam_container( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_EXIT ) == CLASS_EXIT ):
-				$obj = new steam_exit( $pSteamConnectorID, $pID );
+				$obj = new steam_exit( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_DOCEXTERN ) == CLASS_DOCEXTERN ):
-				$obj = new steam_docextern( $pSteamConnectorID, $pID );
+				$obj = new steam_docextern( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_LINK ) == CLASS_LINK ):
-				$obj = new steam_link( $pSteamConnectorID, $pID );
+				$obj = new steam_link( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_DOCWIKI ) == CLASS_DOCWIKI ):
-				$obj = new steam_wiki( $pSteamConnectorID, $pID );
+				$obj = new steam_wiki( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_DOCUMENT ) == CLASS_DOCUMENT ):
-				$obj = new steam_document( $pSteamConnectorID, $pID );
+				$obj = new steam_document( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ($pType & CLASS_DATE ) == CLASS_DATE ):
-				$obj = new steam_date( $pSteamConnectorID, $pID );
+				$obj = new steam_date( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_MESSAGEBOARD ) == CLASS_MESSAGEBOARD ):
-				$obj = new steam_messageboard( $pSteamConnectorID, $pID );
+				$obj = new steam_messageboard( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
 			case ( ( $pType & CLASS_SCRIPT ) == CLASS_SCRIPT ):
-				$obj = new steam_script( $pSteamConnectorID, $pID );
+				$obj = new steam_script( self::get_instance(), $pSteamConnectorID, $pID );
 				break;
+			case ( ( $pType & CLASS_DATABASE ) == CLASS_DATABASE ):
+				$obj = new steam_database( self::get_instance(), $pSteamConnectorID, $pID );
+				break;
+                        case ($pType === 0):
+                                $obj = null;
+                                break;
 			default:
-				$obj = new steam_object( $pSteamConnectorID, $pID, $pType );
+				$obj = new steam_object( self::get_instance(), $pSteamConnectorID, $pID, $pType );
 				break;
 		}
+		//cache in
+                if ($obj) {
+                    self::$objectCache[$globalID] = $obj;
+                }
 		return $obj;
+	}
+	
+	public static function prefetch($pSteamConnectorID, $pObject, $pIventory = false, $pDepanding = false, $pBuffer = 0) {
+		$clientSupport = steam_connection::get_instance($pSteamConnectorID)->get_module("package:clientsupport");
+		if (is_object($clientSupport)) {
+			$objectData = $GLOBALS['STEAM']->predefined_command($clientSupport, "query_object_data", array($pObject, $pIventory, $pDepanding), $pBuffer);
+			$objects = $objectData["objects"];
+			foreach ($objects as $id => $object) {
+				(!API_DEBUG) or error_log("prefetched: " . $id);
+				$steam_object = self::get_object($pSteamConnectorID, $id, $object["object_class"]);
+				$steam_object->set_values($object["attributes"]);
+				$steam_object->set_prefetched();
+				(!API_DEBUG) or error_log(count($steam_object->get_values(), true));
+				if ($steam_object instanceof steam_user) {
+					self::setUserCache($object["attributes"]["OBJ_NAME"],$steam_object);
+				} else if ($steam_object instanceof steam_group) {
+					self::setGroupCache($object["attributes"]["OBJ_NAME"],$steam_object);
+				}
+			}
+		}
 	}
 
 	/**
@@ -135,7 +197,7 @@ class steam_factory
 	{
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 		return steam_connector::get_instance($pSteamConnectorID)->predefined_command(
-		steam_connector::get_instance($pSteamConnectorID)->get_module( "filepath:tree" ),
+		steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"),
 				"path_to_object",
 		array( $pPath ),
 		$pBuffer
@@ -183,15 +245,24 @@ class steam_factory
 	 * @param Boolean $pBuffer Send now or buffer request?
 	 * @return steam_user the user object
 	 */
-	public static function username_to_object( $pSteamConnectorID, $pUserName,  $pBuffer = 0)
+	public static function username_to_object($pSteamConnectorID, $pUserName, $pBuffer = 0)
 	{
+		$globalUserName = $pUserName . ":" . $pSteamConnectorID;
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		return steam_connector::get_instance($pSteamConnectorID)->predefined_command(
-		steam_connector::get_instance($pSteamConnectorID)->get_module( "users" ),
-				"lookup",
-		array( $pUserName ),
-		$pBuffer
-		);
+		if (!isset(self::$userLookupCache[$globalUserName])) {
+			$result = steam_connector::get_instance($pSteamConnectorID)->predefined_command(
+										steam_connector::get_instance($pSteamConnectorID)->get_module("users"),
+												"lookup",
+										array( $pUserName ),
+										$pBuffer
+					   );
+			if ($result instanceof steam_user) {
+				self::$userLookupCache[$globalUserName] = $result;
+			}
+		} else {
+			$result = self::$userLookupCache[$globalUserName];
+		}
+		return $result;
 	}
 
 	/**
@@ -219,15 +290,23 @@ class steam_factory
 	 *
 	 *@return
 	 */
-	public static function groupname_to_object( $pSteamConnectorID, $pGroupName,   $pBuffer = 0 )
-	{
+	public static function groupname_to_object( $pSteamConnectorID, $pGroupName, $pBuffer = 0 ) {
+		$globalGroupName = $pGroupName . ":" . $pSteamConnectorID;
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		return steam_connector::get_instance($pSteamConnectorID)->predefined_command(
-		steam_connector::get_instance($pSteamConnectorID)->get_module( "groups" ),
-				"lookup",
-		array( $pGroupName ),
-		$pBuffer
-		);
+		if (!isset(self::$groupLookupCache[$globalGroupName])) {
+			$result = steam_connector::get_instance($pSteamConnectorID)->predefined_command(
+								steam_connector::get_instance($pSteamConnectorID)->get_module( "groups" ),
+										"lookup",
+								array( $pGroupName ),
+								$pBuffer
+					   );
+			if ($result instanceof steam_group) {
+				self::$groupLookupCache[$globalGroupName] = $result;
+			}
+		} else {
+			$result = self::$groupLookupCache[$globalGroupName];
+		}
+		return $result;
 	}
 
 	/**
@@ -395,6 +474,7 @@ class steam_factory
 	public static function create_group( $pSteamConnectorID, $pName, $pParentGroup, $pEnvironment = FALSE, $pDescription = "" )
 	{
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
+		$pParentGroup->drop_subGroupsLookupCache();
 		return steam_factory::create_object(
 		$pSteamConnectorID,
 		$pName,
@@ -475,7 +555,7 @@ class steam_factory
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 		$modules = steam_connector::get_instance($pSteamConnectorID)->get_login_data()->get_arguments();
 		$steam_factory = $modules[ 9 ][ CLASS_LINK ];
-		if ( $pObject->get_type() & CLASS_LINK == CLASS_LINK )
+		if (($pObject->get_type() & CLASS_LINK) == CLASS_LINK)
 		{
 			$pObject = $pObject->get_source_object();
 		}
@@ -496,9 +576,9 @@ class steam_factory
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 		$modules = steam_connector::get_instance($pSteamConnectorID)->get_login_data()->get_arguments();
 		$steam_factory = $modules[ 9 ][ CLASS_EXIT ];
-		if ( $pObject->get_type() & CLASS_EXIT == CLASS_EXIT )
+		if (($pObject->get_type() & CLASS_EXIT) == CLASS_EXIT )
 		{
-			$pObject = $pObject->get_source_object();
+			$pObject = $pObject->get_exit();
 		}
 		$obj = steam_connector::get_instance($pSteamConnectorID)->predefined_command(
 		$steam_factory,
@@ -595,8 +675,12 @@ class steam_factory
 	 * @param steam_container $pEnvironment room or container where the document should be created
 	 * @return steam_document
 	 */
-	public static function create_document( $pSteamConnectorID, $pName, $pContent, $pMimeType, $pEnvironment = FALSE, $pDescription = "" )
+	public static function create_document( $pSteamConnectorID, $pName, $pContent, $pMimeType, $pEnvironment = FALSE, $pDescription = "" , $persistence_type =false)
 	{
+                /*if(ENABLE_FILESYTEM_PERSISTENCE && (DEFAULT_STEAM_DATA_PROVIDER !== PERSISTENCE_STEAM)){
+                    $pMimeType =  MimetypeHelper::get_instance()->getMimeType($pName);
+                }*/
+
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 		$textdoc = steam_factory::create_object(
 		$pSteamConnectorID,
@@ -606,7 +690,14 @@ class steam_factory
 		array( "mimetype" => $pMimeType,
 				     "attributes" => array(OBJ_DESC => $pDescription) )
 		);
-		$textdoc->set_content( $pContent );
+                
+                if($persistence_type !== false){
+                    
+                    $textdoc->set_content( $pContent,0, $persistence_type );
+                } else {
+                    $textdoc->set_content( $pContent );
+                }
+		
 		return $textdoc;
 	}
 	/**
@@ -721,6 +812,14 @@ class steam_factory
 		{
 			return FALSE;
 		}
+	}
+	
+	public static function setUserCache($userName, $steam_user) {
+		self::$userLookupCache[$userName] = $steam_user;
+	}
+	
+	public static function setGroupCache($groupName, $steam_group) {
+		self::$groupLookupCache[$groupName] = $steam_group;
 	}
 }
 

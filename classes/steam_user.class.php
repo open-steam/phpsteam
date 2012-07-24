@@ -36,28 +36,156 @@ class steam_user extends steam_container
 {
 
 	private $rucksack_current_folder;
-
-	/**
-	 * Initialization of steam_user. The arguments are stored
-	 * as class variables.
-	 *
-	 * @param steam_connector $pSteamConnector The connection to a sTeam-server
-	 * @param integer $pID unique object ID inside the virtual space (optional)
-	 */
-
-	public function __construct( $pSteamConnectorID, $pID = "0" )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_USER;
-		$this->rucksack_set_current_folder();
+	
+	public function get_type() {
+		return CLASS_USER | CLASS_CONTAINER | CLASS_OBJECT;
 	}
 
-	public function get_full_name( ) {
+	public function decline_contact_request($contact_id){
+		//Remove from USER_CONTACTS_TOCONFIRM
+		$unconfirmed = $this->get_attribute("USER_CONTACTS_TOCONFIRM");
+		if(!is_array($unconfirmed)) $unconfirmed = array();
+		$found = FALSE;
+		$s = count($unconfirmed);
+		for($i =0;$i< $s; $i++){
+			$tc = $unconfirmed[$i];
+			if($tc->get_id() == $contact_id){
+				$found = TRUE;
+				unset($unconfirmed[$i]);
+			}
+		}
+		if($found){
+			$unconfirmed_old = array_values($unconfirmed);
+			$this->set_attribute("USER_CONTACTS_TOCONFIRM", $unconfirmed);
+		}
+	}
+
+	public function remove_contact($contact_id){
+		$confirmed_contacts = $this->get_attribute( "USER_CONTACTS_CONFIRMED" );
+		$user_favourites = $this->get_attribute( "USER_FAVOURITES" );
+		if(!is_array($confirmed_contacts)) $confirmed_contacts = array();
+		if(!is_array($user_favourites))$user_favourites = array();
+
+		//REMOVE from USER_CONTACTS_CONFIREMD
+		unset($confirmed_contacts[$contact_id]);
+		$confirmed_contacts["_OBJECT_KEYS"] = "TRUE";
+		$this->set_attribute("USER_CONTACTS_CONFIRMED", $confirmed_contacts);
+
+		//REMOVE from USER_FAVOURITES
+		$found = FALSE;
+		$s = count($user_favourites);
+		$my_id = $this->get_id();
+		for($i =0;$i< $s; $i++){
+			$tc = $user_favourites[$i];
+			if($tc instanceof steam_user && $tc->get_id() == $contact_id){
+				$found = TRUE;
+				unset($user_favourites[$i]);
+			}
+		}
+		if($found){
+			$user_favourites = array_values($user_favourites);
+			$this->set_attribute("USER_FAVOURITES", $user_favourites);
+		}
+	}
+
+	public function add_contact($contact_id){
+		$admin_steam = steam_connector::connect(STEAM_SERVER, STEAM_PORT, STEAM_ROOT_LOGIN, STEAM_ROOT_PW);
+		$contact = steam_factory::get_object( $admin_steam->get_id(), $contact_id, CLASS_USER );
+
+		//The user you are sending a request to is immediatly your contact
+		$this->add_confirmed_contact($contact_id, $admin_steam);
+
+		//This user have to be confirmed befor he is a also a conntact
+		//of the target user
+
+		$contact->add_unconfirmed_contact($this->get_id(), $admin_steam);
+		//$admin_steam->disconnect();
+	}
+
+	/**
+	 * Add an unconfirmed contact.
+	 *
+	 * @param integer $contact_id the ID of the contact that should be added
+	 */
+	public function add_unconfirmed_contact($contact_id, $steam_connector = null){
+		if(!isset($steam_connector)) $steam_connector = $GLOBALS["STEAM"];
+		$unconfirmed_old = $this->get_attribute("USER_CONTACTS_TOCONFIRM");
+		if(!is_array($unconfirmed_old)) $unconfirmed_old = array();
+		$contact = steam_factory::get_object($steam_connector->get_id(), $contact_id, CLASS_USER );
+		//Registry::get('logger')->info($this->get_name()." add " . $contact->get_name(). " to unconfirmed contacts.");
+
+
+		$unconfirmed_new = $unconfirmed_old;
+		$unconfirmed_new[] = $contact;
+
+
+		$this->set_attribute("USER_CONTACTS_TOCONFIRM", $unconfirmed_new);
+	}
+
+	/**
+	 * Add an confirmed contact. If contact was unconfirmed, removes contact from the "unconfirmed"-list.
+	 *
+	 * @param integer $contact_id the ID of the contact that should be added
+	 */
+	public function add_confirmed_contact($contact_id, $steam_connector = null){
+
+		if(!isset($steam_connector)) $steam_connector = $GLOBALS["STEAM"];
+		$confirmed_old = $this->get_attribute("USER_CONTACTS_CONFIRMED");
+		$favourites_old = $this->get_attribute("USER_FAVOURITES");
+		$to_confirm = $this->get_attribute("USER_CONTACTS_TOCONFIRM");
+		$contact = steam_factory::get_object( $steam_connector->get_id(), $contact_id, CLASS_USER );
+		//Registry::get('logger')->info($this->get_name()." add " . $contact->get_name(). " to confirmed contacts.");
+
+		if(!is_array($confirmed_old)) $confirmed_old = array();
+		if(!is_array($favourites_old)) $favourites_old = array();
+		if(!is_array($to_confirm)) $to_confirm = array();
+
+		$contact = steam_factory::get_object( $steam_connector->get_id(), $contact_id, CLASS_USER );
+
+		//check if attribute 'user_contacts_toconfirm' contains the contact
+		//if contact is in the "user_contacts_toconfirm"-list
+		//	remove the contacts from the list and add the contact to
+		//	USER_CONTACTS_CONFIRMED
+		$found = FALSE;//array_search($contact, $to_confirm);
+		$s = count($to_confirm);
+		for($i =0;$i< $s; $i++){
+			$tc = $to_confirm[$i];
+			if($tc->get_id() == $contact->get_id()){
+				$found = TRUE;
+				unset($to_confirm[$i]);
+			}
+		}
+		if($found){
+			$to_confirm = array_values($to_confirm);
+			$this->set_attribute("USER_CONTACTS_TOCONFIRM", $to_confirm);
+		}
+
+
+		$confirmed_new = $confirmed_old;
+
+		//Ugly! Used because of backwards compatibility
+		$confirmed_new[$contact->get_id()] = 1;
+		$confirmed_new["_OBJECT_KEYS"] = "TRUE";
+
+		$this->set_attribute("USER_CONTACTS_CONFIRMED", $confirmed_new);
+
+		//Backward compatibility: Also add contact to favourites
+		$favourites_new = $favourites_old;
+		$favourites_new[] = $contact;
+		$this->set_attribute("USER_FAVOURITES", $favourites_new);
+	}
+
+
+	public function get_full_name($reverse = false) {
 		$fullname = $this->get_attribute( "USER_FULLNAME");
 		$firstname = $this->get_attribute( "USER_FIRSTNAME");
-		if ( !is_string( $firstname ) ) return $fullname;
-		else return $firstname . " " . $fullname;
+		if (!is_string($firstname)) {
+                    return $fullname;
+                } else if ($reverse) {
+                    return $fullname . ", " . $firstname;
+                } else {
+                    return $firstname . " " . $fullname;
+                }
 	}
 
 	/**
@@ -605,12 +733,14 @@ class steam_user extends steam_container
 
 	public function get_buddies( $pBuffer = 0 )
 	{
-		return $this->get_attribute( "USER_FAVOURITES", $pBuffer );
+		return $this->get_confirmed_contacts();
 	}
 
 	public function is_buddy( $pUser )
 	{
+		//Registry::get('logger')->info("-----is-buddy----");
 		$buddies = $this->get_buddies();
+		$is_buddy = FALSE;
 		if ( ! is_array( $buddies ) )
 		{
 			$buddies = array();
@@ -621,13 +751,28 @@ class steam_user extends steam_container
 			{
 				continue;
 			}
-			if ( $buddy->get_id() == $pUser->get_id() )
-			return TRUE;
+			if ( $buddy->get_id() == $pUser->get_id() ){
+				$is_buddy = TRUE;
+				break;
+			}
 		}
-		return FALSE;
+		/*
+		if($is_buddy){
+			Registry::get('logger')->info("User: ". $pUser->get_name(). " is buddy of: ".$this->get_name());
+		}
+		else{
+			Registry::get('logger')->info("User: ". $pUser->get_name(). " is NOT buddy of: ".$this->get_name());
+		}
+		Registry::get('logger')->info("END--is-buddy----");*/
+		return $is_buddy;
 	}
+
+	/**
+	 * @deprecated
+	 */
 	public function contact_confirm()
 	{
+		trigger_error("Deprecated function called.", E_USER_NOTICE);
 		return $this->steam_command(
 		$this,
 			"confirm_contact",
@@ -638,48 +783,75 @@ class steam_user extends steam_container
 
 	public function contact_is_confirmed( $pUser )
 	{
-		$contacts_confirmed = $this->get_confirmed_contacts();
-		return array_key_exists(
-		$pUser->get_id(),
-		$contacts_confirmed
-		);
+		//Registry::get('logger')->info("-----contact-is-confirmed-----");
+		$conf_contacts = $this->get_confirmed_contacts();
+		$is_confirmed = false;
+
+		foreach($conf_contacts as $cc){
+			if($cc->get_id()== $pUser->get_id()) {
+				$is_confirmed = true;
+				break;
+			}
+		}
+		//Registry::get('logger')->info("User: ". $this->get_name(). " has confirmed: ".$pUser->get_name());
+		//Registry::get('logger')->info("END--contact-is-confirmed-----");
+		return $is_confirmed;
 	}
 
 	public function get_confirmed_contacts()
 	{
-		$result = $this->get_attribute( "USER_CONTACTS_CONFIRMED" );
-		if ( ! is_array( $result ) )
-		{
-			$result = array();
+		//Workaround because of inconsistent data - some users are in confirmed and also in unconfirmed
+		$confirmed_contacts = $this->get_attribute( "USER_CONTACTS_CONFIRMED" );
+		$user_favourites_obj = $this->get_attribute( "USER_FAVOURITES" );
+		$user_toconfirm_obj = $this->get_attribute( "USER_CONTACTS_TOCONFIRM" );
+		$user_favourites_ids = array();
+		$user_toconfirm_ids = array();
+		$buddies = array();
+
+		//Get ids
+		if(is_array($user_favourites_obj))
+		foreach($user_favourites_obj as $ufo){
+			if ($ufo instanceof steam_user) {
+				$user_favourites_ids[] =  $ufo->get_id();
+			}
 		}
-		if ( array_key_exists( 0, $result ) )
-		{
-			// CONFIRMED CONTACT HAS BEEN DELETED FROM SYSTEM
-			unset( $result[ 0 ] );
-			$result["_OBJECT_KEYS"] = "TRUE";
-			$this->set_attribute( "USER_CONTACTS_CONFIRMED", $result );
+
+		//Get ids
+		if(is_array($user_toconfirm_obj))
+		foreach($user_toconfirm_obj as $utco){
+			$user_toconfirm_ids[] =  $utco->get_id();
 		}
-		return $result;
+
+		$buddie_ids = array();
+		if(is_array($confirmed_contacts))
+		{
+			$buddie_ids += array_keys($confirmed_contacts);
+		}
+		$buddie_ids = array_unique(array_merge ($user_favourites_ids, $buddie_ids));
+		
+
+		$c = array_diff($buddie_ids, $user_toconfirm_ids);
+		$buddie_ids = array_intersect($c, $buddie_ids);
+
+
+		foreach($buddie_ids as $buddy_id)
+		{
+			if ( steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP) instanceof STEAM_USER || steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP) instanceof STEAM_GROUP )
+			{
+				$buddies[] = steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP);
+			}
+		}
+
+		//Registry::get('logger')->info("Picked buddies: ".print_r($buddie_ids, true));
+
+		return $buddies;
 	}
 
 	public function get_unconfirmed_contacts()
 	{
-		$contacts_confirmed = $this->get_confirmed_contacts();
-		$buddies = $this->get_buddies();
-		$ids_confirmed = array_keys( $contacts_confirmed );
-		foreach( $buddies as $buddy )
-		{
-			if ( $buddy instanceof steam_user )
-			$ids_buddies[] = $buddy->get_id();
-		}
-		if ( empty( $ids_buddies ) || ! is_array( $ids_buddies ) )
-		$ids_unconfirmed = $ids_confirmed;
-		else
-		$ids_unconfirmed = array_diff( $ids_confirmed, $ids_buddies );
-		$contacts_unconfirmed = array();
-		foreach( $ids_unconfirmed as $id )
-		$contacts_unconfirmed[] = steam_factory::get_object( $this->steam_connectorID, $id, CLASS_USER );
-		return $contacts_unconfirmed;
+		$user_toconfirm_obj = $this->get_attribute( "USER_CONTACTS_TOCONFIRM" );
+		if(!is_array($user_toconfirm_obj)) $user_toconfirm_obj = array();
+		return $user_toconfirm_obj;
 	}
 
 	/**

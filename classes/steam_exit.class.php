@@ -17,20 +17,11 @@
  */
 class steam_exit extends steam_link
 {
-
-	/**
-	 * constructor of steam_exit:
-	 *
-	 * @param $pID
-	 * @param $pSteamConnector
-	 */
-	public function __construct($pSteamConnectorID, $pID = "0")
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct($pSteamConnectorID, $pID);
-		$this->type = CLASS_EXIT;
+	
+	public function get_type() {
+		return CLASS_EXIT | CLASS_LINK | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function get_exit:
 	 *

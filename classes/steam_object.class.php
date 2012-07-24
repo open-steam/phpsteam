@@ -47,7 +47,7 @@ class steam_object implements Serializable {
 	 * in sTeam. This array is filled, each time the get_attributes() method
 	 * delivers new values for this object from sTeam.
 	 */
-	protected $attributes = array();
+	public $attributes = array();
 
 	/**
 	 * Array of additional values, where some additional information may be
@@ -58,6 +58,9 @@ class steam_object implements Serializable {
 	 */
 	protected $additional = array();
 
+	
+	private $prefetched = false;
+	
 	/**
 	 * ID of steam_connector. Connection to sTeam-server
 	 */
@@ -70,14 +73,23 @@ class steam_object implements Serializable {
 	 * @param steam_connector $pSteamConnector The connection to a sTeam-server
 	 * @param integer $pID unique object ID inside the virtual space (optional)
 	 */
-	public function __construct( $pSteamConnectorID, $pID = "0", $pType = CLASS_OBJECT )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException( "pSteamConnectorID", "string" );
-		$this->id 	= $pID;
-		$this->steam_connectorID = $pSteamConnectorID;
-		$this->type = $pType;
+	public function __construct($steamFactory, $steamConnectorId, $id) {
+        if (!($steamFactory instanceof steam_factory)) {
+            error_log("phpsteam error: only steam_factory is allowed to call");
+            throw new Exception("phpsteam error: only steam_factory is allowed to call");
+        }
+		$this->id = (int) $id;
+		$this->steam_connectorID = $steamConnectorId;
+	}
+	
+	public function get_type() {
+		return CLASS_OBJECT;
 	}
 
+	public function __toString() {
+		return "#" . $this->get_id();
+	}
+	
 	/**
 	 * function get_id:
 	 *
@@ -89,35 +101,14 @@ class steam_object implements Serializable {
 		return $this->id;
 	}
 
-	/**
-	 * function get_type:
-	 *
-	 * Returns the object's type as a single CLASS_* constant.
-	 * Note that this function only returns the single major
-	 * CLASS_* constant that best defines this object's type, while
-	 * get_object_class() will return the complete bitmask of
-	 * CLASS_* constants for this object.
-	 *
-	 * @see steam_types.conf.php, $type
-	 * @see get_object_class
-	 *
-	 * @return int major CLASS_* constant for type definition
-	 */
-	public function get_type()
-	{
-		return $this->type;
-
-	}
-
 	public function serialize() {
-		return serialize(array($this->id, $this->type, $this->steam_connectorID));
+		return serialize(array($this->id, $this->steam_connectorID));
 	}
 		
 	public function unserialize($data) {
 		$values = unserialize($data);
 		$this->id = $values[0];
-		$this->type = $values[1];
-		$this->steam_connectorID = $values[2];
+		$this->steam_connectorID = $values[1];
 	}
 
 	/**
@@ -187,7 +178,8 @@ class steam_object implements Serializable {
 				if ( $pFollowLinks && ( ( CLASS_LINK & $this->get_type() ) == CLASS_LINK ) )
 				{
 					$object = $this->get_source_object();
-					$source_id = $object->get_id();				                        }
+					$source_id = $object->get_id();				                        
+				}
 					else {
 						$object = $this;
 						$source_id = 0;
@@ -277,6 +269,7 @@ class steam_object implements Serializable {
 	public function get_attribute( $pAttribute, $pBuffer = FALSE)
 	{
 		if ($pBuffer) {
+			(!API_DEBUG) or error_log("query_attribute with buffer");
 			$value = $this->steam_command($this, "query_attribute", array( $pAttribute ), $pBuffer);
 			if (is_string($value)) {
 				$value = strip_tags($value);
@@ -284,10 +277,11 @@ class steam_object implements Serializable {
 			return $value;
 		}
 		else {
-			if (!array_key_exists( $pAttribute, $this->attributes)){
+			if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])){
+				(!API_DEBUG) or error_log("query_attribute without buffer");
 				$this->attributes[ $pAttribute ] = $this->steam_command($this, "query_attribute", array( $pAttribute ), 0);
 			}
-			$value = $this->attributes[ $pAttribute ];
+			$value = isset($this->attributes[$pAttribute]) ? $this->attributes[$pAttribute] : 0;
 			if (is_string($value)) {
 				$value = strip_tags($value);
 			}
@@ -311,7 +305,11 @@ class steam_object implements Serializable {
 	 * @return  array with the attribute names
 	 */
 	public function get_attribute_names($pBuffer = 0){
-		$result = $this->steam_command($this, "get_attribute_names", array(), $pBuffer);
+		if ($this->is_prefetched()) {
+			$result = array_keys($this->attributes);
+		} else {
+			$result = $this->steam_command($this, "get_attribute_names", array(), $pBuffer);
+		}
 		return $result;
 	}
 
@@ -383,6 +381,7 @@ class steam_object implements Serializable {
 
 	/**
 	 *function get_steam_connector:
+     * @return steam_connector
 	 *
 	 */
 	public function get_steam_connector(){
@@ -399,6 +398,30 @@ class steam_object implements Serializable {
 	 */
 	public function unlock_attribute($pKey, $pBuffer = 0){
 		return $this->steam_command($this,"unlock_attribute",array((string) $pKey), $pBuffer);
+	}
+	
+	/**
+	 *function lock_attribute:
+	 *
+	 * @param $pKey
+	 * @param $pBuffer
+	 *
+	 * @return
+	 */
+	public function lock_attribute($pKey, $pBuffer = 0){
+		return $this->steam_command($this,"lock_attribute",array((string) $pKey), $pBuffer);
+	}
+	
+	/**
+	 *function is_locked:
+	 *
+	 * @param $pKey
+	 * @param $pBuffer
+	 *
+	 * @return
+	 */
+	public function is_locked($pKey, $pBuffer = 0){
+		return $this->steam_command($this,"is_locked",array((string) $pKey), $pBuffer);
 	}
 
 	/**
@@ -448,7 +471,7 @@ class steam_object implements Serializable {
 	 */
 	public function delete_attribute( $pAttribute, $pBuffer = 0 )
 	{
-		$this->attributes[ $pAttribute ] = "";
+		unset($this->attributes[$pAttribute]);
 		return $this->steam_command(
 		$this,
 																"set_attribute",
@@ -502,7 +525,7 @@ class steam_object implements Serializable {
 	 * @return $pValues
 	 *
 	 */
-	public function get_values( $pValues )
+	public function get_values()
 	{
 		return $this->attributes;
 	}
@@ -560,7 +583,7 @@ class steam_object implements Serializable {
 	 * @param boolean $pBuffer 0 = send now, 1 = buffer command and send later
 	 * @return steam_request | integer Depending on the buffer argument either a steam_request instance or a unique transaction id is given back
 	 */
-	protected function steam_command( $pObject, $pMethod, $pArgs, $pBuffer = 0 )
+	public function steam_command( $pObject, $pMethod, $pArgs, $pBuffer = 0 )
 	{
 
 		return $this->get_steam_connector()->predefined_command(
@@ -1309,6 +1332,14 @@ class steam_object implements Serializable {
 		array( ),
 		$pBuffer
 		);
+	}
+	
+	public function is_prefetched() {
+		return $this->prefetched;
+	}
+	
+	public function set_prefetched() {
+		$this->prefetched = true;
 	}
 }
 ?>

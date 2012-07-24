@@ -33,10 +33,9 @@ require_once( "steam_factory.class.php" );
  * Insofar, an object of steam_connector can be seen as the key to
  * access all other steam_objects. PHPsTeam is so easy like this:
  * <code>
- * $steam = new steam_connector( 
+ * $steam = steam_connector::connect( 
  * 		"steam.open-steam.org", 
- *		1900,  
- "aroth", 
+ *		1900, "aroth", 
  *		"secret_pw"
  *	);
  * $me = $steam->get_current_steam_user();
@@ -55,9 +54,7 @@ class steam_connector_lite extends steam_connector
 	 * Arguments are all optional. If arguments are given, steam_connector
 	 * tries to connect to the defined sTeam-server.
 	 * Examples:
-	 * - <code>$steam = new steam_connector( "steam.upb.de", 1900, "aroth", "secret" );</code>
-	 * - <code>$steam = new steam_connector( "192.168.104.100", 1900 );</code>
-	 * - <code>$steam = new steam_connector();</code>
+	 * - <code>$steam = steam_connector::connect( "steam.upb.de", 1900, "aroth", "secret" );</code>
 	 *
 	 * @param string  $pServerIP	IP or hostname of a sTeam-server
 	 * @param integer $pServerPort	server's port for COAL-protocol

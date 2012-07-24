@@ -9,5 +9,5 @@
  * @author Dominik Niehus <nicke@upb.de>
  */
 
-	define( "PHPSTEAM_VERSION", "3.1.1" );
+	define( "PHPSTEAM_VERSION", "3.1.4" );
 ?>

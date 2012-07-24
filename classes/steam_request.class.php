@@ -244,7 +244,7 @@ class steam_request
 		return $this->arguments;
 	} //function decode($command)
 
-	function mybin2dec($str) {
+	function mybin2dec($str) {		
 		$result = 0;
 		$pos = true;
 		if (($str[0] & chr(pow(2,7))) == chr(pow(2,7))) {
@@ -269,6 +269,8 @@ class steam_request
 				}
 			}
 		}
+		
+
 		return $result;
 	}
 
@@ -335,7 +337,7 @@ class steam_request
 					$value = $this->decode_data($command);
 
 					if(is_object($key))
-					$newdata[$key->get_id()] = $value;
+					$newdata[$key->get_id()] = $value; //TODO: $newdata[(string)$key] = $value;
 					else if(is_array($key))
 					$newdata[] = $value;
 					else
@@ -354,6 +356,7 @@ class steam_request
 				$length = hexdec(bin2hex(substr($command, 1, 4)));
 				$fname = substr($command, 13, $length-8);
 				$newdata = new steam_function( $fname );
+				$command = substr($command, 5 + $length);
 				break;
 			default:
 				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "COAL support in PHP not yet implemented for object type=" . $typ . " command=" . $command, 120 );

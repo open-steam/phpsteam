@@ -21,19 +21,10 @@ class steam_messageboard extends steam_object
 	private $current_thread;
 	private $current_article;
 
-	/**
-	 * constructor of steam_messageboard:
-	 *
-	 * @param $pSteamConnector
-	 * @param $pID
-	 */
-	public function __construct( $pSteamConnectorID, $pID = 0 )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_MESSAGEBOARD;
+	public function get_type() {
+		return CLASS_MESSAGEBOARD | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function create_entry:
 	 *

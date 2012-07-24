@@ -17,20 +17,13 @@
  */
 class steam_group extends steam_object
 {
-
-	/**
-	 * constructor of steam_group:
-	 *
-	 * @param $pID
-	 * @param $pSteamConnector
-	 */
-	public function __construct($pSteamConnectorID, $pID = 0)
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct($pSteamConnectorID, $pID);
-		$this->type = CLASS_GROUP;
+	
+	private $subGroupsLookupCache;
+	
+	public function get_type() {
+		return CLASS_GROUP | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function get_members:
 	 * This function returns the members of the group
@@ -412,12 +405,19 @@ class steam_group extends steam_object
 	 */
 	public function get_subgroups($pBuffer = 0)
 	{
-		return $this->steam_command(
-		$this,
-				"get_sub_groups",
-		array(),
-		$pBuffer
-		);
+		if (!isset($this->subGroupsLookupCache)) {
+			$result = $this->steam_command($this,
+												"get_sub_groups",
+										array(),
+										$pBuffer
+					);
+			if (is_array($result)) {
+				$this->subGroupsLookupCache = $result;
+			}
+		} else {
+			$result = $this->subGroupsLookupCache;
+		}
+		return $result;
 	}
 
 	/**
@@ -450,9 +450,10 @@ class steam_group extends steam_object
 	 */
 	public function set_name( $pName, $pBuffer = FALSE )
 	{
+		$myConnector = steam_connector::get_instance($this->steam_connectorID);
 		return $this->steam_command(
-		$this->steam_connectorID->get_factory(CLASS_GROUP),
-      "rename_group",
+		$myConnector->get_factory(CLASS_GROUP),
+      	"rename_group",
 		array(
 		$this,
 		$pName
@@ -565,6 +566,10 @@ class steam_group extends steam_object
 			array(),
 			$pBuffer
 		);
+	}
+	
+	public function drop_subGroupsLookupCache() {
+		$this->subGroupsLookupCache = null;
 	}
 }
 

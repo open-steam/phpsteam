@@ -19,26 +19,9 @@
 class steam_date extends steam_object
 {
 
-	/**
- 	* constructor of steam_date:
- 	* 
- 	* @param $pSteamConnector
- 	* @param $pID
-	*/	
-	public function __construct( $pSteamConnectorID, $pID = 0 )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_DATE;
+	public function get_type() {
+		return CLASS_DATE | CLASS_OBJECT;
 	}
 	
-	/**
- 	* function get_ical_data:
- 	*/
-	public function get_ical_data()
-	{
-		
-	}
-
 }
 ?>

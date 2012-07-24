@@ -9,12 +9,15 @@
  * @author Dominik Niehus <nicke@upb.de>
  */
 
+defined("STEAM_SOCKET_TIMEOUT_DEFAULT") or define("STEAM_SOCKET_TIMEOUT_DEFAULT", 60);
+
 class steam_connection {
 	
 	  
 	// socket data
 	protected $socket;
 	protected $socket_status;
+	protected $socket_timeout;
 
 	// server data
 	protected $steam_server_ip;
@@ -38,6 +41,9 @@ class steam_connection {
 
 	// internal request counter
 	protected $sentrequests;
+	protected static $globalRequests = 0;
+	protected static $globalRequestsMap = array();
+	protected static $globalRequestsTime= array();
 	
 	protected $login_arguments;
 	
@@ -49,6 +55,8 @@ class steam_connection {
   	protected $steam_group;
  	protected $server_version;
  	protected $server_config;
+
+    protected $known_results;
 	
 	private static $instances = array();
 	
@@ -92,6 +100,14 @@ class steam_connection {
 			$steam_connection->connect($server_ip,$server_port,$login_name, $login_pw);
 			return $steam_connection;
 		}
+	}
+	
+	public function set_socket_timeout($timeout) {
+		$this->socket_timeout = $timeout;
+	}
+	
+	public function get_socket_timeout() {
+		return $this->socket_timeout;
 	}
 	
 	public function get_id() {
@@ -395,8 +411,15 @@ class steam_connection {
 	 * @return string Encoded answer from sTeam-server
 	 */
 	public function send_command(array $pCommandBuffer ) {
+		$startTime = microtime(TRUE);
+		$orignalRequests = array();
+		foreach ($pCommandBuffer as $key => $req) {
+			$orignalRequests[$key] = clone $req;
+		}
 		// send command to steam-server
+	isset($this->socket_timeout) ? stream_set_timeout($this->socket, $this->socket_timeout) : stream_set_timeout($this->socket, STEAM_SOCKET_TIMEOUT_DEFAULT);
     $this->sentrequests ++;
+    self::$globalRequests ++;
     foreach ( $pCommandBuffer as $request ) {
       $encoded_request = $request->encode();
       $bytes = @fwrite(
@@ -407,7 +430,13 @@ class steam_connection {
       if ( ! $bytes )
       {
         // Exception: Could not write through socket
-        throw new steam_exception( $this->get_login_user_name(),  "Could not write through socket request=" . $encoded_request, 300 );
+        $info = stream_get_meta_data($this->socket);
+    	fclose($this->socket);
+      	if ($info['timed_out']) {
+      		throw new steam_exception( $this->get_login_user_name(),  "Connection timed out! Could not write through socket request=" . $request->get_coalcommand(), 300 );
+    	} else {
+       		throw new steam_exception( $this->get_login_user_name(),  "Could not write through socket request=" . $request->get_coalcommand(), 300 );
+    	}
       }
     }
 		// get result
@@ -426,7 +455,13 @@ class steam_connection {
         if (! $buffer || ! $size )
         {
           // Exception: Could not read from socket
-          throw new steam_exception($this->get_login_user_name(), "Could not read from socket commandbuffer=" . $pCommandBuffer , 300 );
+            $info = stream_get_meta_data($this->socket);
+	    	fclose($this->socket);
+	      	if ($info['timed_out']) {
+	      		throw new steam_exception( $this->get_login_user_name(),  "Connection timed out! Reading socket.", 300 );
+	    	} else {
+	       		throw new steam_exception( $this->get_login_user_name(),  "Reading socket.", 300 );
+	    	}
         }
   
         $count = hexdec( bin2hex( $size ) ) - 5;
@@ -462,7 +497,11 @@ class steam_connection {
           try {
             $pCommandBuffer[ $i ]->decode( $res, $flushing );
           } catch( Exception $exception ){
-            throw new steam_exception($this->get_login_user_name(), $exception->get_message(), 300);
+          	if (method_exists($exception, "get_message")) {
+            	throw new steam_exception($this->get_login_user_name(), $exception->get_message(), 300);
+          	} else {
+          		throw new steam_exception($this->get_login_user_name(), $exception->getMessage(), 300);
+          	}
           }
         }
         else {
@@ -476,6 +515,33 @@ class steam_connection {
           }
         }
       }
+		}
+		if (count($orignalRequests) == 1) {
+			$request = $orignalRequests[0];
+			$args = $request->get_arguments();
+			$string = "object: " . (($request->get_object() instanceof steam_object) ? $request->get_object()->get_id() : "null") . "\t" ;
+			$string .= "methode: " . ((is_array($args) && isset($args[0])) ?  $args[0] : "null") . "\t";
+			$string .= "args: " . ((is_array($args) && isset($args[1])) ?  ((is_array($args[1]) && isset($args[1][0])) ? $args[1][0] : $args[1]) : "null") . "\t";
+			(!API_DEBUG) or error_log($string);
+			$args = $request->get_arguments();
+			if (is_array($args) && isset($args[0])) {
+				$method = $args[0];
+			} else {
+				$method = "problem";
+			}
+		} else {
+			$method = "Sammelaufruf";
+		}
+		if ($method === "" || !is_string($method)) {
+			$method = "Problem2";
+		}
+		$time = microtime(TRUE) - $startTime;
+		if (isset(self::$globalRequestsMap[$method])) {
+			self::$globalRequestsMap[$method]++;
+			self::$globalRequestsTime[$method] = self::$globalRequestsTime[$method] + $time;
+		} else {
+			self::$globalRequestsMap[$method] = 1;
+			self::$globalRequestsTime[$method] = $time;
 		}
 		return $pCommandBuffer;
 	}
@@ -526,6 +592,14 @@ class steam_connection {
 	{
     $this->request_buffer = array();
   }
+
+    public function add_known_result($transaction_number, $result){
+        $this->known_results[$transaction_number] = $result;
+    }
+
+    public function reset_known_results(){
+        $this->known_results = array();
+    }
   
 	/**
 	 * Sends the whole bundle of buffered commands to sTeam
@@ -549,6 +623,14 @@ class steam_connection {
 			      foreach( $data as $answer ) {
 			        $result[ $answer->get_transactionid() ] = $answer->get_arguments();
 			      }
+
+            if(isset($this->known_results)){
+                foreach($this->known_results as $trans_id => $answer){
+                    $result[$trans_id] = $answer;
+                }
+            }
+
+
 			$this->request_buffer = array();
 		}
 		else
@@ -562,11 +644,17 @@ class steam_connection {
 		{
 			while( list( $transaction_id, $object ) = each($this->object_buffer ) )
 			{
-				$attributes = $result[ $transaction_id ];
+                if(isset($this->known_results[$transaction_id])){
+                    $attributes = $this->known_results[ $transaction_id ];
+                } else {
+                    $attributes = $result[ $transaction_id ];
+                }
+
 				$object->set_values( $attributes );
 			}
 		}
 		$this->object_buffer = array();
+        $this->reset_known_results();
 		return $result;
 	}
 
@@ -578,7 +666,7 @@ class steam_connection {
 	 */
 	public function buffer_attributes_request( $pObject, $pAttributes, $pSourceObjectID = 0 )
 	{
-			$object = ( $pSourceObjectID == 0 ) ? $pObject : new steam_object( $this, $pSourceObjectID );
+			$object = ( $pSourceObjectID == 0 ) ? $pObject : steam_factory::get_object($this->get_id(), $pSourceObjectID);
 			$transaction_id = $this->predefined_command(
 				$object,
 				"query_attributes",
@@ -703,6 +791,18 @@ class steam_connection {
 	
 	public function get_sentrequests() {
 		return $this->sentrequests;
+	}
+	
+	public function get_globalrequests() {
+		return self::$globalRequests;
+	}
+	
+	public function get_globalrequestsmap() {
+		return self::$globalRequestsMap;
+	}
+	
+	public function get_globalrequestsTime() {
+		return self::$globalRequestsTime;
 	}
 	
 	public function get_login_user_name() {

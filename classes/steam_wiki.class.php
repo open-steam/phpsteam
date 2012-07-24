@@ -16,18 +16,8 @@
  */
 class steam_wiki extends steam_document
 {
-
-	/**
-	 * constructor of steam_wiki
-	 *
-	 * @param $pID
-	 * @param $pSteamConnector
-	 */
-	public function __construct($pSteamConnectorID,  $pID = "0")
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct($pSteamConnectorID, $pID);
-		$this->type = CLASS_DOCWIKI;
+	public function get_type() {
+		return CLASS_WIKI | CLASS_DOCUMENT | CLASS_OBJECT;
 	}
 }
 

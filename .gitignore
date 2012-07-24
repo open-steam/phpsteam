@@ -1,0 +1,7 @@
+# Hidden OS and IDE files
+.project
+.settings
+.DS_Store
+.idea
+.buildpath
+nbproject

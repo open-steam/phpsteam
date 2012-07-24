@@ -78,19 +78,10 @@ function sort_dates_ascending( $pDateA, $pDateB )
 class steam_calendar extends steam_room
 {
 	
-	/**
- 	* constructor of steam_calendar:
- 	* 
- 	* @param $pSteamConnector
- 	* @param $pID
- 	*/
-	public function __construct( $pSteamConnectorID, $pID = 0 ) {
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		if (!is_integer($pID)) throw new ParameterException("pID", "integer");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_CALENDAR;
+	public function get_type() {
+		return CLASS_CALENDAR | CLASS_ROOM | CLASS_CONTAINER | CLASS_OBJECT;
 	}
-
+	
 	/**
 	 * function get_last_monday:
 	 * 

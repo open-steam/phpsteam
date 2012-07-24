@@ -52,6 +52,7 @@
   define("DOC_ENCODING",              "DOC_ENCODING");
   define("DOC_VERSION",				  "DOC_VERSION");
   define("DOC_VERSIONS",			  "DOC_VERSIONS");
+  define("DOC_PERSISTENCE_TYPE",		"DOC_PERSISTENCE_TYPE");
 
 
   define("CONT_SIZE_X",               "CONT_SIZE_X");

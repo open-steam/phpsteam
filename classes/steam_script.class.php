@@ -17,20 +17,9 @@
  */
 class steam_script extends steam_object
 {
-
-	/**
-	 * constructor of steam_script
-	 *
-	 * @param $pSteamContainer
-	 * @param $pID
-	 */
-	public function __construct( $pSteamConnectorID, $pID = 0 )
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		parent::__construct( $pSteamConnectorID, $pID );
-		$this->type = CLASS_SCRIPT;
+	public function get_type() {
+		return CLASS_SCRIPT | CLASS_OBJECT;
 	}
-
 }
 
 ?>
