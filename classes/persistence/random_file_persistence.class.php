@@ -15,16 +15,21 @@ class RandomFilePersistence extends FilePersistance {
         if (!$version_of) {
             //get versions
             $versions = $document->get_previous_versions();
-
-            foreach ($versions as $version) {
-                if(!empty($version)){
-                    $this->delete($version);
-                }
-                
-            }
+            
+			if(is_array($versions)){
+				foreach ($versions as $version) {
+					if(!empty($version)){
+						$this->delete($version);
+					}
+				
+				}
+			}
         }
 
         $current_dir = pathinfo($file_path, PATHINFO_DIRNAME);
+        if(!is_dir($current_dir)){
+        	return;
+        }
 
         //walk up through directory-tree
         //check if directory contains other files or dirs
@@ -117,7 +122,8 @@ class RandomFilePersistence extends FilePersistance {
 			if(file_exists($old_file)){
 				rename($old_file, $new_file);  
 			} else {
-				throw Exception("File not found."); 
+				//throw new Exception("File not found."); 
+				logging::write_log(LOG_PERSISTENCE, "MISSING FILE: " . $target_dir);
 			}      
         }
 

@@ -519,9 +519,10 @@ class steam_connection {
 		if (count($orignalRequests) == 1) {
 			$request = $orignalRequests[0];
 			$args = $request->get_arguments();
+
 			$string = "object: " . (($request->get_object() instanceof steam_object) ? $request->get_object()->get_id() : "null") . "\t" ;
 			$string .= "methode: " . ((is_array($args) && isset($args[0])) ?  $args[0] : "null") . "\t";
-			$string .= "args: " . ((is_array($args) && isset($args[1])) ?  ((is_array($args[1]) && isset($args[1][0])) ? $args[1][0] : $args[1]) : "null") . "\t";
+// 			$string .= "args: " . (isset($args[1]) ? var_export($args[1], true) : "") . "\t";
 			(!API_DEBUG) or error_log($string);
 			$args = $request->get_arguments();
 			if (is_array($args) && isset($args[0])) {

@@ -338,7 +338,7 @@ class steam_container extends steam_object
 	 * @param boolean $pFollowLinks Optional, get attributes from source in case of steam_link-instances. TRUE as default.
 	 * @return mixed Array of steam_objects
 	 */
-	public function get_inventory( $pClass = 0, $pAttributes = array(), $pSort = SORT_NONE, $pFollowLinks = TRUE )
+	public function get_inventory( $pClass = 0, $pAttributes = array(), $pSort = SORT_NONE, $pFollowLinks = FALSE )
 	{
 		if ( ! $pClass )
 		{
@@ -375,6 +375,7 @@ class steam_container extends steam_object
 
 		foreach( $inventory as $item )
 		{
+			if(!$item instanceof steam_object) continue;
 			if ( $pFollowLinks && ( ( CLASS_LINK & $item->get_type() ) == CLASS_LINK ) )
 			{
 				$object = $item->get_source_object();
@@ -393,6 +394,7 @@ class steam_container extends steam_object
 		$all_items = array();
 		foreach ( $inventory as $item )
 		{
+			if(!$item instanceof steam_object) continue;
 			if ( isset( $trnsctnid[ $item->get_id() ] ) )
 			{
 				$result_size = $result[ $trnsctnid[ $item->get_id() ] ];
