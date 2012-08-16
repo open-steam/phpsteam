@@ -54,7 +54,7 @@ class Thumbnail_Helper {
 			if ($transparent_index != (-1))
 				$transparent_color = ImageColorsForIndex($img, $transparent_index);
 		}
-		else if ($mime == 'image/jpeg' OR $type == 'jpg') {
+		else if ($mime == 'image/jpeg' OR $mime == 'image/pjpeg' OR $type == 'jpg') {
 			$img = ImageCreateFromJPEG($f);
 			$imgFunc = 'ImageJPEG';
 		} else if ($mime == 'image/png' OR $type == 'png') {
