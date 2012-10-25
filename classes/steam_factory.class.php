@@ -474,7 +474,9 @@ class steam_factory
 	public static function create_group( $pSteamConnectorID, $pName, $pParentGroup, $pEnvironment = FALSE, $pDescription = "" )
 	{
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		$pParentGroup->drop_subGroupsLookupCache();
+        if ($pParentGroup instanceof steam_group) {
+            $pParentGroup->drop_subGroupsLookupCache();
+        }
 		return steam_factory::create_object(
 		$pSteamConnectorID,
 		$pName,
