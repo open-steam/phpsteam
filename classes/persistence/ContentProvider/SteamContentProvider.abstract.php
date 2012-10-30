@@ -1,6 +1,8 @@
 <?php
 
-abstract class SteamDocumentDataProvider {
+namespace OpenSteam\Persistence\ContentProvider;
+
+abstract class SteamContentProvider {
 
     public $steam_connector;
 

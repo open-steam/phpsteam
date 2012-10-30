@@ -1,6 +1,8 @@
 <?php
 
-class CoalSteamDocumentDataProvider extends  SteamDocumentDataProvider {
+namespace OpenSteam\Persistence\ContentProvider;
+
+class CoalContentProvider extends  SteamContentProvider {
 
     public function get_content(steam_document $document) {
         return $document->steam_command(

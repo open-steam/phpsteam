@@ -244,7 +244,7 @@ class steam_user extends steam_container
 	 * personate as the user.
 	 *
 	 * @see steam_container::get_inventory
-	 * @param string $pClass if you ask for objects of a specific type, you can optionally use this byte-string for the typedefinition (see steam_types.conf.php)
+	 * @param string $pClass if you ask for objects of a specific type, you can optionally use this byte-string for the typedefinition (see steam_types.def.php)
 	 * @return mixed Array of steam_objects
 	 */
 	public function rucksack_get_inventory( $pClass = "", $pAttributes = array(), $pSort = SORT_DATE, $pFollowLinks = TRUE )
@@ -263,7 +263,7 @@ class steam_user extends steam_container
 	 * </code>
 	 *
 	 * @param steam_container $pNewEnvironment New place where the objects should move to
-	 * @param string $pClass if you ask for objects of a specific type, you can optionally use this byte-string for the typedefinition (see steam_types.conf.php)
+	 * @param string $pClass if you ask for objects of a specific type, you can optionally use this byte-string for the typedefinition (see steam_types.def.php)
 	 */
 	public function rucksack_drop_objects( $pNewEnvironment = "", $pClass = "" )
 	{

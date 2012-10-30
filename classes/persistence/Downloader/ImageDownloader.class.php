@@ -1,6 +1,8 @@
 <?php
 
-class ThumbnailDownload extends DocumentDownload
+namespace OpenSteam\Persistence\Downloader;
+
+class ImageDownloader extends DocumentDownloader
 {
 
     public $width;

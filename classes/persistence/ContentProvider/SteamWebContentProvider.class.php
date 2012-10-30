@@ -1,6 +1,8 @@
 <?php
 
-class WebSteamDocumentDataProvider extends  SteamDocumentDataProvider {
+namespace OpenSteam\Persistence\ContentProvider;
+
+class SteamWebContentProvider extends  SteamContentProvider {
 
     public $password, $login;
 

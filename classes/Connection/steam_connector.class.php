@@ -24,7 +24,7 @@ defined("FILESYTEM_PERSISTENCE_BASE_PATH") or define("FILESYTEM_PERSISTENCE_BASE
 defined("DEFAULT_FILESYTEM_PERSISTENCE_TYPE") or define("DEFAULT_FILESYTEM_PERSISTENCE_TYPE", "RANDOM");
 
 
-require_once( "steam_factory.class.php" );
+require_once("steam_factory.class.php");
 require_once( "steam_connection.class.php" );
 
 /**

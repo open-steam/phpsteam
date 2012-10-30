@@ -1,6 +1,8 @@
 <?php
 
-class SteamPersistence extends DocumentPersistence {
+namespace OpenSteam\Persistence;
+
+class DatabasePersistence extends Persistence {
 
     protected $data_provider;
 

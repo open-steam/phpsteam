@@ -24,8 +24,8 @@
 /**
  * includes
  */
-require_once( "steam_types.conf.php" );
-require_once( "steam_attributes.conf.php" );
+require_once(dirname(dirname(dirname(__FILE__))) . "/etc/steam_types.def.php");
+require_once(dirname(dirname(dirname(__FILE__))) . "/etc/steam_attributes.def.php");
 
 
 /**
@@ -73,7 +73,7 @@ class steam_factory
 	 *
 	 * @param steam_connection	the connection to steam is essential
 	 * @param int pID if you have an object-id, place it here (optional)
-	 * @param int pType see steam_types.conf.php for the type definitions (optional)
+	 * @param int pType see steam_types.def.php for the type definitions (optional)
 	 * @return steam_object new instance of a subclass of steam_object, depending on the type definition parameter
 	 */
 	public static function get_object( $pSteamConnectorID, $pID = 0, $pType = FALSE )

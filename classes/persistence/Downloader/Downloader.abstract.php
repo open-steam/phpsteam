@@ -1,6 +1,8 @@
 <?php
 
-abstract class DocumentDownload
+namespace OpenSteam\Persistence\Downloader;
+
+abstract class Downloader
 {
 
     /**

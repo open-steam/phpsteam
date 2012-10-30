@@ -21,6 +21,20 @@
 
 class steam_document extends steam_object
 {
+	private $persistence;
+
+	public function __construct($steamFactory, $steamConnectorId, $id) {
+		parent::__construct($steamFactory, $steamConnectorId, $id);
+		$docPersistenzType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+		if ($docPersistenzType === PERSISTENCE_FILERANDOM) {
+			$this->persistence = new FileRandomPersistence($this);
+		} else if ($docPersistenzType === PERSISTENCE_DATABASE) {
+			$this->persistence = new DatabasePersistence($this);
+		} else {
+			$this->persistence = new DatabasePersistence($this);
+		}
+	}
+
 	public function get_type() {
 		return CLASS_DOCUMENT | CLASS_OBJECT;
 	}
@@ -28,32 +42,19 @@ class steam_document extends steam_object
 	/**
 	 *function download:
 	 *
-	 * @return
+	 * @return success or not
 	 */
-	public function download() {
-		//first run server request
-		$request = new steam_request($this->get_steam_connector()->get_id(), $this->get_steam_connector()->get_transaction_id(), $this, 0, COAL_FILE_DOWNLOAD );
-		$command = $this->get_steam_connector()->command( $request );
-		$buffer = "";
-		$size = 0;
-		$args = $command->get_arguments();
-		 
-		//then get data
-		while ( $size < $args[ 0 ] )
-		{
-			$buffer .= $this->get_steam_connector()->read_socket( $args[ 0 ] );
-			$size = strlen( $buffer );
+	public function download($type = DOWNLOAD_ATTACHMENT) {
+		if ($type === DOWNLOAD_ATTACHMENT) {
+			$downloader = new \OpenSteam\Persistence\Downloader\AttachmentDownloader($this);
+		} else if ($type === DOWNLOAD_IMAGE)  {
+			$downloader = new \OpenSteam\Persistence\Downloader\ImageDownloader($this);
+		} else if ($type === DOWNLOAD_INLINE) {
+			$downloader = new \OpenSteam\Persistence\Downloader\InlineDownloader($this);
+		} else if ($type === DOWNLOAD_RANGE) {
+			 $downloader = new \OpenSteam\Persistence\Downloader\RangeDownloader($this);
 		}
-
-		//if no error send headers
-		header( "Pragma: private\n" );
-		header( "Cache-Control: must-revalidate, post-check=0, pre-check=0\n" );
-		header( "Content-Type: " . $this->get_attribute( "DOC_MIME_TYPE" ) . "\n");
-		header( "Content-Disposition: attachment; filename=\"" . $this->get_name() . "\"\n" );
-		header( "Content-Length: " . $this->get_content_size() . "\n");
-		//print data
-		echo $buffer;
-		return "";
+		return $downloader->download();
 	}
 
 	/**
@@ -102,14 +103,8 @@ class steam_document extends steam_object
 	 * @param Boolean $pBuffer send now or buffer request?
 	 * @return boolean TRUE|FALSE
 	 */
-	public function set_content( $pContent, $pBuffer = 0 )
-	{
-		return $this->steam_command(
-		$this,
-			"set_content",
-		array( $pContent ),
-		$pBuffer
-		);
+	public function set_content(&$pContent, $pBuffer = 0) {
+		return $this->persistence->save($pContent, $pBuffer);
 	}
 
 	/**
@@ -125,19 +120,9 @@ class steam_document extends steam_object
 	 *
 	 * @return Integer the content size in Byte
 	 */
-	public function get_content_size( $pBuffer = 0 )
+	public function get_content_size($pBuffer = 0)
 	{
-		$result = $this->steam_command(
-		$this,
-			"get_content_size",
-		array(),
-		$pBuffer
-		);
-		if ( $pBuffer == 0 )
-		{
-			$this->attributes[ "DOC_SIZE" ] = $result;
-		}
-		return $result;
+		return $this->persistence->get_file_size($pBuffer);
 	}
 
 	/**
@@ -184,12 +169,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content( $pBuffer = 0 )
 	{
-		return $this->steam_command(
-		$this,
-			"get_content",
-		array(),
-		$pBuffer
-		);
+		return $this->persistence->load($pBuffer);
 	}
 
 	/**

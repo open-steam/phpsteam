@@ -1,6 +1,8 @@
 <?php
 
-class DatabaseSteamDocumentDataProvider extends SteamDocumentDataProvider
+namespace OpenSteam\Persistence\ContentProvider;
+
+class DatabaseContentProvider extends SteamContentProvider
 {
     
 

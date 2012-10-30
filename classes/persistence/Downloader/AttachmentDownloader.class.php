@@ -1,6 +1,8 @@
 <?php
 
-class DirectDownload extends DocumentDownload {
+namespace OpenSteam\Persistence\Downloader;
+
+class AttachmentDownloader extends Downloader {
 
 	protected function prepare_header() {
 		header("Pragma: public");

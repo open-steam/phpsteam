@@ -1,6 +1,6 @@
 <?php
 
-class Thumbnail_Helper {
+class ThumbnailHelper {
 
 	public static function createThumbnail(steam_document $document, $content, $mime, $thumbnail_path, $width, $height) {
 		$type = MimetypeHelper::get_instance()->getExtension($mime);

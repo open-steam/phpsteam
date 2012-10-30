@@ -18,7 +18,7 @@
  * @author  Daniel Buese <dbuese@upb.de>, Alexander Roth <aroth@it-roth.de>, Henrik Beige <hebeige@gmx.de>, Dominik Niehus <nicke@upb.de>
  */
 
-require_once( "steam_factory.class.php" );
+require_once("steam_factory.class.php");
 
 /**
  * The steam_connector manages all socket functions.

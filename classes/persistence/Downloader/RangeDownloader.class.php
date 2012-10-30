@@ -1,5 +1,8 @@
 <?php
-class RangeDownload extends DocumentDownload
+
+namespace OpenSteam\Persistence\Downloader;
+
+class RangeDownloader extends Downloader
 {
     public $file;
 

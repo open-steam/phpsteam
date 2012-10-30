@@ -1,11 +1,13 @@
 <?php
 
-class RandomFilePersistence extends FilePersistance {
+namespace OpenSteam\Persistence;
 
-    public function delete(steam_document $document) {
-        $version_of = $document->get_attribute(OBJ_VERSIONOF);
+class FileRandomPersistence extends FilesytemPersistance {
 
-        $file_path = $this->get_file_path($document);
+    public function delete() {
+        $version_of = $this->document->get_attribute(OBJ_VERSIONOF);
+
+        $file_path = $this->get_file_path();
         $filesystem_persistence_base_dir = pathinfo(FILESYTEM_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
         if(file_exists($file_path)){
             unlink($file_path);
@@ -48,7 +50,7 @@ class RandomFilePersistence extends FilePersistance {
         }
     }
 
-    public function load(steam_document $document) {
+    public function load() {
         $file_path = $this->get_file_path($document);
         $file_exists = file_exists($file_path);
 
@@ -57,7 +59,7 @@ class RandomFilePersistence extends FilePersistance {
         return $content;
     }
 
-    public function save(steam_document $document, $content) {
+    public function save() {
         $uuid = $this->generate_id($document, $content);
         $dir_array = str_split($uuid, 3);
 
@@ -82,7 +84,7 @@ class RandomFilePersistence extends FilePersistance {
         return $uuid;
     }
 
-    public function generate_id(steam_document $document, $content) {
+    public function generate_id(&$content) {
         return $this->generate_id_unwrapped();
     }
 
@@ -96,7 +98,7 @@ class RandomFilePersistence extends FilePersistance {
         return $id;
     }
 
-    public function get_file_path(steam_document $document) {
+    public function get_file_path() {
         $uuid = $document->get_content(0, true);
         $dir_array = str_split($uuid, 3);
 

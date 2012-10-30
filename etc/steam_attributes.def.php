@@ -38,7 +38,7 @@
   define("OBJ_VERSIONOF",			 "OBJ_VERSIONOF");
 
   define("DOC_TYPE",                  "DOC_TYPE");
-  define("DOC_SIZE",		      "DOC_SIZE");
+  define("DOC_SIZE",				  "DOC_SIZE");
   define("DOC_MIME_TYPE",             "DOC_MIME_TYPE");
   define("DOC_USER_MODIFIED",         "DOC_USER_MODIFIED");
   define("DOC_LAST_MODIFIED",         "DOC_LAST_MODIFIED");
@@ -52,7 +52,7 @@
   define("DOC_ENCODING",              "DOC_ENCODING");
   define("DOC_VERSION",				  "DOC_VERSION");
   define("DOC_VERSIONS",			  "DOC_VERSIONS");
-  define("DOC_PERSISTENCE_TYPE",		"DOC_PERSISTENCE_TYPE");
+  define("DOC_PERSISTENCE_TYPE",	  "DOC_PERSISTENCE_TYPE");
 
 
   define("CONT_SIZE_X",               "CONT_SIZE_X");

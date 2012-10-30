@@ -1,7 +1,8 @@
 <?php
 
-class InlineDownload
-{
+namespace OpenSteam\Persistence\Downloader;
+
+class InlineDownloader {
 
     protected function prepare_header()
     {
