@@ -5,3 +5,7 @@
 .idea
 .buildpath
 nbproject
+
+#composer
+test/deps/vendor
+test/composer/composer.phar

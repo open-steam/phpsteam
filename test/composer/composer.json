@@ -1,0 +1,9 @@
+{
+    "config": {
+        "vendor-dir": "../deps/vendor",
+        "process-timeout": "3000"
+    },
+    "require": {
+        "phpunit/phpunit": "3.7.*"
+    }
+}
