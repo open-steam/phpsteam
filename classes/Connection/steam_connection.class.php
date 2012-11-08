@@ -311,7 +311,7 @@ class steam_connection {
 			$this->current_steam_user = steam_factory::get_object($this->get_id(), $result->object->get_id(), CLASS_USER);
 			return $this->current_steam_user;
 		} else {
-			$this->login_status = 0;
+			$this->login_status = false;
 			return FALSE;
 		}
 	}
