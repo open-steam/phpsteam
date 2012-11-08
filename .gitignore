@@ -13,3 +13,6 @@ test/composer/composer.lock
 
 #config
 test/etc/default.def.php
+
+#test-tools
+test/tools/phpunit-skelgen.phar

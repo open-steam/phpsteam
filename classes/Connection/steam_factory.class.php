@@ -24,8 +24,6 @@
 /**
  * includes
  */
-require_once(dirname(dirname(dirname(__FILE__))) . "/etc/steam_types.def.php");
-require_once(dirname(dirname(dirname(__FILE__))) . "/etc/steam_attributes.def.php");
 
 
 /**

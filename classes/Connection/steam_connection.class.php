@@ -9,8 +9,6 @@
  * @author Dominik Niehus <nicke@upb.de>
  */
 
-include_once dirname(dirname(dirname(__FILE__))) . "/etc/default.def.php";
-
 class steam_connection {
 
 

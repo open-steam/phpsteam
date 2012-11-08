@@ -13,19 +13,7 @@
  * @author  Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
  */
 
-
-defined("LOW_API_CACHE") or define("LOW_API_CACHE", true);
-defined("API_DEBUG") or define("API_DEBUG", false);
-
-defined("ENABLE_FILESYTEM_PERSISTENCE") or define("ENABLE_FILESYTEM_PERSISTENCE", false);
-
-//sub-directories: uuid, hash
-defined("FILESYTEM_PERSISTENCE_BASE_PATH") or define("FILESYTEM_PERSISTENCE_BASE_PATH", false);
-defined("DEFAULT_FILESYTEM_PERSISTENCE_TYPE") or define("DEFAULT_FILESYTEM_PERSISTENCE_TYPE", "RANDOM");
-
-
-require_once("steam_factory.class.php");
-require_once( "steam_connection.class.php" );
+include_once dirname(dirname(dirname(__FILE__))) . "/etc/default.def.php";
 
 /**
  * The steam_connector manages all socket functions.

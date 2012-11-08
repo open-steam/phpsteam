@@ -1,6 +1,8 @@
 <?php
 
-require dirname(dirname(__FILE__)) . "/version.def.php";
+include_once dirname(dirname(__FILE__)) . "/version.def.php";
+include_once dirname(__FILE__) . "/steam_attributes.def.php";
+include_once dirname(__FILE__) . "/steam_types.def.php";
 
 defined("STEAM_SOCKET_TIMEOUT_DEFAULT") or define("STEAM_SOCKET_TIMEOUT_DEFAULT", 60);
 
@@ -20,3 +22,12 @@ define("CONTENT_PROVIDER_DATABASE", "database");
 define("CONTENT_PROVIDER_STEAMWEB", "steamweb");
 
 defined("CONF_CONTENT_PROVIDER") or define("CONF_CONTENT_PROVIDER", CONTENT_PROVIDER_STEAMWEB);
+
+defined("LOW_API_CACHE") or define("LOW_API_CACHE", true);
+defined("API_DEBUG") or define("API_DEBUG", false);
+
+defined("ENABLE_FILESYTEM_PERSISTENCE") or define("ENABLE_FILESYTEM_PERSISTENCE", false);
+
+//sub-directories: uuid, hash
+defined("FILESYTEM_PERSISTENCE_BASE_PATH") or define("FILESYTEM_PERSISTENCE_BASE_PATH", false);
+defined("DEFAULT_FILESYTEM_PERSISTENCE_TYPE") or define("DEFAULT_FILESYTEM_PERSISTENCE_TYPE", "RANDOM");
