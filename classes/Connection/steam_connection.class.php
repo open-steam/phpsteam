@@ -277,7 +277,7 @@ class steam_connection {
 			$result = $this->command($request);
 		} catch (steam_exception $e) {
 			// not of my business
-			$this->login_status = 0;
+			$this->login_status = false;
 			return FALSE;
 		}
 		$this->login_status = !($request->is_error());
