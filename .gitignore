@@ -9,3 +9,6 @@ nbproject
 #composer
 test/deps/vendor
 test/composer/composer.phar
+
+#config
+test/etc/default.def.php

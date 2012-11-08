@@ -17,3 +17,5 @@ if (file_exists($pathComposer . "composer.phar")) {
 }
 
 passthru("cd $pathComposer; php composer.phar install");
+
+passthru("deps/vendor/bin/phpunit tests");
