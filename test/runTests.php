@@ -16,6 +16,6 @@ if (file_exists($pathComposer . "composer.phar")) {
 	passthru("cd $pathComposer; curl -s https://getcomposer.org/installer | php");
 }
 
-passthru("cd $pathComposer; php composer.phar install");
+passthru("cd $pathComposer; php composer.phar update");
 
 passthru("deps/vendor/bin/phpunit tests");

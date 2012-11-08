@@ -1,6 +1,32 @@
 {
-    "hash": "e5dc4299b7a7a1ba58dc6b19b91905f2",
+    "hash": "d88bfd4bcd5e6bb07835c434596433a1",
     "packages": [
+        {
+            "name": "open-steam/phpsteam",
+            "version": "dev-feature/file-persistence",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:open-steam/phpsteam.git",
+                "reference": "7c184c88d273e7318abdd531c427cd4f421a3850"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/open-steam/phpsteam/archive/7c184c88d273e7318abdd531c427cd4f421a3850.zip",
+                "reference": "7c184c88d273e7318abdd531c427cd4f421a3850",
+                "shasum": ""
+            },
+            "time": "1352370212",
+            "type": "library",
+            "installation-source": "source",
+            "autoload": {
+                "classmap": [
+                    "classes/"
+                ]
+            },
+            "support": {
+                "source": "https://github.com/open-steam/phpsteam/tree/feature/file-persistence"
+            }
+        },
         {
             "name": "phpunit/php-code-coverage",
             "version": "1.2.6",
@@ -405,7 +431,7 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ]
+    "stability-flags": {
+        "open-steam/phpsteam": 20
+    }
 }
