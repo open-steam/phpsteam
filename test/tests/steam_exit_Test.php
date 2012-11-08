@@ -15,7 +15,7 @@ class steam_exit_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_exit;
+        //$this->object = new steam_exit;
     }
 
     /**

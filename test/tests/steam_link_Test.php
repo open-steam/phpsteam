@@ -15,7 +15,7 @@ class steam_link_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_link;
+        //$this->object = new steam_link;
     }
 
     /**

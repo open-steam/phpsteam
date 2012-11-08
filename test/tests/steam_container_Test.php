@@ -15,7 +15,7 @@ class steam_container_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_container;
+        //$this->object = new steam_container;
     }
 
     /**

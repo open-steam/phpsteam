@@ -15,7 +15,7 @@ class steam_messageboard_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_messageboard;
+        //$this->object = new steam_messageboard;
     }
 
     /**

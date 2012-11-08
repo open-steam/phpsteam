@@ -15,7 +15,7 @@ class steam_calendar_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_calendar;
+        //$this->object = new steam_calendar;
     }
 
     /**

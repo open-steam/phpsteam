@@ -15,7 +15,7 @@ class steam_database_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_database;
+        //$this->object = new steam_database;
     }
 
     /**

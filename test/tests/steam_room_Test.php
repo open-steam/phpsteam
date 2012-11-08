@@ -15,7 +15,7 @@ class steam_room_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_room;
+        //$this->object = new steam_room;
     }
 
     /**

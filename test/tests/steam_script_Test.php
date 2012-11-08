@@ -15,7 +15,7 @@ class steam_script_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_script;
+        //$this->object = new steam_script;
     }
 
     /**

@@ -15,7 +15,7 @@ class steam_group_Test extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new steam_group;
+        //$this->object = new steam_group;
     }
 
     /**
