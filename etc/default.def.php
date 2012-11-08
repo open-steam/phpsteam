@@ -1,5 +1,9 @@
 <?php
 
+require dirname(dirname(__FILE__)) . "/version.def.php";
+
+defined("STEAM_SOCKET_TIMEOUT_DEFAULT") or define("STEAM_SOCKET_TIMEOUT_DEFAULT", 60);
+
 // define persistence types
 define("PERSISTENCE_DATABASE","Database");
 define("PERSISTENCE_FILERANDOM", "FileRandom");

@@ -2,14 +2,14 @@
 /**
  * Handles connection socket to steam server
  *
- * PHP versions 5
+ * PHP versions 5.3
  * 
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author Dominik Niehus <nicke@upb.de>
  */
 
-defined("STEAM_SOCKET_TIMEOUT_DEFAULT") or define("STEAM_SOCKET_TIMEOUT_DEFAULT", 60);
+include_once dirname(dirname(dirname(__FILE__))) . "/etc/default.def.php";
 
 class steam_connection {
 	
@@ -778,7 +778,6 @@ class steam_connection {
 	}
 	
 	public function get_version() {
-		include_once('phpsteam_version.php');
 		return PHPSTEAM_VERSION;
 	}
 	
