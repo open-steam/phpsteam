@@ -14,7 +14,7 @@ class steam_connector_Test extends PHPUnit_Framework_TestCase {
 		$steam_connector = steam_connector::connect(STEAM_SERVER, STEAM_SERVER_PORT, STEAM_ROOT_LOGIN, STEAM_ROOT_PW);
 		$this->assertTrue($steam_connector->get_login_status(), "checking get_login_status on success");
 
-		$steam_connector = steam_connector::connect(STEAM_SERVER, STEAM_SERVER_PORT, STEAM_ROOT_LOGIN, STEAM_ROOT_PW);
+		$steam_connector = steam_connector::connect(STEAM_SERVER, STEAM_SERVER_PORT, "dfds", "sadfs");
 		$this->assertFalse($steam_connector->get_login_status(), "checking get_login_status on fail");
 	}
 
