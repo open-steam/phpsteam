@@ -8,19 +8,24 @@ class FileUidPersistence extends FilePersistence {
 
 	public static function init() {
 		self::$persistenceBaseFolder = FILE_PERSISTENCE_BASE_PATH . "uid/";
-		//Check is file persistence is configured correct
+		if (!is_dir(self::$persistenceBaseFolder)) {
+			throw new \Exception("file persistence folder (" . self::$persistenceBaseFolder . ") is missing.");
+		}
+		if (!is_readable(self::$persistenceBaseFolder)) {
+			throw new \Exception("file persistence folder (" . self::$persistenceBaseFolder . ") is not readable.");
+		}
+		if (!is_writable(self::$persistenceBaseFolder)) {
+			throw new \Exception("file persistence folder (" . self::$persistenceBaseFolder . ") is not writable.");
+		}
 	}
 
     public function delete(\steam_document $document, $buffer = 0) {
-        $version_of = $document->get_attribute(OBJ_VERSIONOF);
-
         $file_path = $this->get_file_path($document);
-        $file_persistence_base_dir = pathinfo(FILE_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
-        if(file_exists($file_path)){
+		if(file_exists($file_path)){
             unlink($file_path);
         }
-        
 
+		$version_of = $document->get_attribute(OBJ_VERSIONOF);
         if (!$version_of) {
             //get versions
             $versions = $document->get_previous_versions();
@@ -40,9 +45,11 @@ class FileUidPersistence extends FilePersistence {
         	return;
         }
 
+
         //walk up through directory-tree
         //check if directory contains other files or dirs
         //if not: delete the current directory
+		$file_persistence_base_dir = pathinfo(FILE_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
         while ($current_dir !== $file_persistence_base_dir) {
             $obj_count = count(glob($current_dir . "/*"));
 

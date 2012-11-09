@@ -180,6 +180,11 @@ class steam_document extends steam_object
 		return $this->getPersistence()->load($this, $pBuffer);
 	}
 
+	public function delete($pBuffer = 0) {
+		$this->getPersistence()->delete($this, $pBuffer);
+		parent::delete($pBuffer);
+	}
+
 	/**
 	 * get wiki content as html
 	 *
