@@ -96,7 +96,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     public function testSet_content()
     {
 		$newContent = "Goodbye!";
-		$this->assertTrue($this->testObject->set_content($newContent));
+		$this->assertEquals(strlen($newContent), $this->testObject->set_content($newContent));
 		$this->assertEquals($newContent, $this->testObject->get_content());
     }
 
@@ -181,7 +181,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 
     /**
      * @covers steam_document::get_content_html
-	 * @todo test with a read wiki!!
+	 * @todo test with a real wiki!!
      */
     public function testGet_content_html()
     {
@@ -195,30 +195,22 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(1, $this->testObject->get_version());
 		$this->testObject->set_content("Hund");
-		$this->assertEquals(1, $this->testObject->get_version());
+		$this->assertEquals(2, $this->testObject->get_version());
     }
 
     /**
      * @covers steam_document::get_previous_versions
-     * @todo   Implement testGet_previous_versions().
      */
     public function testGet_previous_versions()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        var_dump($this->testObject->get_previous_versions());
     }
 
     /**
      * @covers steam_document::is_previous_version_of
-     * @todo   Implement testIs_previous_version_of().
      */
     public function testIs_previous_version_of()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+
     }
 }

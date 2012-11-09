@@ -103,7 +103,7 @@ class steam_document extends steam_object
 	 * Sets the content of this document
 	 * @param string $pContent document's content
 	 * @param Boolean $pBuffer send now or buffer request?
-	 * @return boolean TRUE|FALSE
+	 * @return int content size
 	 */
 	public function set_content($pContent, $pBuffer = 0) {
 		$result = $this->getPersistence()->save($this, $pContent, $pBuffer);
@@ -374,25 +374,23 @@ class steam_document extends steam_object
 		return $version;
 	}
 
-	public function get_previous_versions()
-	{
+	public function get_previous_versions(){
 		$versions = $this->get_attribute( "DOC_VERSIONS" );
 		 
-		if(is_array($versions) && !empty($versions) && count($versions) > 0)
-  	{
-  		krsort($versions);
-  		$versions = array_values($versions);
-  		return $versions;	
-  	}
-  	return FALSE;
-  }
+		if(is_array($versions) && !empty($versions) && count($versions) > 0){
+			krsort($versions);
+			$versions = array_values($versions);
+			return $versions;
+		}
+  		return array();
+	}
   
-  public function is_previous_version_of()
-  {
-  	$doc = $this->get_attribute("OBJ_VERSIONOF");
-  	if(is_object($doc))
-  		return $doc;
-  	return FALSE;
-  }
+	public function is_previous_version_of() {
+		$doc = $this->get_attribute("OBJ_VERSIONOF");
+		if($doc instanceof steam_document) {
+			return $doc;
+		}
+		return false;
+	}
 }
 ?>
