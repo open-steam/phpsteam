@@ -13,8 +13,8 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 	}
 
 	public static function tearDownAfterClass() {
-		//self::$steamConnector->disconnect();
-		//self::$steamConnector = null;
+		self::$steamConnector->disconnect();
+		self::$steamConnector = null;
 	}
 
     protected function setUp()
@@ -66,10 +66,13 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testGet_readers()
     {
-		//var_dump(self::$steamConnector->get_login_data());
-        //var_dump($this->testObject->get_readers());
+		$readersArray = $this->testObject->get_readers();
+		$this->assertTrue(is_array($readersArray));
+		$this->assertTrue(empty($readersArray));
 		$this->testObject->get_content();
-		//var_dump($this->testObject->get_readers());
+		$readersArray = $this->testObject->get_readers();
+		$this->assertTrue(sizeof($readersArray) === 1);
+		$this->assertEquals(self::$steamConnector->get_current_steam_user(), $readersArray[0]);
     }
 
     /**

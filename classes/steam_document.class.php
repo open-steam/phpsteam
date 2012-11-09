@@ -68,10 +68,7 @@ class steam_document extends steam_object
 	 */
 	public function get_readers( $pBuffer = 0 )
 	{
-		$module_read_doc = steam_factory::get_object($this->get_steam_connector()->get_id(), 26);
-		var_dump($module_read_doc);
-		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
-		var_dump($module_read_doc);
+		$module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
 		return $this->steam_command(
 		$module_read_doc,
 			"get_readers",
@@ -91,7 +88,7 @@ class steam_document extends steam_object
 	public function is_reader( $pUser = "", $pBuffer = 0  )
 	{
 		$pUser = ( empty( $pUser ) ) ? $this->get_steam_connector()->get_current_steam_user() : $pUser;
-		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
+		$module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
 		return $this->steam_command(
 		$module_read_doc,
 			"is_reader",
