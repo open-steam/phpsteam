@@ -5,21 +5,7 @@ namespace OpenSteam\Persistence\Downloader;
 class ImageDownloader extends DocumentDownloader
 {
 
-    public $width;
-    public $height;
-    public $identifier_type;
-    public $identifier;
-    public $allow_cache = true;
-    protected $filesize;
-
-    public $steam_connector;
-
-    public function __construct()
-    {
-        $this->persistence = new SteamPersistence();
-    }
-
-    public function init_document()
+/*    public function init_document()
     {
         //init document
         if ($this->identifier_type === "id") {
@@ -35,46 +21,36 @@ class ImageDownloader extends DocumentDownloader
             }
         }
         return $this->document;
-    }
+    }*/
 
-    public function download()
+    public static function download(\steam_document $document, $width = 0, $height = 0, $cache = true)
     {
         //check if thumbnail for object already exists
-		$mime = $this->document->get_attribute(DOC_MIME_TYPE);
+		$mime = $document->get_attribute(DOC_MIME_TYPE);
 		if(empty($mime)){
 			$mime = MimetypeHelper::get_instance()->getMimeType($document->get_name());
 		}
 		$ext = MimetypeHelper::get_instance()->getExtension($mime);
-        $thumbnail_path = THUMBNAIL_PATH . $this->identifier . "_" . $this->width . "x" . $this->height . "." . $ext;
+        $thumbnail_path = THUMBNAIL_PATH . $document->get_id() . "_" . $width . "x" . $height . "." . $ext;
 		$thumbnail_exists = file_exists($thumbnail_path);
 		
-        if(!$this->allow_cache || !$thumbnail_exists){
-            $content = $this->document->get_content();
+        if(!$cache || !$thumbnail_exists){
+            $content = $document->get_content();
             $thumbnail_path = Thumbnail_Helper::createThumbnail(
-                $this->document, $content, $mime, $thumbnail_path, $this->width, $this->height);
+                $document, $content, $mime, $thumbnail_path, $width, $height);
         }
 
-        $this->filesize = filesize($thumbnail_path);
+        $filesize = filesize($thumbnail_path);
 
-        $this->prepare_header();
+        self::prepare_header($document, $filesize, $cache);
         @ob_flush();
         readfile($thumbnail_path);
-        //@ob_flush();
-        exit;
-        //$this->stream($thumbnail_path);
     }
 
-
-    public function set_dimensions($width, $height)
-    {
-        $this->width = $width;
-        $this->height = $height;
-    }
-
-    protected function prepare_header()
+    protected static function prepare_header(\steam_document $document, $filesize, $cache)
     {
         header('Content-Description: File Transfer;');
-        if($this->allow_cache){
+        if($cache){
             //cache 1 week
             header('Cache-Control: max-age=604800;');
         } else {
@@ -83,9 +59,8 @@ class ImageDownloader extends DocumentDownloader
 
         header('Pragma: public;');
 
-        header("Last-Modified: {$this->document->attributes['lastmodified']};");
-        header("Content-Type: {$this->document->attributes['mimetype']};");
-        header("Content-Length: {$this->filesize};");
-        //header( "Content-Disposition: attachment; filename=\"" . $this->document->attributes['name'] . "\"");
+        header("Last-Modified: {$document->attributes['lastmodified']};");
+        header("Content-Type: {$document->attributes['mimetype']};");
+        header("Content-Length: {$filesize};");
     }
 }

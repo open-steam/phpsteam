@@ -2,27 +2,13 @@
 
 namespace OpenSteam\Persistence\Downloader;
 
-abstract class Downloader
-{
+abstract class Downloader {
 
-    /**
-     * @var steam_document
-     */
-    public $document;
+    protected abstract static function prepare_header(\steam_document $document);
 
-    public $persistence;
-
-    protected abstract function prepare_header();
-
-    public function download()
-    {
-        $this->prepare_header();
+    public static function download(\steam_document $document) {
+        self::prepare_header($document);
         @ob_flush();
-        if (isset($this->persistence)) {
-            print $this->persistence->load($this->document);
-        }
-        else {
-            print $this->document->get_content();
-        }
+        print $document->get_content();
     }
 }

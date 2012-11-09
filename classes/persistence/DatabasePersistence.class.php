@@ -4,32 +4,19 @@ namespace OpenSteam\Persistence;
 
 class DatabasePersistence extends Persistence {
 
-    protected $data_provider;
+    protected static $_contentProvider;
 
-    public function __construct(){
-        /*if(USE_DATABASE_DOWNLOAD){
-            $class = "DatabaseSteamDocumentDataProvider";
-        } else {*/
-            $class = DEFAULT_STEAM_DATA_PROVIDER;
-        //}
-
-        $this->data_provider = new $class();
+    public static function init() {
+        $class = DEFAULT_STEAM_DATA_PROVIDER;
+        self::$_contentProvider = new $class();
     }
 
-    public function get_data_provider(){
-        return $this->data_provider;
-    }
-
-    public function set_data_provider($data_provider){
-        $this->data_provider = $data_provider;
-    }
-
-    public function delete(steam_document $document) {
+    public function delete(\steam_document $document, $buffer = 0) {
         //no additional stuff needed
     }
 
-    public function save(steam_document $document, $content) {
-        if( is_resource($content)){
+    public function save(\steam_document $document, &$content, $buffer = 0) {
+        if(is_resource($content)){
             $content = stream_get_contents($content);
         }
         
@@ -38,11 +25,11 @@ class DatabasePersistence extends Persistence {
         );
     }
 
-    public function load(steam_document $document) {
+    public function load(\steam_document $document, $buffer = 0) {
         return $this->data_provider->get_content($document);
     }
 
-    public function get_file_size(steam_document $document , $buffer = 0) {
+    public function getSize(\steam_document $document , $buffer = 0) {
         $result = $document->steam_command(
             $document, "get_content_size", array(), $buffer
         );

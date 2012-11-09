@@ -4,23 +4,22 @@ namespace OpenSteam\Persistence\Downloader;
 
 class RangeDownloader extends Downloader
 {
-    public $file;
 
-    public function download(){
+    public static function download(\steam_document $document){
         //check if document stored in filesystem
         //  if not stored in filesystem - create tmp-file
-        $persistence_type = $this->document->get_attribute(DOC_PERSISTENCE_TYPE);
+        $persistence_type = $document->get_attribute(DOC_PERSISTENCE_TYPE);
         $persistence = PersistenceFactory::getInstance()->create_file_persistence($persistence_type);
-        $file = PATH_TEMP . $this->document->get_id();
+        $file = PATH_TEMP . $document->get_id();
         if($persistence_type === PERSISTENCE_STEAM && !file_exists($file)){
-            $content =  $persistence->load($this->document);
+            $content =  $persistence->load($document);
 
             file_put_contents( $file , $content);
         } else if($persistence_type !== PERSISTENCE_STEAM){
-            $file = $persistence->get_file_path($this->document);
+            $file = $persistence->get_file_path($document);
         }
 
-        header("Content-type: " . $this->document->attributes['mimetype']);
+        header("Content-type: " . $document->attributes['mimetype']);
 
         $fp = @fopen($file, 'rb');
 
@@ -116,6 +115,5 @@ class RangeDownloader extends Downloader
         fclose($fp);
     }
 
-    protected function prepare_header(){}
-
+    protected static function prepare_header(\steam_document $document){}
 }

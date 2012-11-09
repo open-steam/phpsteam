@@ -2,9 +2,14 @@
 
 namespace OpenSteam\Persistence;
 
-class FileRandomPersistence extends FilesytemPersistance {
+class FileRandomPersistence extends FilesytemPersistence {
 
-    public function delete() {
+
+	public static function init() {
+		//Check is file persistence is configured correct
+	}
+
+    public function delete(\steam_document $document, $buffer = 0) {
         $version_of = $this->document->get_attribute(OBJ_VERSIONOF);
 
         $file_path = $this->get_file_path();
@@ -50,16 +55,7 @@ class FileRandomPersistence extends FilesytemPersistance {
         }
     }
 
-    public function load() {
-        $file_path = $this->get_file_path($document);
-        $file_exists = file_exists($file_path);
-
-        $content = file_get_contents($file_path);
-
-        return $content;
-    }
-
-    public function save() {
+    public function save(\steam_document $document, &$content, $buffer = 0) {
         $uuid = $this->generate_id($document, $content);
         $dir_array = str_split($uuid, 3);
 
@@ -84,11 +80,40 @@ class FileRandomPersistence extends FilesytemPersistance {
         return $uuid;
     }
 
+	public function load(\steam_document $document, $buffer = 0) {
+		$file_path = $this->get_file_path($document);
+		$file_exists = file_exists($file_path);
+
+		$content = file_get_contents($file_path);
+
+		return $content;
+	}
+
+	public function getSize(\steam_document $document, $buffer = 0) {
+		$file_path = $this->get_file_path($document);
+		if(file_exists($file_path)){
+			$file_size = filesize($file_path);
+		} else {
+			$file_size = 0;
+		}
+
+		if($buffer){
+			$steam = $document->get_steam_connector();
+			$steam_connection = steam_connection::get_instance($steam->get_id());
+			$trans_action = $steam_connection->get_transaction_id();
+			$steam_connection->add_known_result($trans_action, $file_size);
+
+			return $trans_action;
+		}  else {
+			return $file_size;
+		}
+	}
+
     public function generate_id(&$content) {
         return $this->generate_id_unwrapped();
     }
 
-    public function generate_id_unwrapped(){
+    private function generate_id_unwrapped(){
         $id_length = 15;
         $id = "";
         for ($i = 0; $i < $id_length; $i++) {
@@ -131,26 +156,4 @@ class FileRandomPersistence extends FilesytemPersistance {
 
         return $target_dir;
     }
-    
-
-    public function get_file_size(steam_document $document, $buffer = 0) {
-        $file_path = $this->get_file_path($document);
-        if(file_exists($file_path)){
-            $file_size = filesize($file_path);
-        } else {
-            $file_size = 0;
-        }
-
-        if($buffer){
-            $steam = $document->get_steam_connector();
-            $steam_connection = steam_connection::get_instance($steam->get_id());
-            $trans_action = $steam_connection->get_transaction_id();
-            $steam_connection->add_known_result($trans_action, $file_size);
-
-            return $trans_action;
-        }  else {
-            return $file_size;
-        }
-    }
-
 }
