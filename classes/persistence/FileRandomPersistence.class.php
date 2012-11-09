@@ -123,7 +123,7 @@ class FileRandomPersistence extends FilesytemPersistence {
         return $id;
     }
 
-    public function get_file_path() {
+    public function get_file_path(\steam_document $document) {
         $uuid = $document->get_content(0, true);
         $dir_array = str_split($uuid, 3);
 
