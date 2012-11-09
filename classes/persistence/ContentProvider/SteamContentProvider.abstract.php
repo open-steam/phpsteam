@@ -6,5 +6,5 @@ abstract class SteamContentProvider {
 
     public $steam_connector;
 
-    public abstract function get_content(steam_document $document);
+    public abstract function get_content(steam_document $document, $buffer = 0);
 }
