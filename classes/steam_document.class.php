@@ -68,7 +68,8 @@ class steam_document extends steam_object
 	 */
 	public function get_readers( $pBuffer = 0 )
 	{
-		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
+		$module_read_doc = steam_factory::get_object($this->get_steam_connector()->get_id(), 26);
+		//$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
 		return $this->steam_command(
 		$module_read_doc,
 			"get_readers",

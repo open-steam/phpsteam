@@ -66,6 +66,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testGet_readers()
     {
+		var_dump(self::$steamConnector->get_login_data());
         var_dump($this->testObject->get_readers());
 		$this->testObject->get_content();
 		var_dump($this->testObject->get_readers());
