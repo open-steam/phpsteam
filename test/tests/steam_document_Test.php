@@ -114,7 +114,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     public function testGet_content_id()
     {
 		$firstContentId = $this->testObject->get_content_id();
-		$this->testObject->set_content("Hund");
+		$this->testObject->set_content("Dog");
 		$secondContentId = $this->testObject->get_content_id();
 		$this->assertTrue(is_int($firstContentId));
 		$this->assertTrue(is_int($secondContentId));
@@ -194,7 +194,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     public function testGet_version()
     {
         $this->assertEquals(1, $this->testObject->get_version());
-		$this->testObject->set_content("Hund");
+		$this->testObject->set_content("Dog");
 		$this->assertEquals(2, $this->testObject->get_version());
     }
 
@@ -203,7 +203,11 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testGet_previous_versions()
     {
-        var_dump($this->testObject->get_previous_versions());
+		$this->assertEquals(array(), $this->testObject->get_previous_versions());
+		$this->testObject->set_content("Dog");
+		$versions = $this->testObject->get_previous_versions();
+		$this->assertEquals(1, sizeof($versions));
+		$this->assertEquals($this->initContent, $versions[0]->get_content());
     }
 
     /**
@@ -211,6 +215,9 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testIs_previous_version_of()
     {
-
+		$this->assertFalse($this->testObject->is_previous_version_of());
+		$this->testObject->set_content("Dog");
+		$versions = $this->testObject->get_previous_versions();
+		$this->assertEquals($this->testObject, $versions[0]->is_previous_version_of());
     }
 }
