@@ -7,7 +7,7 @@ class DatabasePersistence extends Persistence {
     protected static $_contentProvider;
 
     public static function init() {
-        $class = DEFAULT_STEAM_DATA_PROVIDER;
+        $class = DEFAULT_CONTENT_PROVIDER;
         self::$_contentProvider = new $class();
     }
 
