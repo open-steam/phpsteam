@@ -23,17 +23,19 @@ class steam_document extends steam_object
 {
 	private $_persistence;
 
-/*	public function __construct($steamFactory, $steamConnectorId, $id) {
-		parent::__construct($steamFactory, $steamConnectorId, $id);
-		$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
-		if ($docPersistenceType === PERSISTENCE_FILERANDOM) {
-			$this->_persistence = \Opensteam\Perstistence\FileRandomPersistence::getInstance();
-		} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
-			$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
-		} else {
-			$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
+	public function getPersistence() {
+		if (!isset($_persistence)) {
+			$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+			if ($docPersistenceType === PERSISTENCE_FILERANDOM) {
+				$this->_persistence = \Opensteam\Perstistence\FileRandomPersistence::getInstance();
+			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
+				$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
+			} else {
+				$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
+			}
 		}
-	}*/
+		return $this->_persistence;
+	}
 
 	public function get_type() {
 		return CLASS_DOCUMENT | CLASS_OBJECT;
@@ -104,7 +106,7 @@ class steam_document extends steam_object
 	 * @return boolean TRUE|FALSE
 	 */
 	public function set_content(&$pContent, $pBuffer = 0) {
-		return $this->_persistence->save($this, $pContent, $pBuffer);
+		return $this->getPersistence()->save($this, $pContent, $pBuffer);
 	}
 
 	/**
@@ -122,7 +124,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content_size($pBuffer = 0)
 	{
-		return $this->_persistence->getSize($this, $pBuffer);
+		return $this->getPersistence()->getSize($this, $pBuffer);
 	}
 
 	/**
@@ -169,7 +171,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content( $pBuffer = 0 )
 	{
-		return $this->_persistence->load($this, $pBuffer);
+		return $this->getPersistence()->load($this, $pBuffer);
 	}
 
 	/**
