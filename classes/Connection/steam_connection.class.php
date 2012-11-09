@@ -198,7 +198,7 @@ class steam_connection {
 	public function disconnect() {
 		if (isset($this->socket)) {
 			@fclose($this->socket);
-			$this->socket = null;
+			unset($this->socket);
 		}
 		$this->init_variables();
 	}
