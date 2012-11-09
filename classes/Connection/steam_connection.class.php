@@ -429,7 +429,6 @@ class steam_connection {
 					try {
 						$pCommandBuffer[$i]->decode($res, $flushing);
 					} catch (Exception $exception) {
-						var_dump($exception);
 						if (method_exists($exception, "get_message")) {
 							throw new steam_exception($this->get_login_user_name(), $exception->get_message(), 300);
 						} else {

@@ -234,11 +234,12 @@ class steam_request
 
 		// detect if result is an error
 		if ( $this->coalcommand == COAL_ERROR ) {
-			if ( is_array($this->arguments) )
-			$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1], 120);
-			else
-			$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
-			if (!$flushing) throw $sex;
+			if ( is_array($this->arguments) ) {
+				var_dump($this->arguments);
+				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1], 120);
+			} else {
+				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
+			}if (!$flushing) throw $sex;
 			else return $sex;
 		}
 		return $this->arguments;
