@@ -8,10 +8,6 @@ require dirname(dirname(__FILE__)) . '/deps/vendor/autoload.php';
  */
 class steam_document_Test extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @var steam_document
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -83,14 +79,20 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 
     /**
      * @covers steam_document::set_content
-     * @todo   Implement testSet_content().
      */
     public function testSet_content()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+		//creating object for testing
+		$currentUser = $GLOBALS["STEAM"]->get_current_steam_user();
+		$userHome = $currentUser->get_workroom();
+		$testObject = steam_factory::create_document($GLOBALS["STEAM"]->get_id(), "Test Document.txt", "Hello World!", "text/plain", $userHome, "This is a document for testing.");
+
+		$newContent = "Goodbye!";
+		$testObject->set_content($newContent);
+		$this->assertEquals($newContent, $testObject->get_content());
+
+		//cleanup
+		//$testObject->delete();
     }
 
     /**
