@@ -21,7 +21,7 @@ define("DOWNLOAD_RANGE", "range");
 define("CONTENT_PROVIDER_COAL", "OpenSteam\\Persistence\\ContentProvider\\CoalContentProvider");
 define("CONTENT_PROVIDER_DATABASE", "OpenSteam\\Persistence\\ContentProvider\\DatabaseContentProvider");
 define("CONTENT_PROVIDER_STEAMWEB", "OpenSteam\\Persistence\\ContentProvider\\SteamWebContentProvider");
-// define content provider
+// config default content provider
 defined("DEFAULT_CONTENT_PROVIDER") or define("DEFAULT_CONTENT_PROVIDER", CONTENT_PROVIDER_COAL);
 
 

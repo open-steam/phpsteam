@@ -1,8 +1,5 @@
 <?php
 
-require dirname(dirname(dirname(__FILE__))) . '/etc/default.def.php';
-require dirname(dirname(dirname(__FILE__))) . '/deps/vendor/autoload.php';
-
 class steam_factory_Test extends PHPUnit_Framework_TestCase
 {
 
