@@ -21,17 +21,17 @@
 
 class steam_document extends steam_object
 {
-	private $persistence;
+	private $_persistence;
 
 	public function __construct($steamFactory, $steamConnectorId, $id) {
 		parent::__construct($steamFactory, $steamConnectorId, $id);
-		$docPersistenzType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
-		if ($docPersistenzType === PERSISTENCE_FILERANDOM) {
-			$this->persistence = new FileRandomPersistence($this);
-		} else if ($docPersistenzType === PERSISTENCE_DATABASE) {
-			$this->persistence = new DatabasePersistence($this);
+		$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+		if ($docPersistenceType === PERSISTENCE_FILERANDOM) {
+			$this->_persistence = \Opensteam\Perstistence\FileRandomPersistence::getInstance();
+		} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
+			$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
 		} else {
-			$this->persistence = new DatabasePersistence($this);
+			$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
 		}
 	}
 
@@ -46,15 +46,15 @@ class steam_document extends steam_object
 	 */
 	public function download($type = DOWNLOAD_ATTACHMENT) {
 		if ($type === DOWNLOAD_ATTACHMENT) {
-			$downloader = new \OpenSteam\Persistence\Downloader\AttachmentDownloader($this);
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\AttachmentDownloader";
 		} else if ($type === DOWNLOAD_IMAGE)  {
-			$downloader = new \OpenSteam\Persistence\Downloader\ImageDownloader($this);
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\ImageDownloader";
 		} else if ($type === DOWNLOAD_INLINE) {
-			$downloader = new \OpenSteam\Persistence\Downloader\InlineDownloader($this);
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\InlineDownloader";
 		} else if ($type === DOWNLOAD_RANGE) {
-			 $downloader = new \OpenSteam\Persistence\Downloader\RangeDownloader($this);
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\RangeDownloader";
 		}
-		return $downloader->download();
+		return $downloaderClass::download($this);
 	}
 
 	/**
@@ -104,7 +104,7 @@ class steam_document extends steam_object
 	 * @return boolean TRUE|FALSE
 	 */
 	public function set_content(&$pContent, $pBuffer = 0) {
-		return $this->persistence->save($pContent, $pBuffer);
+		return $this->_persistence::save($this, $pContent, $pBuffer);
 	}
 
 	/**
@@ -122,7 +122,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content_size($pBuffer = 0)
 	{
-		return $this->persistence->get_file_size($pBuffer);
+		return $this->_persistence::getSize($this, $pBuffer);
 	}
 
 	/**
@@ -169,7 +169,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content( $pBuffer = 0 )
 	{
-		return $this->persistence->load($pBuffer);
+		return $this->_persistence::load($this, $pBuffer);
 	}
 
 	/**
