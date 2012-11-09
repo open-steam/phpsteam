@@ -15,7 +15,7 @@ abstract class Persistence {
 
 		if (!isset(static::$_instance[$className])) {
 			static::$_instance[$className] = new static();
-			static::$_instance[$className]::init();
+			static::$_instance[$className]->init();
 		}
 		return static::$_instance[$className];
 	}
