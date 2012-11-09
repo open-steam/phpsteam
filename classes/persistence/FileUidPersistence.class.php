@@ -61,7 +61,7 @@ class FileUidPersistence extends FilePersistence {
         $uuid = $this->generate_id($document, $content);
         $dir_array = str_split($uuid, 3);
 
-        if (!FILESYTEM_PERSISTENCE_BASE_PATH) {
+        if (!FILE_PERSISTENCE_BASE_PATH) {
             throw Exception('Have to set persistence base path!');
         }
         $target_dir = self::$persistenceBaseFolder;
