@@ -18,4 +18,4 @@ if (file_exists($pathComposer . "composer.phar")) {
 
 passthru("cd $pathComposer; php composer.phar update");
 
-passthru("deps/vendor/bin/phpunit tests");
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrap.php tests");

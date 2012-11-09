@@ -29,9 +29,9 @@ class steam_document extends steam_object
 			if ($docPersistenceType === PERSISTENCE_FILERANDOM) {
 				$this->_persistence = \OpenSteam\Persistence\FileRandomPersistence::getInstance();
 			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
-				$this->persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
+				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			} else {
-				$this->persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
+				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			}
 		}
 		return $this->_persistence;
