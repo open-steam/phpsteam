@@ -42,14 +42,11 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 
     /**
      * @covers steam_document::get_type
-     * @todo   Implement testGet_type().
      */
     public function testGet_type()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $objectClass = $this->testObject->get_object_class();
+		$this->assertTrue(($objectClass & $this->testObject->get_type()) == $this->testObject->get_type());
     }
 
     /**
@@ -65,15 +62,13 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers steam_document::get_reader
-     * @todo   Implement testGet_reader().
+     * @covers steam_document::get_readers
      */
-    public function testGet_reader()
+    public function testGet_readers()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        var_dump($this->testObject->get_readers());
+		$this->testObject->get_content();
+		var_dump($this->testObject->get_readers());
     }
 
     /**

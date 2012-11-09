@@ -60,18 +60,18 @@ class steam_document extends steam_object
 	}
 
 	/**
-	 * function get_reader:
+	 * function get_readers:
 	 *
 	 * @param $pBuffer
 	 *
 	 * @return
 	 */
-	public function get_reader( $pBuffer = 0 )
+	public function get_readers( $pBuffer = 0 )
 	{
 		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
 		return $this->steam_command(
 		$module_read_doc,
-			"get_reader",
+			"get_readers",
 		array( $this ),
 		$pBuffer
 		);
