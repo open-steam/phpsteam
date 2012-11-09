@@ -26,8 +26,8 @@ class steam_document extends steam_object
 	public function getPersistence() {
 		if (!isset($_persistence)) {
 			$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
-			if ($docPersistenceType === PERSISTENCE_FILE_RANDOM) {
-				$this->_persistence = \OpenSteam\Persistence\FileRandomPersistence::getInstance();
+			if ($docPersistenceType === PERSISTENCE_FILE_UID) {
+				$this->_persistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
 			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
 				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			} else {
@@ -175,7 +175,7 @@ class steam_document extends steam_object
 	 * @return String content of the document
 	 *
 	 */
-	public function get_content( $pBuffer = 0 )
+	public function get_content($pBuffer = 0)
 	{
 		return $this->getPersistence()->load($this, $pBuffer);
 	}

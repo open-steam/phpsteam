@@ -2,18 +2,20 @@
 
 namespace OpenSteam\Persistence;
 
-class FileRandomPersistence extends FilesytemPersistence {
+class FileUidPersistence extends FilePersistence {
 
+	private static $persistenceBaseFolder;
 
 	public static function init() {
+		self::$persistenceBaseFolder = FILE_PERSISTENCE_BASE_PATH . "uid/";
 		//Check is file persistence is configured correct
 	}
 
     public function delete(\steam_document $document, $buffer = 0) {
-        $version_of = $this->document->get_attribute(OBJ_VERSIONOF);
+        $version_of = $document->get_attribute(OBJ_VERSIONOF);
 
-        $file_path = $this->get_file_path();
-        $filesystem_persistence_base_dir = pathinfo(FILESYTEM_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
+        $file_path = $this->get_file_path($document);
+        $filesystem_persistence_base_dir = pathinfo(FILE_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
         if(file_exists($file_path)){
             unlink($file_path);
         }
@@ -62,7 +64,7 @@ class FileRandomPersistence extends FilesytemPersistence {
         if (!FILESYTEM_PERSISTENCE_BASE_PATH) {
             throw Exception('Have to set persistence base path!');
         }
-        $target_dir = FILESYTEM_PERSISTENCE_BASE_PATH . "random/";
+        $target_dir = self::$persistenceBaseFolder;
 
         foreach ($dir_array as $subdir) {
             $target_dir .= $subdir . "/";
@@ -82,8 +84,6 @@ class FileRandomPersistence extends FilesytemPersistence {
 
 	public function load(\steam_document $document, $buffer = 0) {
 		$file_path = $this->get_file_path($document);
-		$file_exists = file_exists($file_path);
-
 		$content = file_get_contents($file_path);
 
 		return $content;
@@ -124,10 +124,10 @@ class FileRandomPersistence extends FilesytemPersistence {
     }
 
     public function get_file_path(\steam_document $document) {
-        $uuid = $document->get_content(0, true);
-        $dir_array = str_split($uuid, 3);
+        $uid = $document->get_content();
+        $dir_array = str_split($uid, 3);
 
-        $target_dir = FILESYTEM_PERSISTENCE_BASE_PATH . "random/";
+        $target_dir = self::$persistenceBaseFolder;
         $version_of = $document->get_attribute(OBJ_VERSIONOF);
 
         foreach ($dir_array as $subdir) {
@@ -136,7 +136,7 @@ class FileRandomPersistence extends FilesytemPersistence {
 
         $tmp = $target_dir;
 
-        if ($version_of) {
+        if ($version_of instanceof \steam_document) {
             $target_dir .= $version_of->get_id();
         } else {
             $target_dir .= $document->get_id();
