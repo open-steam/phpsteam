@@ -26,7 +26,7 @@ class DatabasePersistence extends Persistence {
     }
 
     public function load(\steam_document $document, $buffer = 0) {
-        return self::$_contentProvider->get_content($document, $buffer);
+        return self::$_contentProvider->getContent($document, $buffer);
     }
 
     public function getSize(\steam_document $document , $buffer = 0) {

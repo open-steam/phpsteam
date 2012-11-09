@@ -6,7 +6,7 @@ class DatabaseContentProvider extends SteamContentProvider
 {
     
 
-    public function get_content(steam_document $document)
+    public function getContent(\steam_document $document, $buffer = 0)
     {
         $identifier = $document->get_id();
 
