@@ -85,7 +85,7 @@ class steam_document extends steam_object
 	 *
 	 * @return
 	 */
-	public function is_read( $pUser = "", $pBuffer = 0  )
+	public function is_reader( $pUser = "", $pBuffer = 0  )
 	{
 		$pUser = ( empty( $pUser ) ) ? $this->get_steam_connector()->get_current_steam_user() : $pUser;
 		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );

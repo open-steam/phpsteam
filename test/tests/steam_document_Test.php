@@ -72,15 +72,11 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers steam_document::is_read
-     * @todo   Implement testIs_read().
+     * @covers steam_document::is_reader
      */
-    public function testIs_read()
+    public function testIs_reader()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        var_dump($this->testObject->is_reader());
     }
 
     /**
