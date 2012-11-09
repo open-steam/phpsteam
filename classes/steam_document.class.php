@@ -104,7 +104,7 @@ class steam_document extends steam_object
 	 * @return boolean TRUE|FALSE
 	 */
 	public function set_content(&$pContent, $pBuffer = 0) {
-		return $this->_persistence::save($this, $pContent, $pBuffer);
+		return $this->_persistence->save($this, $pContent, $pBuffer);
 	}
 
 	/**
@@ -122,7 +122,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content_size($pBuffer = 0)
 	{
-		return $this->_persistence::getSize($this, $pBuffer);
+		return $this->_persistence->getSize($this, $pBuffer);
 	}
 
 	/**
@@ -169,7 +169,7 @@ class steam_document extends steam_object
 	 */
 	public function get_content( $pBuffer = 0 )
 	{
-		return $this->_persistence::load($this, $pBuffer);
+		return $this->_persistence->load($this, $pBuffer);
 	}
 
 	/**
@@ -353,9 +353,9 @@ class steam_document extends steam_object
 	 * @return html representation of the wikis content
 	 */
 	public function get_content_html($pBuffer = FALSE) {
-		$wikimodule = $steam_connector->get_module("wiki");
+		$wikimodule = $this->get_steam_connector()->get_module("wiki");
 		if (is_object($wikimodule)) {
-			return $steam_connector->predefined_command( $wikimodule, "wiki_to_html_plain", array( $document ), $pBuffer);
+			return $this->get_steam_connector()->predefined_command( $wikimodule, "wiki_to_html_plain", array( $this ), $pBuffer);
 		}
 		throw new steam_exception( $this->steam_connector->get_login_user_name(), "Error: cant get module \"wiki\" from server.", 404 );
 	}
