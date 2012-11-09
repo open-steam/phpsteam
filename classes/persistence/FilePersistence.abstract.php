@@ -2,7 +2,7 @@
 
 namespace OpenSteam\Persistence;
 
-abstract class FilesytemPersistence extends Persistence {
+abstract class FilePersistence extends Persistence {
 
 	public abstract function generate_id(&$content);
 
