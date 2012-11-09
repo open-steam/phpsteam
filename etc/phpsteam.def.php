@@ -17,11 +17,10 @@ define("DOWNLOAD_INLINE", "inline");
 define("DOWNLOAD_RANGE", "range");
 
 // define content provider types
-define("CONTENT_PROVIDER_COAL", "coal");
-define("CONTENT_PROVIDER_DATABASE", "database");
-define("CONTENT_PROVIDER_STEAMWEB", "steamweb");
-
-defined("CONF_CONTENT_PROVIDER") or define("CONF_CONTENT_PROVIDER", CONTENT_PROVIDER_STEAMWEB);
+define("CONTENT_PROVIDER_COAL", "OpenSteam\\Persistence\\ContentProvider\\CoalContentProvider");
+define("CONTENT_PROVIDER_DATABASE", "OpenSteam\\Persistence\\ContentProvider\\DatabaseContentProvider");
+define("CONTENT_PROVIDER_STEAMWEB", "OpenSteam\\Persistence\\ContentProvider\\SteamWebContentProvider");
+defined("DEFAULT_CONTENT_PROVIDER") or define("DEFAULT_CONTENT_PROVIDER", CONTENT_PROVIDER_COAL);
 
 defined("LOW_API_CACHE") or define("LOW_API_CACHE", true);
 defined("API_DEBUG") or define("API_DEBUG", false);
