@@ -134,26 +134,11 @@ class FileUidPersistence extends FilePersistence {
             $target_dir .= $subdir . "/";
         }
 
-        $tmp = $target_dir;
-
         if ($version_of instanceof \steam_document) {
             $target_dir .= $version_of->get_id();
         } else {
             $target_dir .= $document->get_id();
         }
-
-        if(!file_exists($target_dir)){
-            $new_file = $target_dir;
-            $old_file = $tmp . "content";
-			
-			if(file_exists($old_file)){
-				rename($old_file, $new_file);  
-			} else {
-				//throw new Exception("File not found."); 
-				logging::write_log(LOG_PERSISTENCE, "MISSING FILE: " . $target_dir);
-			}      
-        }
-
-        return $target_dir;
+		return $target_dir;
     }
 }
