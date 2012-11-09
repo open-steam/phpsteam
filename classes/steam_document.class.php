@@ -105,7 +105,7 @@ class steam_document extends steam_object
 	 * @param Boolean $pBuffer send now or buffer request?
 	 * @return boolean TRUE|FALSE
 	 */
-	public function set_content(&$pContent, $pBuffer = 0) {
+	public function set_content($pContent, $pBuffer = 0) {
 		return $this->getPersistence()->save($this, $pContent, $pBuffer);
 	}
 

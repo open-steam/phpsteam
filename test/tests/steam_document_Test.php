@@ -8,6 +8,11 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 	private static $steamConnector;
 	private $testObject;
 
+	private $initObjName = "Test Document.txt";
+	private $initContent = "Hello World!";
+	private $initMimeType = "text/plain";
+	private $initObjDesc = "This is a document for testing.";
+
 	public static function setUpBeforeClass() {
 		self::$steamConnector = steam_connector::connect(STEAM_SERVER, STEAM_SERVER_PORT, STEAM_ROOT_LOGIN, STEAM_ROOT_PW);
 	}
@@ -24,7 +29,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		//creating object for testing
 		$currentUser = self::$steamConnector->get_current_steam_user();
 		$userHome = $currentUser->get_workroom();
-		$this->testObject = steam_factory::create_document(self::$steamConnector->get_id(), "Test Document.txt", "Hello World!", "text/plain", $userHome, "This is a document for testing.");
+		$this->testObject = steam_factory::create_document(self::$steamConnector->get_id(), $this->initObjName, $this->initContent, $this->initMimeType, $userHome, $this->initObjDesc);
 	}
 
     /**
@@ -80,7 +85,9 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testIs_reader()
     {
-        var_dump($this->testObject->is_reader());
+        $this->assertEquals(0, $this->testObject->is_reader());
+		$this->testObject->get_content();
+		$this->assertEquals(1, $this->testObject->is_reader());
     }
 
     /**
@@ -95,26 +102,20 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 
     /**
      * @covers steam_document::get_content_size
-     * @todo   Implement testGet_content_size().
      */
     public function testGet_content_size()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertEquals(strlen($this->initContent), $this->testObject->get_content_size());
     }
 
     /**
      * @covers steam_document::get_content_id
-     * @todo   Implement testGet_content_id().
      */
     public function testGet_content_id()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+		var_dump($this->testObject->get_content_id());
+		$this->testObject->set_content("Hund");
+		var_dump($this->testObject->get_content_id());
     }
 
     /**
