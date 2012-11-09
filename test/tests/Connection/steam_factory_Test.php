@@ -13,8 +13,8 @@ class steam_factory_Test extends PHPUnit_Framework_TestCase
 	}
 
 	public static function tearDownAfterClass() {
-		self::$steamConnector->disconnect();
-		self::$steamConnector = null;
+		//self::$steamConnector->disconnect();
+		//self::$steamConnector = null;
 	}
 
     /**
