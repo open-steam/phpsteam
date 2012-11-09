@@ -79,7 +79,11 @@ class steam_connector implements Serializable
 		if (!isset(self::$instances[$pLoginName . "@" . $pServerIp])) {
 			return new self($pServerIp, $pServerPort, $pLoginName, $pLoginPassword);
 		} else {
-			return self::$instances[$pLoginName . "@" . $pServerIp];
+			$instance =  self::$instances[$pLoginName . "@" . $pServerIp];
+			if (!$instance->get_socket_status()) {
+				$instance->reconnect();
+			}
+			return $instance;
 		}
 	}
 	
@@ -153,6 +157,11 @@ class steam_connector implements Serializable
 	public function disconnect()
 	{
 		steam_connection::get_instance($this->get_id())->disconnect();
+	}
+
+	public function reconnect()
+	{
+		steam_connection::get_instance($this->get_id())->reconnect();
 	}
 
 	/**
@@ -493,6 +502,10 @@ class steam_connector implements Serializable
   	public function get_socket_status() {
   		return steam_connection::get_instance($this->get_id())->get_socket_status();
   	}
+
+	public function is_connected() {
+		return steam_connection::get_instance($this->get_id())->is_connected();
+	}
   
   	public function exception( $pCode, $pDetails = "", $allow_backtrace = TRUE ) {
   		return steam_connection::get_instance($this->get_id())->exception( $pCode, $pDetails, $allow_backtrace);

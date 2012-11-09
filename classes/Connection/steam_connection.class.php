@@ -197,10 +197,11 @@ class steam_connection {
 	 * and sets the socket_status to FALSE.
 	 */
 	public function disconnect() {
-		if ($this->socket) {
+		if (isset($this->socket)) {
 			@fclose($this->socket);
+			$this->socket = null;
 		}
-		$this->socket_status = FALSE;
+		$this->init_variables();
 	}
 
 	/**
