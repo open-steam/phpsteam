@@ -562,22 +562,28 @@ class steam_factory {
 	 * @param steam_container $pEnvironment room or container where the document should be created
 	 * @return steam_document
 	 */
-	public static function create_document($pSteamConnectorID, $pName, $pContent, $pMimeType, $pEnvironment = FALSE, $pDescription = "", $persistence_type = false) {
-		/*if(ENABLE_FILESYTEM_PERSISTENCE && (DEFAULT_STEAM_DATA_PROVIDER !== PERSISTENCE_STEAM)){
-			$pMimeType =  MimetypeHelper::get_instance()->getMimeType($pName);
-		}*/
-
+	public static function create_document($pSteamConnectorID, $pName, $pContent, $pMimeType, $pEnvironment = FALSE, $pDescription = "") {
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-
-		$textdoc = steam_factory::create_object($pSteamConnectorID, $pName, CLASS_DOCUMENT, $pEnvironment, array("mimetype" => $pMimeType, "attributes" => array(OBJ_DESC => $pDescription)));
-
-		if ($persistence_type !== false) {
-			$textdoc->set_content($pContent, 0, $persistence_type);
+		if (DEFAULT_PERSISTENCE_TYPE == PERSISTENCE_DATABASE) {
+			$doc_persistence_type = PERSISTENCE_DATABASE;
+		} else if (((DEFAULT_PERSISTENCE_TYPE & PERSISTENCE_FILE) == PERSISTENCE_FILE) && ENABLE_FILESYTEM_PERSISTENCE && FILESYTEM_PERSISTENCE_BASE_PATH) {
+			if(DEFAULT_PERSISTENCE_TYPE == PERSISTENCE_FILERANDOM) {
+				$doc_persistence_type = PERSISTENCE_FILERANDOM;
+			} else {
+				$doc_persistence_type = PERSISTENCE_DATABASE;
+			}
 		} else {
-			$textdoc->set_content($pContent);
+			$doc_persistence_type = PERSISTENCE_DATABASE;
 		}
 
-		return $textdoc;
+		if (!isset($pMimeType) || empty($pMimeType)) {
+			$pMimeType =  MimetypeHelper::get_instance()->getMimeType($pName);
+		}
+
+		$steam_document = steam_factory::create_object($pSteamConnectorID, $pName, CLASS_DOCUMENT, $pEnvironment, array("mimetype" => $pMimeType, "attributes" => array(OBJ_DESC => $pDescription, DOC_PERSISTENCE_TYPE => $doc_persistence_type)));
+		$steam_document->set_content($pContent);
+
+		return $steam_document;
 	}
 
 	/**
