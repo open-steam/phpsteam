@@ -106,7 +106,13 @@ class steam_document extends steam_object
 	 * @return boolean TRUE|FALSE
 	 */
 	public function set_content($pContent, $pBuffer = 0) {
-		return $this->getPersistence()->save($this, $pContent, $pBuffer);
+		$result = $this->getPersistence()->save($this, $pContent, $pBuffer);
+		unset($this->attributes[OBJ_VERSIONOF]);
+		unset($this->attributes[DOC_VERSION]);
+		unset($this->attributes[DOC_VERSIONS]);
+		unset($this->attributes[DOC_LAST_MODIFIED]);
+		unset($this->attributes[DOC_USER_MODIFIED]);
+		return $result;
 	}
 
 	/**

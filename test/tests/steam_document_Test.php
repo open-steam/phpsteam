@@ -96,7 +96,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     public function testSet_content()
     {
 		$newContent = "Goodbye!";
-		$this->testObject->set_content($newContent);
+		$this->assertTrue($this->testObject->set_content($newContent));
 		$this->assertEquals($newContent, $this->testObject->get_content());
     }
 
@@ -113,21 +113,22 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testGet_content_id()
     {
-		var_dump($this->testObject->get_content_id());
+		$firstContentId = $this->testObject->get_content_id();
 		$this->testObject->set_content("Hund");
-		var_dump($this->testObject->get_content_id());
+		$secondContentId = $this->testObject->get_content_id();
+		$this->assertTrue(is_int($firstContentId));
+		$this->assertTrue(is_int($secondContentId));
+		$this->assertTrue($firstContentId < $secondContentId);
     }
 
     /**
      * @covers steam_document::get_content
-     * @todo   Implement testGet_content().
      */
     public function testGet_content()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+		$newContent = "Goodbye!";
+		$this->testObject->set_content($newContent);
+		$this->assertEquals($newContent, $this->testObject->get_content());
     }
 
     /**
@@ -180,26 +181,21 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 
     /**
      * @covers steam_document::get_content_html
-     * @todo   Implement testGet_content_html().
+	 * @todo test with a read wiki!!
      */
     public function testGet_content_html()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+		$this->assertEquals("<!-- wiki: Source Document is not a wiki file !-->\n", $this->testObject->get_content_html());
     }
 
     /**
      * @covers steam_document::get_version
-     * @todo   Implement testGet_version().
      */
     public function testGet_version()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertEquals(1, $this->testObject->get_version());
+		$this->testObject->set_content("Hund");
+		$this->assertEquals(1, $this->testObject->get_version());
     }
 
     /**
