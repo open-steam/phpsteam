@@ -27,11 +27,11 @@ class steam_document extends steam_object
 		if (!isset($_persistence)) {
 			$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
 			if ($docPersistenceType === PERSISTENCE_FILERANDOM) {
-				$this->_persistence = \Opensteam\Perstistence\FileRandomPersistence::getInstance();
+				$this->_persistence = \OpenSteam\Persistence\FileRandomPersistence::getInstance();
 			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
-				$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
+				$this->persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			} else {
-				$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
+				$this->persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			}
 		}
 		return $this->_persistence;
