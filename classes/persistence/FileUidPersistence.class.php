@@ -20,44 +20,31 @@ class FileUidPersistence extends FilePersistence {
 	}
 
     public function delete(\steam_document $document, $buffer = 0) {
-        $file_path = $this->get_file_path($document);
-		if(file_exists($file_path)){
-            unlink($file_path);
-        }
+        $contentFile = $this->get_file_path($document);
+		if(file_exists($contentFile)){
+            unlink($contentFile);
+        } else {
+			throw new \Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
+		}
 
 		$version_of = $document->get_attribute(OBJ_VERSIONOF);
-        if (!$version_of) {
+        if (!($version_of instanceof \steam_document)) {
             //get versions
             $versions = $document->get_previous_versions();
-            
-			if(is_array($versions)){
-				foreach ($versions as $version) {
-					if(!empty($version)){
-						$this->delete($version);
-					}
-				
+			foreach ($versions as $version) {
+				if(!empty($version)){
+					$this->delete($version);
 				}
+
 			}
         }
 
-        $current_dir = pathinfo($file_path, PATHINFO_DIRNAME);
-        if(!is_dir($current_dir)){
-        	return;
-        }
-
-
-        //walk up through directory-tree
-        //check if directory contains other files or dirs
-        //if not: delete the current directory
-		$file_persistence_base_dir = pathinfo(FILE_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
-        while ($current_dir !== $file_persistence_base_dir) {
+		$current_dir = dirname($contentFile);
+        while ($current_dir . "/" !== self::$persistenceBaseFolder) {
             $obj_count = count(glob($current_dir . "/*"));
-
             if ($obj_count === 0) {
                 rmdir($current_dir);
-
-                //goto parent directory
-                $current_dir = substr($current_dir, 0, strrpos($current_dir, "/"));
+                $current_dir = dirname($current_dir);
             } else {
                 break;
             }
