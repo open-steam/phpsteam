@@ -446,6 +446,28 @@ class steam_factory {
 		return steam_factory::create_object($pSteamConnectorID, $pName, CLASS_ROOM, $pEnvironment, array("attributes" => array(OBJ_DESC => $pDescription)));
 	}
 
+	/**
+	 * function create_drawing:
+	 *
+	 * Creates a new drawing
+	 *
+	 * @param steam_connector $pSteamConnector connection to sTeam-server
+	 * @param string $pName drawing's name
+	 * @param steam_room $pEnvironment room, where the new drawing should be created in
+	 * @return steam_drawing
+	 */
+	public static function create_drawing( $pSteamConnectorID, $pName, $pEnvironment, $pDescription = "" )
+	{
+		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
+		return steam_factory::create_object(
+			$pSteamConnectorID,
+			$pName,
+			CLASS_DRAWING,
+			$pEnvironment,
+			array( "attributes" => array(OBJ_DESC => $pDescription) )
+		);
+	}
+
 	public static function create_calendar($pSteamConnectorID, $pName, $pEnvironment, $pDescription = "") {
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 		return steam_factory::create_object($pSteamConnectorID, $pName, CLASS_CALENDAR, $pEnvironment, array("attributes" => array(OBJ_DESC => $pDescription)));

@@ -23,7 +23,7 @@ class steam_document extends steam_object
 {
 	private $_persistence;
 
-	public function __construct($steamFactory, $steamConnectorId, $id) {
+/*	public function __construct($steamFactory, $steamConnectorId, $id) {
 		parent::__construct($steamFactory, $steamConnectorId, $id);
 		$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
 		if ($docPersistenceType === PERSISTENCE_FILERANDOM) {
@@ -33,7 +33,7 @@ class steam_document extends steam_object
 		} else {
 			$this->persistence = \Opensteam\Perstistence\DatabasePersistence::getInstance();
 		}
-	}
+	}*/
 
 	public function get_type() {
 		return CLASS_DOCUMENT | CLASS_OBJECT;
