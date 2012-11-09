@@ -132,54 +132,6 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers steam_document::delete_thumbnail
-     * @todo   Implement testDelete_thumbnail().
-     */
-    public function testDelete_thumbnail()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers steam_document::delete_thumbnails
-     * @todo   Implement testDelete_thumbnails().
-     */
-    public function testDelete_thumbnails()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers steam_document::get_thumbnail
-     * @todo   Implement testGet_thumbnail().
-     */
-    public function testGet_thumbnail()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers steam_document::get_thumbnail_data
-     * @todo   Implement testGet_thumbnail_data().
-     */
-    public function testGet_thumbnail_data()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
      * @covers steam_document::get_content_html
 	 * @todo test with a real wiki!!
      */
