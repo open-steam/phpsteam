@@ -23,7 +23,7 @@ class steam_connection {
 	// login information
 	protected $login_data; //??
 	protected $current_steam_user;
-	protected $login_user_name;
+	protected $login_user_name = "Anonymous";
 	private $login_passwd;
 	protected $login_status; // 1=logged in, 0=logged out
 
@@ -122,7 +122,6 @@ class steam_connection {
 		$this->transaction_id = 1;
 		$this->socket_status = FALSE;
 		$this->login_status = FALSE;
-		$this->login_user_name = "Anonymous";
 		$this->request_buffer = array();
 		$this->object_buffer = array();
 	}
