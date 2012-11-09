@@ -571,12 +571,11 @@ class steam_factory {
 
 		$textdoc = steam_factory::create_object($pSteamConnectorID, $pName, CLASS_DOCUMENT, $pEnvironment, array("mimetype" => $pMimeType, "attributes" => array(OBJ_DESC => $pDescription)));
 
-/*		if ($persistence_type !== false) {
-
+		if ($persistence_type !== false) {
 			$textdoc->set_content($pContent, 0, $persistence_type);
 		} else {
 			$textdoc->set_content($pContent);
-		}*/
+		}
 
 		return $textdoc;
 	}
