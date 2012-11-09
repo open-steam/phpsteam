@@ -15,7 +15,7 @@ class FileUidPersistence extends FilePersistence {
         $version_of = $document->get_attribute(OBJ_VERSIONOF);
 
         $file_path = $this->get_file_path($document);
-        $filesystem_persistence_base_dir = pathinfo(FILE_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
+        $file_persistence_base_dir = pathinfo(FILE_PERSISTENCE_BASE_PATH, PATHINFO_DIRNAME);
         if(file_exists($file_path)){
             unlink($file_path);
         }
@@ -43,7 +43,7 @@ class FileUidPersistence extends FilePersistence {
         //walk up through directory-tree
         //check if directory contains other files or dirs
         //if not: delete the current directory
-        while ($current_dir !== $filesystem_persistence_base_dir) {
+        while ($current_dir !== $file_persistence_base_dir) {
             $obj_count = count(glob($current_dir . "/*"));
 
             if ($obj_count === 0) {
