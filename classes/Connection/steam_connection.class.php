@@ -11,7 +11,6 @@
 
 class steam_connection {
 
-
 	// socket data
 	protected $socket;
 	protected $socket_status;
@@ -35,7 +34,7 @@ class steam_connection {
 	protected $object_buffer;
 
 	// internal transaction counter
-	protected $transactionid;
+	protected $transaction_id;
 
 	// internal request counter
 	protected $sentrequests;
@@ -210,7 +209,7 @@ class steam_connection {
 	 * returns the socket status, TRUE if connector is connected to a steam
 	 * server, FALSE if not
 	 *
-	 * @return TRUE if connector is connected to a steam server
+	 * @return boolean if connector is connected to a steam server
 	 */
 	function is_connected() {
 		return $this->socket_status;
@@ -240,9 +239,9 @@ class steam_connection {
 	 * @return socket
 	 */
 	public function reconnect() {
-		if (!empty($this->steam_server_ip) && !empty($this->steam_server_port) && !empty($this->login_user_name) && !empty($this->login_user_pw)) {
+		if (!empty($this->steam_server_ip) && !empty($this->steam_server_port) && !empty($this->login_user_name) && !empty($this->login_passwd)) {
 			try {
-				$this->connect($this->steam_server_ip, $this->steam_server_port, $this->login_user_name, $this->login_user_pw, TRUE);
+				$this->connect($this->steam_server_ip, $this->steam_server_port, $this->login_user_name, $this->login_passwd, TRUE);
 			} catch (steam_exception $e) {
 				// not of my business...
 				throw $e;
@@ -305,7 +304,7 @@ class steam_connection {
 			if (!$relogin) $this->steam_group = $this->login_arguments[7];
 			if (!$relogin) $this->server_config = $this->login_arguments[10];
 			$this->login_user_name = $pLogin;
-			$this->login_user_pw = $pPassword;
+			$this->login_passwd = $pPassword;
 			$this->current_steam_user = steam_factory::get_object($this->get_id(), $result->object->get_id(), CLASS_USER);
 			return $this->current_steam_user;
 		} else {
@@ -425,7 +424,7 @@ class steam_connection {
 					$res = $buffer . $size . $data_read;
 					if (trim($res) == "") {
 						// Exception: Got no result back
-						throw new steam_exception($this->get_login_user_name(), "Got no result back. command=" . $command, 300);
+						throw new steam_exception($this->get_login_user_name(), "Got no result back.", 300);
 					}
 					try {
 						$pCommandBuffer[$i]->decode($res, $flushing);
