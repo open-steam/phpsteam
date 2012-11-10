@@ -225,6 +225,7 @@ class steam_document extends steam_object
 			$result = $versions;
 		}
 		if ($pBuffer) {
+			var_dump($result);
 			return $this->get_steam_connector()->add_to_buffer($result);
 		} else {
 			return $result;

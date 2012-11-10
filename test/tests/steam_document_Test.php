@@ -261,7 +261,6 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		//test with buffer
 		$tid = $this->testObject->get_previous_versions(true);
 		$result = self::$steamConnector->buffer_flush();
-		var_dump($result);
 		$this->assertEquals(array(), $result[$tid]);
 		$this->testObject->set_content("Dog", true);
 		$tid = $this->testObject->get_previous_versions(true);
@@ -295,6 +294,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		$tid = $this->testObject->get_previous_versions(true);
 		$result = self::$steamConnector->buffer_flush();
 		$versions = $result[$tid];
+		var_dump($versions);
 		$tid = $versions[0]->is_previous_version_of(true);
 		$result = self::$steamConnector->buffer_flush();
 		$this->assertEquals($this->testObject, $result[$tid]);
