@@ -16,13 +16,8 @@ class DatabasePersistence extends Persistence {
     }
 
     public function save(\steam_document $document, &$content, $buffer = 0) {
-     /*   if(is_resource($content)){     ????????????????????????????????????????????????
-            $content = stream_get_contents($content);
-        }*/
-        
-        return $document->steam_command(
-            $document, "set_content", array($content), 0
-        );
+		unset($document->attributes["DOC_SIZE"]);
+		return $document->steam_command($document, "set_content", array($content), $buffer);
     }
 
     public function load(\steam_document $document, $buffer = 0) {
@@ -30,9 +25,10 @@ class DatabasePersistence extends Persistence {
     }
 
     public function getSize(\steam_document $document , $buffer = 0) {
-        $result = $document->steam_command(
-            $document, "get_content_size", array(), $buffer
-        );
+		if (($buffer == 0) && isset($document->attributes["DOC_SIZE"])) {
+			return $document->attributes["DOC_SIZE"];
+		}
+        $result = $document->steam_command($document, "get_content_size", array(), $buffer);
         if ($buffer == 0) {
             $document->attributes["DOC_SIZE"] = $result;
         }
