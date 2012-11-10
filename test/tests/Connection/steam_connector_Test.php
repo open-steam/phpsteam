@@ -513,4 +513,16 @@ class steam_connector_Test extends PHPUnit_Framework_TestCase
           'This test has not been implemented yet.'
         );
     }
+
+	/**
+	 * @covers steam_connector::add_to_buffer
+	 * @todo   Implement testRead_socket().
+	 */
+	public function testAdd_to_buffer()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 }

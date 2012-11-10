@@ -523,4 +523,11 @@ class steam_connector implements Serializable
   	public function read_socket($pLength) {
   		return steam_connection::get_instance($this->get_id())->read_socket($pLength);
   	}
+
+	public function add_to_buffer($value) {
+		$steam_connection = steam_connection::get_instance($this->get_id());
+		$trans_action = $steam_connection->get_transaction_id();
+		$steam_connection->add_known_result($trans_action, $value);
+		return $trans_action;
+	}
 } 

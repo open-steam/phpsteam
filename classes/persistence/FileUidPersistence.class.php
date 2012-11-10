@@ -88,12 +88,7 @@ class FileUidPersistence extends FilePersistence {
 		}
 
 		if($buffer){
-			$steam = $document->get_steam_connector();
-			$steam_connection = steam_connection::get_instance($steam->get_id());
-			$trans_action = $steam_connection->get_transaction_id();
-			$steam_connection->add_known_result($trans_action, $file_size);
-
-			return $trans_action;
+			return $document->get_steam_connector()->add_to_buffer($file_size);
 		}  else {
 			return $file_size;
 		}

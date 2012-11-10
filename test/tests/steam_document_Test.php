@@ -215,7 +215,8 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		$this->assertEquals("<!-- wiki: Source Document is not a wiki file !-->\n", $this->testObject->get_content_html());
 
 		//test with buffer
-		$tid = $this->testObject->get_content_html();
+		$tid = $this->testObject->get_content_html(true);
+		$result = self::$steamConnector->buffer_flush();
 		$this->assertEquals("<!-- wiki: Source Document is not a wiki file !-->\n", $result[$tid]);
     }
 
