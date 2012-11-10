@@ -546,17 +546,15 @@ class steam_connection {
 			foreach ($data as $answer) {
 				$result[$answer->get_transactionid()] = $answer->get_arguments();
 			}
-
-			if (isset($this->known_results)) {
-				foreach ($this->known_results as $trans_id => $answer) {
-					$result[$trans_id] = $answer;
-				}
-			}
-
-
 			$this->request_buffer = array();
 		} else {
 			$result = array();
+		}
+
+		if (isset($this->known_results)) {
+			foreach ($this->known_results as $trans_id => $answer) {
+				$result[$trans_id] = $answer;
+			}
 		}
 
 		// do set_values for all objects in object buffer
