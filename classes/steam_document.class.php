@@ -216,7 +216,7 @@ class steam_document extends steam_object
 		return $version;
 	}
 
-	public function get_previous_versions($pBuffer = 0){
+	public function get_previous_versions($pBuffer = 0){     //todo buffer fix
 		$versions = $this->get_attribute("DOC_VERSIONS", $pBuffer);
 		 
 		if(is_array($versions) && !empty($versions) && count($versions) > 0){
@@ -227,7 +227,7 @@ class steam_document extends steam_object
   		return array();
 	}
   
-	public function is_previous_version_of($pBuffer = 0) {
+	public function is_previous_version_of($pBuffer = 0) {   //todo buffer fix
 		$doc = $this->get_attribute("OBJ_VERSIONOF", $pBuffer);
 		if($doc instanceof steam_document) {
 			return $doc;

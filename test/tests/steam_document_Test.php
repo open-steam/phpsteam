@@ -252,6 +252,23 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		$versions = $this->testObject->get_previous_versions();
 		$this->assertEquals(1, sizeof($versions));
 		$this->assertEquals($this->initContent, $versions[0]->get_content());
+
+		//reset test object
+		$this->tearDown();
+		$this->setUp();
+
+		//test with buffer
+		$tid = $this->testObject->get_previous_versions(true);
+		$result = self::$steamConnector->buffer_flush();
+		$this->assertEquals(array(), $result[$tid]);
+		$this->testObject->set_content("Dog", true);
+		$tid = $this->testObject->get_previous_versions(true);
+		$result = self::$steamConnector->buffer_flush();
+		$versions = $result[$tid];
+		$this->assertEquals(1, sizeof($versions));
+		$tid = $versions[0]->get_content();
+		$result = self::$steamConnector->buffer_flush();
+		$this->assertEquals($this->initContent, $result[$tid]);
     }
 
     /**
@@ -263,5 +280,21 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		$this->testObject->set_content("Dog");
 		$versions = $this->testObject->get_previous_versions();
 		$this->assertEquals($this->testObject, $versions[0]->is_previous_version_of());
+
+		//reset test object
+		$this->tearDown();
+		$this->setUp();
+
+		//test with buffer
+		$tid = $this->testObject->is_previous_version_of(true);
+		$result = self::$steamConnector->buffer_flush();
+		$this->assertFalse($result[$tid]);
+		$this->testObject->set_content("Dog", true);
+		$tid = $this->testObject->get_previous_versions(true);
+		$result = self::$steamConnector->buffer_flush();
+		$versions = $result[$tid];
+		$tid = $versions[0]->is_previous_version_of(true);
+		$result = self::$steamConnector->buffer_flush();
+		$this->assertEquals($this->testObject, $result[$tid]);
     }
 }
