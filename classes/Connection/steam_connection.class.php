@@ -54,6 +54,7 @@ class steam_connection {
 	protected $server_config;
 
 	protected $known_results = array();
+	protected $buffer_result_callbacks = array();
 
 	private static $instances = array();
 
@@ -520,12 +521,20 @@ class steam_connection {
 		$this->request_buffer = array();
 	}
 
-	public function add_known_result($transaction_number, $result) {
-		$this->known_results[$transaction_number] = $result;
+	public function add_known_result($transactionid, $result) {
+		$this->known_results[$transactionid] = $result;
 	}
 
 	public function reset_known_results() {
 		$this->known_results = array();
+	}
+
+	public function add_buffer_result_callback($transactionid, $callback) {
+		$this->buffer_result_callbacks[$transactionid] = $callback;
+	}
+
+	public function reset_buffer_result_callbacks() {
+		$this->buffer_result_callbacks = array();
 	}
 
 	/**
@@ -544,16 +553,20 @@ class steam_connection {
 			$data = $this->send_command($this->request_buffer);
 			// construct result array with transaction id as key
 			foreach ($data as $answer) {
-				$result[$answer->get_transactionid()] = $answer->get_arguments();
+				$value = $answer->get_arguments();
+				if (isset($this->buffer_result_callbacks[$answer->get_transactionid()])) {
+					$value = $this->buffer_result_callbacks[$answer->get_transactionid()]($value);
+				}
+				$result[$answer->get_transactionid()] = $value;
 			}
 			$this->request_buffer = array();
 		} else {
 			$result = array();
 		}
 
-		if (isset($this->known_results)) {
-			foreach ($this->known_results as $trans_id => $answer) {
-				$result[$trans_id] = $answer;
+		if (!empty($this->known_results)) {
+			foreach ($this->known_results as $transactionid => $answer) {
+				$result[$transactionid] = $answer;
 			}
 		}
 
@@ -572,6 +585,7 @@ class steam_connection {
 		}
 		$this->object_buffer = array();
 		$this->reset_known_results();
+		$this->reset_buffer_result_callbacks();
 		return $result;
 	}
 

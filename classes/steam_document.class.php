@@ -217,18 +217,24 @@ class steam_document extends steam_object
 	}
 
 	public function get_previous_versions($pBuffer = 0){
-		$versions = $this->get_attribute("DOC_VERSIONS");
-		$result = array();
-		if(is_array($versions) && !empty($versions) && count($versions) > 0){
-			krsort($versions);
-			$versions = array_values($versions);
-			$result = $versions;
-		}
-		if ($pBuffer) {
-			var_dump($result);
-			return $this->get_steam_connector()->add_to_buffer($result);
-		} else {
+		$callback = function($versions) {
+			$result = array();
+			if(is_array($versions) && !empty($versions)){
+				krsort($versions);
+				$versions = array_values($versions);
+				$result = $versions;
+			}
 			return $result;
+		};
+
+		if ($pBuffer) {
+			$tid = $this->get_attribute("DOC_VERSIONS");
+			$this->get_steam_connector()->add_buffer_result_callback($tid, $callback);
+			return $tid;
+		} else {
+			$versions = $this->get_attribute("DOC_VERSIONS");
+			$versions = $callback($versions);
+			return $versions;
 		}
 	}
   

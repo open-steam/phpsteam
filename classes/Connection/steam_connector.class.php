@@ -530,4 +530,9 @@ class steam_connector implements Serializable
 		$steam_connection->add_known_result($trans_action, $value);
 		return $trans_action;
 	}
+
+	public function add_buffer_result_callback($transactionid, $callback) {
+		$steam_connection = steam_connection::get_instance($this->get_id());
+		$steam_connection->add_buffer_result_callback($transactionid, $callback);
+	}
 } 
