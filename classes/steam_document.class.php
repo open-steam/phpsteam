@@ -228,7 +228,7 @@ class steam_document extends steam_object
 		};
 
 		if ($pBuffer) {
-			$tid = $this->get_attribute("DOC_VERSIONS");
+			$tid = $this->get_attribute("DOC_VERSIONS", $pBuffer);
 			$this->get_steam_connector()->add_buffer_result_callback($tid, $callback);
 			return $tid;
 		} else {
