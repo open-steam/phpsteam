@@ -69,8 +69,12 @@ class FileUidPersistence extends FilePersistence {
 
         $steam_id = $document->get_id();
         file_put_contents($target_dir . $steam_id, $content);
-		$document->steam_command($document, "set_content", array($uuid), 0);
-        return strlen($content);
+		$document->steam_command($document, "set_content", array($uuid), $buffer);
+		if ($buffer) {
+			return $document->get_steam_connector()->add_to_buffer(strlen($content));
+		} else {
+			return strlen($content);
+		}
     }
 
 	public function load(\steam_document $document, $buffer = 0) {
