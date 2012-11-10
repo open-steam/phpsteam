@@ -9,7 +9,7 @@ class CoalContentProvider extends  SteamContentProvider {
             $document,
             "get_content",
             array(),
-            0
+			$buffer
         );
     }
 }
