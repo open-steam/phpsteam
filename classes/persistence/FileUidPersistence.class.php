@@ -76,7 +76,11 @@ class FileUidPersistence extends FilePersistence {
 	public function load(\steam_document $document, $buffer = 0) {
 		$file_path = $this->get_file_path($document);
 		$content = file_get_contents($file_path);
-		return $content;
+		if ($buffer) {
+			return $document->get_steam_connector()->add_to_buffer($content);
+		} else {
+			return $content;
+		}
 	}
 
 	public function getSize(\steam_document $document, $buffer = 0) {
