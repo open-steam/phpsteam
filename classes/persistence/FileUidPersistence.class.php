@@ -70,16 +70,12 @@ class FileUidPersistence extends FilePersistence {
         $steam_id = $document->get_id();
         file_put_contents($target_dir . $steam_id, $content);
 		$document->steam_command($document, "set_content", array($uuid), 0);
-        //TODO: check file permissions in target directory
-        //if can't write - throw exception
-        //if could write return uuid else false
         return strlen($content);
     }
 
 	public function load(\steam_document $document, $buffer = 0) {
 		$file_path = $this->get_file_path($document);
 		$content = file_get_contents($file_path);
-
 		return $content;
 	}
 

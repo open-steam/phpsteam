@@ -210,14 +210,14 @@ class steam_document extends steam_object
 		throw new steam_exception( $this->steam_connector->get_login_user_name(), "Error: cant get module \"wiki\" from server.", 404 );
 	}
 
-	public function get_version()
+	public function get_version($pBuffer = 0)
 	{
-		$version = (int) $this->get_attribute( "DOC_VERSION" );
+		$version = (int) $this->get_attribute("DOC_VERSION", $pBuffer);
 		return $version;
 	}
 
-	public function get_previous_versions(){
-		$versions = $this->get_attribute( "DOC_VERSIONS" );
+	public function get_previous_versions($pBuffer = 0){
+		$versions = $this->get_attribute("DOC_VERSIONS", $pBuffer);
 		 
 		if(is_array($versions) && !empty($versions) && count($versions) > 0){
 			krsort($versions);
@@ -227,8 +227,8 @@ class steam_document extends steam_object
   		return array();
 	}
   
-	public function is_previous_version_of() {
-		$doc = $this->get_attribute("OBJ_VERSIONOF");
+	public function is_previous_version_of($pBuffer = 0) {
+		$doc = $this->get_attribute("OBJ_VERSIONOF", $pBuffer);
 		if($doc instanceof steam_document) {
 			return $doc;
 		}
