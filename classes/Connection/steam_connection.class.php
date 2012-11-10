@@ -53,7 +53,7 @@ class steam_connection {
 	protected $server_version;
 	protected $server_config;
 
-	protected $known_results;
+	protected $known_results = array();
 
 	private static $instances = array();
 
