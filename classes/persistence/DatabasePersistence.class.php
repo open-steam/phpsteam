@@ -24,7 +24,6 @@ class DatabasePersistence extends Persistence {
     }
 
     public function save(\steam_document $document, &$content, $buffer = 0) {
-		unset($document->attributes["DOC_SIZE"]);
 		return $document->steam_command($document, "set_content", array($content), $buffer);
     }
 

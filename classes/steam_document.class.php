@@ -112,6 +112,7 @@ class steam_document extends steam_object
 		unset($this->attributes[DOC_VERSIONS]);
 		unset($this->attributes[DOC_LAST_MODIFIED]);
 		unset($this->attributes[DOC_USER_MODIFIED]);
+		unset($this->attributes[DOC_SIZE]);
 		return $result;
 	}
 
