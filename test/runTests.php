@@ -18,6 +18,10 @@ if (file_exists($pathComposer . "composer.phar")) {
 
 passthru("cd $pathComposer; php composer.phar update");
 
-passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistence.php tests-function");
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceCoalProvider.php tests-function");
+
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceDatabaseProvider.php tests-function");
+
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceSteamWebProvider.php tests-function");
 
 passthru("deps/vendor/bin/phpunit --bootstrap bootstrapFileUidPersistence.php tests-function");

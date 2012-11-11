@@ -7,8 +7,16 @@ class DatabasePersistence extends Persistence {
     protected static $_contentProvider;
 
     public static function init() {
-        $class = DEFAULT_CONTENT_PROVIDER;
-        self::$_contentProvider = new $class();
+    	if (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_COAL) {
+			self::$_contentProvider = new \OpenSteam\Persistence\ContentProvider\CoalContentProvider();
+	  	} else if (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_STEAMWEB) {
+			self::$_contentProvider = new \OpenSteam\Persistence\ContentProvider\SteamWebContentProvider();
+		} else if (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_DATABASE) {
+			self::$_contentProvider = new \OpenSteam\Persistence\ContentProvider\DatabaseContentProvider();
+		} else {
+			self::$_contentProvider = new \OpenSteam\Persistence\ContentProvider\CoalContentProvider();
+		}
+
     }
 
     public function delete(\steam_document $document, $buffer = 0) {

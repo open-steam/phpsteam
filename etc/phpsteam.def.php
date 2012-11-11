@@ -18,9 +18,9 @@ define("DOWNLOAD_INLINE", "inline");
 define("DOWNLOAD_RANGE", "range");
 
 // define content provider types
-define("CONTENT_PROVIDER_COAL", "OpenSteam\\Persistence\\ContentProvider\\CoalContentProvider");
-define("CONTENT_PROVIDER_DATABASE", "OpenSteam\\Persistence\\ContentProvider\\DatabaseContentProvider");
-define("CONTENT_PROVIDER_STEAMWEB", "OpenSteam\\Persistence\\ContentProvider\\SteamWebContentProvider");
+define("CONTENT_PROVIDER_COAL",		0x00000000);
+define("CONTENT_PROVIDER_STEAMWEB", 0x00000001);
+define("CONTENT_PROVIDER_DATABASE", 0x00000002);
 // config default content provider
 defined("DEFAULT_CONTENT_PROVIDER") or define("DEFAULT_CONTENT_PROVIDER", CONTENT_PROVIDER_COAL);
 
