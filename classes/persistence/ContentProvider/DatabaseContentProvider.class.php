@@ -40,9 +40,9 @@ class DatabaseContentProvider extends SteamContentProvider
         }
         $data = $downloader->get_document_attributes($identifier);
         $content = $downloader->get_content($identifier, $login);*/
-        $downloader = new downloader();
-        $downloader->connect_to_mysql();
-        $content = $downloader->get_content($identifier);
+        $databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
+		$databaseHelper->connect_to_mysql();
+        $content = $databaseHelper->get_content($identifier);
 
         return $content;
     }

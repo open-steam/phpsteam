@@ -1,6 +1,21 @@
 <?php
 
+namespace OpenSteam\Helper;
+
 class DatabaseHelper {
+
+	private static $instance;
+
+	private function __construct() {
+
+	}
+
+	public static function getInstance() {
+		if (!isset(self::$instance)) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
 	public static function getAllUsers(){
 		$query = "SELECT * FROM i_users;";
@@ -207,8 +222,7 @@ class DatabaseHelper {
 	}
 
 	function get_mime_type($oid) {
-		$query = "select ob_data from ob_data where ob_attr='DOC_MIME_TYPE' and ob_i\
-  d = " . $oid;
+		$query = "select ob_data from ob_data where ob_attr='DOC_MIME_TYPE' and ob_id = " . $oid;
 		$result = mysql_query($query);
 		if ($result) {
 			if ($row = mysql_fetch_row($result)) {
