@@ -24,7 +24,7 @@ class steam_connection {
 	protected $login_data; //??
 	protected $current_steam_user;
 	protected $login_user_name = "Anonymous";
-	private $login_passwd;
+	protected $login_passwd;
 	protected $login_status; // 1=logged in, 0=logged out
 
 	// request buffer

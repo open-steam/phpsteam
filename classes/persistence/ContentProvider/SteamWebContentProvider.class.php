@@ -16,7 +16,7 @@ class SteamWebContentProvider extends  SteamContentProvider {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
-        curl_setopt($ch, CURLOPT_USERPWD, $this->login . ":" . $this->password);
+        curl_setopt($ch, CURLOPT_USERPWD, \steam_connection::get_instance($document->get_steam_connector()->get_id())->login_user_name . ":" . \steam_connection::get_instance($document->get_steam_connector()->get_id())->login_passwd);
         $result = curl_exec($ch);
         curl_close($ch);
 
