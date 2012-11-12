@@ -41,4 +41,8 @@ class DatabasePersistence extends Persistence {
         }
         return $result;
     }
+
+	public static function getContentProvider() {
+		return self::$_contentProvider;
+	}
 }

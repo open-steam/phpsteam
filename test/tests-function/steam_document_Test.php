@@ -68,6 +68,10 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testGet_readers()
     {
+		$contentProvider = $this->testObject->getPersistence()->getContentProvider();
+		if (($contentProvider instanceof \OpenSteam\Persistence\ContentProvider\SteamWebContentProvider) || ($contentProvider instanceof \OpenSteam\Persistence\ContentProvider\DatabaseContentProvider)) {
+			return;
+		}
 		$readersArray = $this->testObject->get_readers();
 		$this->assertTrue(is_array($readersArray));
 		$this->assertTrue(empty($readersArray));
@@ -100,6 +104,10 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
      */
     public function testIs_reader()
     {
+		$contentProvider = $this->testObject->getPersistence()->getContentProvider();
+		if (($contentProvider instanceof \OpenSteam\Persistence\ContentProvider\SteamWebContentProvider) || ($contentProvider instanceof \OpenSteam\Persistence\ContentProvider\DatabaseContentProvider)) {
+			return;
+		}
         $this->assertEquals(0, $this->testObject->is_reader());
 		$this->testObject->get_content();
 		$this->assertEquals(1, $this->testObject->is_reader());
@@ -154,6 +162,12 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		$tid = $this->testObject->get_content_size(true);
 		$result = self::$steamConnector->buffer_flush();
 		$this->assertEquals(strlen($this->initContent), $result[$tid]);
+
+		$newContent = "Goodbye!";
+		$this->testObject->set_content($newContent, true);
+		$tid = $this->testObject->get_content_size(true);
+		$result = self::$steamConnector->buffer_flush();
+		$this->assertEquals(strlen($newContent), $result[$tid]);
     }
 
     /**
