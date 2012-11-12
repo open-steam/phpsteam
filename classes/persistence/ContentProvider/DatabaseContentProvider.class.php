@@ -17,7 +17,8 @@ class DatabaseContentProvider extends SteamContentProvider
 
 		if ($buffer) {
 			$tid = $document->get_steam_connector()->add_to_buffer($document);
-			return $document->get_steam_connector()->add_buffer_result_callback($tid, $callback);
+			$document->get_steam_connector()->add_buffer_result_callback($tid, $callback);
+			return $tid;
 		} else {
 			return $callback($document);
 		}
