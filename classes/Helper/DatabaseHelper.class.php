@@ -238,7 +238,7 @@ class DatabaseHelper {
 	}
 
 	function get_content_id($oid) {
-		$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
+		$query = "flush tables; select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
 		try{
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
@@ -261,19 +261,10 @@ class DatabaseHelper {
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
 			$results = $statement->fetchAll();
-			var_dump($results);die;
 			return $results[0][0];
 		} catch (\PDOException $e) {
 			echo 'Query failed: ' . $e->getMessage();
 		}
-		$result = mysql_query($query);
-
-		$content = "";
-		while ($row = mysql_fetch_row($result)) {
-			$content .= print_r($row[0], true);
-		}
-
-		return $content;
 	}
 
 
