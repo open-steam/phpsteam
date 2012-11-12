@@ -566,7 +566,11 @@ class steam_connection {
 
 		if (!empty($this->known_results)) {
 			foreach ($this->known_results as $transactionid => $answer) {
-				$result[$transactionid] = $answer;
+				$value = $answer;
+				if (isset($this->buffer_result_callbacks[$transactionid])) {
+					$value = $this->buffer_result_callbacks[$transactionid]($value);
+				}
+				$result[$transactionid] = $value;
 			}
 		}
 
