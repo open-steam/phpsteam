@@ -179,11 +179,11 @@ class DatabaseHelper {
 		if (!empty($db_host) && !empty($db_database) && !empty($db_user)) {
 			$dsn = "mysql:dbname={$db_database};host={$db_host}";
 			try{
-				$this->pdo = new PDO($dsn, $db_user, $db_password);
-			} catch (PDOException $e) {
+				$this->pdo = new \PDO($dsn, $db_user, $db_password);
+			} catch (\PDOException $e) {
 				echo 'Connection failed: ' . $e->getMessage();
 			}
-		} else throw new Exception("Unable to connect to database.", E_CONFIGURATION);
+		} else throw new \Exception("Unable to connect to database.", E_CONFIGURATION);
 	}
 
 	function disconnect_from_mysql() {
@@ -248,7 +248,7 @@ class DatabaseHelper {
 			die;
 
 			return $return_arr;
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			echo 'Connection failed: ' . $e->getMessage();
 		}
 		//if ($this->content_id === -1) {
