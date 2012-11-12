@@ -169,6 +169,7 @@ class DatabaseHelper {
 	}
 
 	//private $content_id = -1;
+	private $pdo;
 
 	function connect_to_mysql() {
 		$db_host = STEAM_DATABASE_HOST;
@@ -176,8 +177,12 @@ class DatabaseHelper {
 		$db_user = STEAM_DATABASE_USER;
 		$db_password = STEAM_DATABASE_PASS;
 		if (!empty($db_host) && !empty($db_database) && !empty($db_user)) {
-			mysql_connect($db_host, $db_user, $db_password);
-			mysql_select_db($db_database);
+			$dsn = "mysql:dbname={$db_database};host={$db_host}";
+			try{
+				$this->pdo = new PDO($dsn, $db_user, $db_password);
+			} catch (PDOException $e) {
+				echo 'Connection failed: ' . $e->getMessage();
+			}
 		} else throw new Exception("Unable to connect to database.", E_CONFIGURATION);
 	}
 
@@ -233,6 +238,19 @@ class DatabaseHelper {
 	}
 
 	function get_content_id($oid) {
+		$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
+		try{
+			$statement = $this->pdo->prepare($query);
+			$statement->execute();
+			$results = $statement->fetchAll();
+
+			var_dump($results);
+			die;
+
+			return $return_arr;
+		} catch (PDOException $e) {
+			echo 'Connection failed: ' . $e->getMessage();
+		}
 		//if ($this->content_id === -1) {
 			$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
 			$result = mysql_query($query);
