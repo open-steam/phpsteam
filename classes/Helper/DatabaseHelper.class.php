@@ -250,10 +250,10 @@ class DatabaseHelper {
 		}
 	}
 
-	function get_content($oid, $user = "") {
-		$content_id = $this->get_content_id($oid);
+	function get_content($cid, $user = "") {
+		$content_id = $cid;//$this->get_content_id($oid);
 		if ($content_id == 0) {
-			echo "Error: no content id found for #{$oid}";
+			//echo "Error: no content id found for #{$oid}";
 			return "";
 		}
 		$query = "select rec_data from doc_data where doc_id=" . $content_id . " order by rec_order";
