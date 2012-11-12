@@ -238,6 +238,7 @@ class DatabaseHelper {
 	}
 
 	function get_content_id($oid) {
+		var_dump($oid);
 		$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
 		try{
 			$statement = $this->pdo->prepare($query);
