@@ -42,6 +42,10 @@ class DatabaseContentProvider extends SteamContentProvider
 		$databaseHelper->connect_to_mysql();
         $content = $databaseHelper->get_content($document->get_content_id());
 
-        return $content;
+		if ($buffer) {
+			return $document->get_steam_connector()->add_to_buffer($content);
+		} else {
+			return $content;
+		}
     }
 }
