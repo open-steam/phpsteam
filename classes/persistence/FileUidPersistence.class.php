@@ -134,4 +134,8 @@ class FileUidPersistence extends FilePersistence {
         }
 		return $target_dir;
     }
+
+	public static function getContentProvider() {
+		return null;
+	}
 }

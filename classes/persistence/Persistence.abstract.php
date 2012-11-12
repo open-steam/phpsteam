@@ -33,4 +33,6 @@ abstract class Persistence {
     public abstract function load(\steam_document $document, $buffer = 0);
 
 	public abstract function getSize(\steam_document $document, $buffer = 0);
+
+	public abstract static function getContentProvider();
 }
