@@ -16,3 +16,5 @@ test/etc/default.def.php
 
 #test-tools
 test/tools/phpunit-skelgen.phar
+
+test/var/temp/*

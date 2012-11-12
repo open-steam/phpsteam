@@ -20,17 +20,29 @@ passthru("cd $pathComposer; php composer.phar update");
 
 $colors = new Colors();
 
-echo $colors->getColoredString("******** Setup: Database Persistence with COAL Provider ********" . PHP_EOL, "purple");
+/*echo $colors->getColoredString("******** [FunctionTests] Setup: Database Persistence with COAL Provider ********" . PHP_EOL, "purple");
 passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceCoalProvider.php tests-function");
 
-echo $colors->getColoredString("******** Setup: Database Persistence with Database Provider ********" . PHP_EOL, "purple");
+echo $colors->getColoredString("******** [FunctionTests] Setup: Database Persistence with Database Provider ********" . PHP_EOL, "purple");
 passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceDatabaseProvider.php tests-function");
 
-echo $colors->getColoredString("******** Setup: Database Persistence with SteamWeb Provider ********" . PHP_EOL, "purple");
+echo $colors->getColoredString("******** [FunctionTests] Setup: Database Persistence with SteamWeb Provider ********" . PHP_EOL, "purple");
 passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceSteamWebProvider.php tests-function");
 
-echo $colors->getColoredString("******** Setup: File Uid Persistence ********" . PHP_EOL, "purple");
+echo $colors->getColoredString("******** [FunctionTests] Setup: File Uid Persistence ********" . PHP_EOL, "purple");
 passthru("deps/vendor/bin/phpunit --bootstrap bootstrapFileUidPersistence.php tests-function");
+
+echo $colors->getColoredString("******** [PerformanceTests] Setup: Database Persistence with COAL Provider ********" . PHP_EOL, "purple");
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceCoalProvider.php tests-performance");
+
+echo $colors->getColoredString("******** [PerformanceTests] Setup: Database Persistence with Database Provider ********" . PHP_EOL, "purple");
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceDatabaseProvider.php tests-performance");
+
+echo $colors->getColoredString("******** [PerformanceTests] Setup: Database Persistence with SteamWeb Provider ********" . PHP_EOL, "purple");
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapDatabasePersistenceSteamWebProvider.php tests-performance");*/
+
+echo $colors->getColoredString("******** [PerformanceTests] Setup: File Uid Persistence ********" . PHP_EOL, "purple");
+passthru("deps/vendor/bin/phpunit --bootstrap bootstrapFileUidPersistence.php tests-performance");
 
 class Colors {
 	private $foreground_colors = array();
