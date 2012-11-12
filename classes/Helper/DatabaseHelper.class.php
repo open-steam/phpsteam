@@ -254,6 +254,7 @@ class DatabaseHelper {
 			//$this->content_id = $row[0];
 		//}
 		//return $this->content_id;
+		echo $row[0];
 		return $row[0];
 	}
 
