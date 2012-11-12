@@ -125,6 +125,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
     {
 		$newContent = "Goodbye!";
 		$this->assertEquals(strlen($newContent), $this->testObject->set_content($newContent));
+		sleep(1); // wait for db store finished
 		$this->assertEquals($newContent, $this->testObject->get_content());
 
 		//reset test object
@@ -136,6 +137,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		$tid = $this->testObject->set_content($newContent, true);
 		$result = self::$steamConnector->buffer_flush();
 		$this->assertEquals(strlen($newContent), $result[$tid]);
+		sleep(1);
 		$tid = $this->testObject->get_content(true);
 		$result = self::$steamConnector->buffer_flush();
 		$this->assertEquals($newContent, $result[$tid]);

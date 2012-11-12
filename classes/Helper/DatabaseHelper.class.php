@@ -238,60 +238,30 @@ class DatabaseHelper {
 	}
 
 	function get_content_id($oid) {
-		var_dump($oid);
 		$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
 		try{
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
 			$results = $statement->fetchAll();
 
-			var_dump($results);
-			die;
-
-			return $return_arr;
+			return $results[0][0];
 		} catch (\PDOException $e) {
-			echo 'Connection failed: ' . $e->getMessage();
+			echo 'Query failed: ' . $e->getMessage();
 		}
-		//if ($this->content_id === -1) {
-			$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
-			$result = mysql_query($query);
-			if (!$result) {
-				if (defined("LOG_DEBUGLOG")) {
-					$time1 = microtime(TRUE);
-					logging::write_log(LOG_DEBUGLOG, "download_handling::get_content_id\t" . $oid . " \tCONTENT_ID not set. (result is null)");
-				}
-				return -1;
-			}
-			$row = mysql_fetch_row($result);
-			if (!$row) {
-				if (defined("LOG_DEBUGLOG")) {
-					$time1 = microtime(TRUE);
-					logging::write_log(LOG_DEBUGLOG, "download_handling::get_content_id\t" . $oid . " \tCONTENT_ID not set (row is null).");
-				}
-				return -1;
-			}
-			//$this->content_id = $row[0];
-		//}
-		//return $this->content_id;
-		if(mysql_error()>0)
-		{
-			print mysql_error() . "\n\n";
-			print $query;
-		}
-		echo $row[0];
-		return $row[0];
 	}
 
 	function get_content($oid, $user = "") {
 		$content_id = $this->get_content_id($oid);
-
-		if ($content_id === -1) {
-			if (defined("LOG_DEBUGLOG")) {
-				$time1 = microtime(TRUE);
-				logging::write_log(LOG_DEBUGLOG, "download_handling::download_and_print\t" . $oid . " \tCONTENT_ID is -1 (not yet set in database).");
-			}
-		}
 		$query = "select rec_data from doc_data where doc_id=" . $content_id . " order by rec_order";
+		try{
+			$statement = $this->pdo->prepare($query);
+			$statement->execute();
+			$results = $statement->fetchAll();
+			var_dump($results);die;
+			return $results[0][0];
+		} catch (\PDOException $e) {
+			echo 'Query failed: ' . $e->getMessage();
+		}
 		$result = mysql_query($query);
 
 		$content = "";
