@@ -730,6 +730,10 @@ class steam_connection {
 		return $this->login_user_name;
 	}
 
+	public function get_login_passwd() {
+		return $this->login_passwd;
+	}
+
 	/**
 	 * function exception:
 	 *
