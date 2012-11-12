@@ -8,8 +8,6 @@ class DatabaseContentProvider extends SteamContentProvider
 
     public function getContent(\steam_document $document, $buffer = 0)
     {
-        $identifier = $document->get_id();
-
         /*
         if (isset($_SESSION["LMS_USER"]) && $_SESSION["LMS_USER"] instanceof lms_user
             && $_SESSION["LMS_USER"]->is_logged_in()
@@ -42,7 +40,7 @@ class DatabaseContentProvider extends SteamContentProvider
         $content = $downloader->get_content($identifier, $login);*/
         $databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 		$databaseHelper->connect_to_mysql();
-        $content = $databaseHelper->get_content($identifier);
+        $content = $databaseHelper->get_content($document->get_id());
 
         return $content;
     }

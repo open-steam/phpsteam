@@ -168,7 +168,7 @@ class DatabaseHelper {
 		return $unreadMails;
 	}
 
-	private $content_id = -1;
+	//private $content_id = -1;
 
 	function connect_to_mysql() {
 		$db_host = STEAM_DATABASE_HOST;
@@ -233,7 +233,7 @@ class DatabaseHelper {
 	}
 
 	function get_content_id($oid) {
-		if ($this->content_id === -1) {
+		//if ($this->content_id === -1) {
 			$query = "select ob_data from ob_data where ob_attr='CONTENT_ID' AND ob_id=" . $oid;
 			$result = mysql_query($query);
 			if (!$result) {
@@ -251,9 +251,10 @@ class DatabaseHelper {
 				}
 				return -1;
 			}
-			$this->content_id = $row[0];
-		}
-		return $this->content_id;
+			//$this->content_id = $row[0];
+		//}
+		//return $this->content_id;
+		return $row[0];
 	}
 
 	function get_content($oid, $user = "") {
