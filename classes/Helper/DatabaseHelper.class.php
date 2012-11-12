@@ -254,6 +254,11 @@ class DatabaseHelper {
 			//$this->content_id = $row[0];
 		//}
 		//return $this->content_id;
+		if(mysql_error()>0)
+		{
+			print mysql_error() . "\n\n";
+			print $query;
+		}
 		echo $row[0];
 		return $row[0];
 	}
