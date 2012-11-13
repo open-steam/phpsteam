@@ -183,7 +183,7 @@ class steam_document extends steam_object
 
 	public function delete($pBuffer = 0) {
 		$this->getPersistence()->delete($this, $pBuffer);
-		parent::delete($pBuffer);
+		return parent::delete($pBuffer);
 	}
 
 	/**

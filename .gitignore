@@ -18,3 +18,4 @@ test/etc/default.def.php
 test/tools/phpunit-skelgen.phar
 
 test/var/temp/*
+test/var/persistence/uid/*

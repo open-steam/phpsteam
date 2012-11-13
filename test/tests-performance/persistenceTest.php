@@ -32,7 +32,7 @@ class persistenceTest extends PHPUnit_Framework_TestCase
 	{
 	}
 
-/*	public function testCreateManyDocuments()
+	public function testCreateManyDocuments()
 	{
 		$currentUser = self::$steamConnector->get_current_steam_user();
 		$userHome = $currentUser->get_workroom();
@@ -40,7 +40,7 @@ class persistenceTest extends PHPUnit_Framework_TestCase
 		for($i = 0; $i < 10; $i++) {
 			$document = steam_factory::create_document(self::$steamConnector->get_id(), $this->initObjName, $content, "", $userHome, $this->initObjDesc);
 			self::$testObjects[] = $document;
-			$this->assertEquals($content, $document->get_content());
+			$this->assertTrue(($content === $document->get_content()));
 		}
 	}
 
@@ -48,9 +48,9 @@ class persistenceTest extends PHPUnit_Framework_TestCase
 		foreach(self::$testObjects as $testObject) {
 			$this->assertTrue($testObject->delete());
 		}
-	} */
+	}
 
-	public function testDeleteAll() {
+	/*public function testDeleteAll() {
 		$currentUser = self::$steamConnector->get_current_steam_user();
 		$userHome = $currentUser->get_workroom();
 		$objects = $userHome->get_inventory();
@@ -59,6 +59,6 @@ class persistenceTest extends PHPUnit_Framework_TestCase
 				$object->delete();
 			}
 		}
-	}
+	}*/
 
 }
