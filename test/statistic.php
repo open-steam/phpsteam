@@ -6,6 +6,7 @@ function shutdown() {
 	$colors = new Colors();
 	echo $colors->getColoredString("******** Statistic ********" . PHP_EOL, "yellow");
 	echo $colors->getColoredString("time: " . (microtime(TRUE) - $GLOBALS['startTime']) . "s" . PHP_EOL, "yellow");
+	echo PHP_EOL . PHP_EOL;
 
 }
 

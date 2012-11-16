@@ -40,13 +40,13 @@ class persistenceTest extends PHPUnit_Framework_TestCase
 		for($i = 0; $i < 10; $i++) {
 			$document = steam_factory::create_document(self::$steamConnector->get_id(), $this->initObjName, $content, "", $userHome, $this->initObjDesc);
 			self::$testObjects[] = $document;
-			$this->assertTrue(($content === $document->get_content()));
+			//$this->assertTrue(($content === $document->get_content()));
 		}
 	}
 
 	public function testDeleteDocuments() {
 		foreach(self::$testObjects as $testObject) {
-			$this->assertTrue($testObject->delete());
+			$this->assertEquals(1, $testObject->delete());
 		}
 	}
 
