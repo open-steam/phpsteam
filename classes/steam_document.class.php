@@ -58,13 +58,13 @@ class steam_document extends steam_object
 			//get content from database
 			$content = $this->get_content();
 
+			//cleanup file persistence
+			$this->_persistence->lowDeleteContentFile($this);
+
 			//new persistence
 			$newPersistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			//change persistence without creating a new document version
 			$newPersistence->save($this, $content, 0, true);
-
-			//cleanup file persistence
-			$this->_persistence->lowDeleteContentFile($this);
 
 			//change persistence type
 			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_DATABASE);
