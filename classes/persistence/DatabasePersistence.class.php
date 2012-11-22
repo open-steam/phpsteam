@@ -23,8 +23,19 @@ class DatabasePersistence extends Persistence {
         //no additional stuff needed
     }
 
-    public function save(\steam_document $document, &$content, $buffer = 0) {
-		return $document->steam_command($document, "set_content", array($content), $buffer);
+    public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
+		if ($noVersion) {
+			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
+			$databaseHelper->connect_to_mysql();
+			$databaseHelper->set_content($document->get_content_id(), $content);
+			if ($buffer) {
+				return $document->get_steam_connector()->add_to_buffer(strlen($content));
+			} else {
+				return strlen($content);
+			}
+		} else {
+			return $document->steam_command($document, "set_content", array($content), $buffer);
+		}
     }
 
     public function load(\steam_document $document, $buffer = 0) {

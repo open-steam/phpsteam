@@ -37,6 +37,42 @@ class steam_document extends steam_object
 		return $this->_persistence;
 	}
 
+	public function migratePersistence($toPersistenceType) {
+		$currentPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+		if ($currentPersistenceType === $toPersistenceType) {
+			return;
+		}
+		if (($currentPersistenceType === PERSISTENCE_DATABASE) && ($toPersistenceType === PERSISTENCE_FILE_UID)) {
+			//get content from database
+			$content = $this->get_content();
+
+			//new persistence
+			$newPersistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
+			//change persistence without creating a new document version
+			$newPersistence->save($this, $content, 0, true);
+
+			//change persistence type
+			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_FILE_UID);
+			$this->_persistence = $newPersistence;
+		} else if (($currentPersistenceType === PERSISTENCE_FILE_UID) && ($toPersistenceType === PERSISTENCE_DATABASE)) {
+			//get content from database
+			$content = $this->get_content();
+
+			//new persistence
+			$newPersistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
+			//change persistence without creating a new document version
+			$newPersistence->save($this, $content, 0, true);
+
+			//cleanup file persistence
+			$this->_persistence->lowDeleteContentFile($this);
+
+			//change persistence type
+			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_DATABASE);
+			$this->_persistence = $newPersistence;
+
+		}
+	}
+
 	public function get_type() {
 		return CLASS_DOCUMENT | CLASS_OBJECT;
 	}

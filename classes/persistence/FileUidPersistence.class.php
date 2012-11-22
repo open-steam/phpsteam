@@ -20,13 +20,9 @@ class FileUidPersistence extends FilePersistence {
 	}
 
     public function delete(\steam_document $document, $buffer = 0) {
-        $contentFile = $this->get_file_path($document);
-		if(file_exists($contentFile)){
-            unlink($contentFile);
-        } else {
-			throw new \Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
-		}
+        $this->lowDeleteContentFile($document);
 
+		//delete versions if not is version
 		$version_of = $document->get_attribute(OBJ_VERSIONOF);
         if (!($version_of instanceof \steam_document)) {
             //get versions
@@ -39,19 +35,31 @@ class FileUidPersistence extends FilePersistence {
 			}
         }
 
-		$current_dir = dirname($contentFile);
-        while ($current_dir . "/" !== self::$persistenceBaseFolder) {
-            $obj_count = count(glob($current_dir . "/*"));
-            if ($obj_count === 0) {
-                rmdir($current_dir);
-                $current_dir = dirname($current_dir);
-            } else {
-                break;
-            }
-        }
+
     }
 
-    public function save(\steam_document $document, &$content, $buffer = 0) {
+	public function lowDeleteContentFile($document) {
+		$contentFile = $this->get_file_path($document);
+
+		if(file_exists($contentFile)){
+			unlink($contentFile);
+		} else {
+			throw new \Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
+		}
+
+		$current_dir = dirname($contentFile);
+		while ($current_dir . "/" !== self::$persistenceBaseFolder) {
+			$obj_count = count(glob($current_dir . "/*"));
+			if ($obj_count === 0) {
+				rmdir($current_dir);
+				$current_dir = dirname($current_dir);
+			} else {
+				break;
+			}
+		}
+	}
+
+    public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
         $uuid = $this->generate_id($document, $content);
         $dir_array = str_split($uuid, 3);
 
@@ -69,7 +77,13 @@ class FileUidPersistence extends FilePersistence {
 
         $steam_id = $document->get_id();
         file_put_contents($target_dir . $steam_id, $content);
-		$document->steam_command($document, "set_content", array($uuid), 0);
+		if ($noVersion) {
+			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
+			$databaseHelper->connect_to_mysql();
+			$databaseHelper->set_content($document->get_content_id(), $uuid);
+		} else {
+			$document->steam_command($document, "set_content", array($uuid), 0);
+		}
 		if ($buffer) {
 			return $document->get_steam_connector()->add_to_buffer(strlen($content));
 		} else {
