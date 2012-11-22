@@ -64,7 +64,7 @@ class FileUidPersistence extends FilePersistence {
         $dir_array = str_split($uuid, 3);
 
         if (!FILE_PERSISTENCE_BASE_PATH) {
-            throw Exception('Have to set persistence base path!');
+            throw \Exception('Have to set persistence base path!');
         }
         $target_dir = self::$persistenceBaseFolder;
 
@@ -130,10 +130,14 @@ class FileUidPersistence extends FilePersistence {
         return $id;
     }
 
+	public function isValidUid($uid) {
+		return preg_match("/^[a-f0-9]{15}$/is", $uid);
+	}
+
     public function get_file_path(\steam_document $document) {
         $uid = $document->steam_command($document, "get_content", array(), 0);
-		if (!preg_match("/^[a-f0-9]{15}$/is", $uid)) {
-			throw Exception('this is not a uid: ' . $uid);
+		if (!isValidUid($uid)) {
+			throw \Exception('this is not a uid: ' . $uid);
 		}
         $dir_array = str_split($uid, 3);
 
