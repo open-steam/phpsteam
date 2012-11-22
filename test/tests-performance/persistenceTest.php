@@ -50,6 +50,22 @@ class persistenceTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	public function testMigrateBigFiles() {
+		$currentUser = self::$steamConnector->get_current_steam_user();
+		$userHome = $currentUser->get_workroom();
+		$content = file_get_contents(dirname(dirname(__FILE__)) . "/data/8mbTest");
+		for($i = 0; $i < 10; $i++) {
+			$document = steam_factory::create_document(self::$steamConnector->get_id(), $this->initObjName, $content, "", $userHome, $this->initObjDesc);
+			$docPersistenceType = $document->get_attribute(DOC_PERSISTENCE_TYPE);
+			if ($docPersistenceType === PERSISTENCE_FILE_UID) {
+				$document->migratePersistence(PERSISTENCE_DATABASE);
+			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
+				$document->migratePersistence(PERSISTENCE_FILE_UID);
+			}
+			$document->delete();
+		}
+	}
+
 	/*public function testDeleteAll() {
 		$currentUser = self::$steamConnector->get_current_steam_user();
 		$userHome = $currentUser->get_workroom();
