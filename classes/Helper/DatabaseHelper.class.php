@@ -273,7 +273,7 @@ class DatabaseHelper {
 			//echo "Error: no content id found for #{$oid}";
 			return "";
 		}
-		$query = "update doc_data set rec_data=" . $content . " where doc_id=" . $content_id . " order by rec_order";
+		$query = "update doc_data set rec_data='" . mysql_real_escape_string($content) . "' where doc_id=" . $content_id;
 		//$query = "select rec_data from doc_data where doc_id=" . $content_id . " order by rec_order";
 		try{
 			$statement = $this->pdo->prepare($query);
