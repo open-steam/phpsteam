@@ -28,6 +28,7 @@ class DatabasePersistence extends Persistence {
 			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 			$databaseHelper->connect_to_mysql();
 			$databaseHelper->set_content($document->get_content_id(), $content);
+			$document->steam_command($document, "update_content_size", array(), 0);
 			if ($buffer) {
 				return $document->get_steam_connector()->add_to_buffer(strlen($content));
 			} else {

@@ -81,6 +81,7 @@ class FileUidPersistence extends FilePersistence {
 			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 			$databaseHelper->connect_to_mysql();
 			$databaseHelper->set_content($document->get_content_id(), $uuid);
+			$document->steam_command($document, "update_content_size", array(), 0);
 		} else {
 			$document->steam_command($document, "set_content", array($uuid), 0);
 		}
