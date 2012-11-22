@@ -150,7 +150,7 @@ class FileUidPersistence extends FilePersistence {
         }
 		$version_of = $document->get_attribute(OBJ_VERSIONOF);
         if ($version_of instanceof \steam_document) {
-            $target_dir .= $document->get_id() . "-" . $version_of->get_content_id();
+            $target_dir .= $version_of->get_id() . "-" . $document->get_content_id();
         } else {
             $target_dir .= $document->get_id() . "-" . $document->get_content_id();
         }
