@@ -63,7 +63,7 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		}
 
 		$this->testGetPersistence();
-		$this->testGet_content();
+		//$this->testGet_content();
 	}
 
     /**

@@ -144,16 +144,13 @@ class FileUidPersistence extends FilePersistence {
 			throw new \Exception('this is not a uid: ' . $uid);
 		}
         $dir_array = str_split($uid, 3);
-
-        $target_dir = self::$persistenceBaseFolder;
-        $version_of = $document->get_attribute(OBJ_VERSIONOF);
-
+		$target_dir = self::$persistenceBaseFolder;
         foreach ($dir_array as $subdir) {
             $target_dir .= $subdir . "/";
         }
-
+		$version_of = $document->get_attribute(OBJ_VERSIONOF);
         if ($version_of instanceof \steam_document) {
-            $target_dir .= $version_of->get_id() . "-" . $version_of->get_content_id();
+            $target_dir .= $document->get_id() . "-" . $version_of->get_content_id();
         } else {
             $target_dir .= $document->get_id() . "-" . $document->get_content_id();
         }
