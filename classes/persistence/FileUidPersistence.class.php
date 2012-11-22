@@ -136,7 +136,7 @@ class FileUidPersistence extends FilePersistence {
 
     public function get_file_path(\steam_document $document) {
         $uid = $document->steam_command($document, "get_content", array(), 0);
-		if (!isValidUid($uid)) {
+		if (!$this->isValidUid($uid)) {
 			throw \Exception('this is not a uid: ' . $uid);
 		}
         $dir_array = str_split($uid, 3);
