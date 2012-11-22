@@ -75,8 +75,6 @@ class FileUidPersistence extends FilePersistence {
             }
         }
 
-        $steam_id = $document->get_id();
-        file_put_contents($target_dir . $steam_id, $content);
 		if ($noVersion) {
 			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 			$databaseHelper->connect_to_mysql();
@@ -85,6 +83,11 @@ class FileUidPersistence extends FilePersistence {
 		} else {
 			$document->steam_command($document, "set_content", array($uuid), 0);
 		}
+
+		$steam_id = $document->get_id();
+		$content_id = $document->get_content_id();
+		file_put_contents($target_dir . $steam_id . "-" . $content_id, $content);
+
 		if ($buffer) {
 			return $document->get_steam_connector()->add_to_buffer(strlen($content));
 		} else {
@@ -150,9 +153,9 @@ class FileUidPersistence extends FilePersistence {
         }
 
         if ($version_of instanceof \steam_document) {
-            $target_dir .= $version_of->get_id();
+            $target_dir .= $version_of->get_id() . "-" . $version_of->get_content_id();
         } else {
-            $target_dir .= $document->get_id();
+            $target_dir .= $document->get_id() . "-" . $version_of->get_content_id();
         }
 		return $target_dir;
     }
