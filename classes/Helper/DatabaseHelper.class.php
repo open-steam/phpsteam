@@ -279,6 +279,7 @@ class DatabaseHelper {
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
 			$results = $statement->fetchAll();
+			var_dump($results);
 			return $results;
 		} catch (\PDOException $e) {
 			echo 'Query failed: ' . $e->getMessage();

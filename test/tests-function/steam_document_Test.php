@@ -42,6 +42,30 @@ class steam_document_Test extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	public function testGetPersistence() {
+		$persistence = $this->testObject->getPersistence();
+		$docPersistenceType = $this->testObject->get_attribute(DOC_PERSISTENCE_TYPE);
+		if ($docPersistenceType === PERSISTENCE_FILE_UID) {
+			$this->assertTrue($persistence instanceof \OpenSteam\Persistence\FileUidPersistence);
+		}  else if ($docPersistenceType === PERSISTENCE_DATABASE) {
+			$this->assertTrue($persistence instanceof \OpenSteam\Persistence\DatabasePersistence);
+		} else {
+			$this->assertTrue($persistence instanceof \OpenSteam\Persistence\DatabasePersistence);
+		}
+	}
+
+	public function testMigratePersistence() {
+		$docPersistenceType = $this->testObject->get_attribute(DOC_PERSISTENCE_TYPE);
+		if ($docPersistenceType === PERSISTENCE_FILE_UID) {
+			$this->testObject->migratePersistence(PERSISTENCE_DATABASE);
+		} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
+			$this->testObject->migratePersistence(PERSISTENCE_FILE_UID);
+		}
+
+		$this->testGetPersistence();
+		//$this->testGet_content();
+	}
+
     /**
      * @covers steam_document::get_type
      */
