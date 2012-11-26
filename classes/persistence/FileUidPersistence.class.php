@@ -61,35 +61,20 @@ class FileUidPersistence extends FilePersistence {
 
 	public function initialSave(\steam_document $document, &$content) {
 		$uid = $this->generate_id($document, $content);
-		return $this->lowSave($document, $uid, $content);
+		$this->directDbSave($document, $uid);
+		return $this->putToFile($document, $uid, $content);
 	}
 
     public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
 		$uid = $this->get_uid($document);
-        $dir_array = str_split($uid, 3);
-
-        if (!FILE_PERSISTENCE_BASE_PATH) {
-            throw \Exception('Have to set persistence base path!');
-        }
-        $target_dir = self::$persistenceBaseFolder;
-
-        foreach ($dir_array as $subdir) {
-            $target_dir .= $subdir . "/";
-            if(! file_exists($target_dir)){
-                mkdir($target_dir);
-            }
-        }
 
 		if ($noVersion) {
-			$this->lowSave($document, $uid, $uid);
+			$this->directDbSave($document, $uid);
 		} else {
-			$document->steam_command($document, "set_content", array($uid), 0);
+			$document->steam_command($document, "set_content", array($uid), 0); //no change, but this will create a version
 		}
 
-		$steam_id = $document->get_id();
-		$content_id = $document->get_content_id();
-		file_put_contents($target_dir . $steam_id . "-" . $content_id, $content);
-
+		$this->putToFile($document, $uid, $content);
 		if ($buffer) {
 			return $document->get_steam_connector()->add_to_buffer(strlen($content));
 		} else {
@@ -97,11 +82,30 @@ class FileUidPersistence extends FilePersistence {
 		}
     }
 
-	private function lowSave(\steam_document $document, $uid, &$content) {
+	private function directDbSave(\steam_document $document, &$content) {
 		$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 		$databaseHelper->connect_to_mysql();
-		$databaseHelper->set_content($document->get_content_id(), $uid);
+		$databaseHelper->set_content($document->get_content_id(), $content);
 		$document->steam_command($document, "update_content_size", array(), 0);
+	}
+
+	private function putToFile(\steam_document $document, $uid, &$content) {
+		$dir_array = str_split($uid, 3);
+
+		if (!FILE_PERSISTENCE_BASE_PATH) {
+			throw \Exception('Have to set persistence base path!');
+		}
+		$target_dir = self::$persistenceBaseFolder;
+
+		foreach ($dir_array as $subdir) {
+			$target_dir .= $subdir . "/";
+			if(! file_exists($target_dir)){
+				mkdir($target_dir);
+			}
+		}
+		$steam_id = $document->get_id();
+		$content_id = $document->get_content_id();
+		file_put_contents($target_dir . $steam_id . "-" . $content_id, $content);
 	}
 
 	public function load(\steam_document $document, $buffer = 0) {
