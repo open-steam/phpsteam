@@ -66,6 +66,13 @@ class FileUidPersistence extends FilePersistence {
 		return $this->putToFile($document, $uid, $content);
 	}
 
+	public function migrateSave(\steam_document $document, &$content) {
+		$uid = $this->generate_id($document, $content);
+		//$document->steam_command($document, "set_content", array($uid), 0);
+		$this->directDbSave($document, $uid);
+		return $this->putToFile($document, $uid, $content);
+	}
+
     public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
 		$uid = $this->get_uid($document);
 
