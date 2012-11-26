@@ -115,5 +115,5 @@ class RangeDownloader extends Downloader
         fclose($fp);
     }
 
-    protected static function prepare_header(\steam_document $document){}
+    protected static function prepare_header(\steam_document $document, $params = array()){}
 }

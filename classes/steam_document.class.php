@@ -82,7 +82,7 @@ class steam_document extends steam_object
 	 *
 	 * @return success or not
 	 */
-	public function download($type = DOWNLOAD_ATTACHMENT) {
+	public function download($type = DOWNLOAD_ATTACHMENT, $params = array()) {
 		if ($type === DOWNLOAD_ATTACHMENT) {
 			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\AttachmentDownloader";
 		} else if ($type === DOWNLOAD_IMAGE)  {
@@ -92,7 +92,8 @@ class steam_document extends steam_object
 		} else if ($type === DOWNLOAD_RANGE) {
 			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\RangeDownloader";
 		}
-		return $downloaderClass::download($this);
+		array_unshift($params, $this);
+		return call_user_func_array(array($downloaderClass , "download"), $params);
 	}
 
 	/**
@@ -282,6 +283,14 @@ class steam_document extends steam_object
   
 	public function is_previous_version_of($pBuffer = 0) {
 		return $this->get_attribute("OBJ_VERSIONOF", $pBuffer);
+	}
+
+	public function get_mimetype($pBuffer = 0) {
+		$mime = $this->get_attribute(DOC_MIME_TYPE);
+		if(empty($mime)){
+			$mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
+		}
+		return $mime;
 	}
 }
 ?>

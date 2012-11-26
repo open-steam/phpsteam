@@ -92,7 +92,7 @@ class DatabaseHelper {
 		}
 	}
 
-	public static function getUnreadMails($userName=""){
+	public function getUnreadMails($userName=""){
 		$link = mysql_connect(STEAM_DATABASE_HOST, STEAM_DATABASE_USER, STEAM_DATABASE_PASS, true);
 		if (!$link) {
 			error_log('no connection: ' . mysql_error());

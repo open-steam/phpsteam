@@ -2,9 +2,9 @@
 
 namespace OpenSteam\Persistence\Downloader;
 
-class InlineDownloader {
+class InlineDownloader extends Downloader {
 
-    protected static function prepare_header(\steam_document $document)
+    protected static function prepare_header(\steam_document $document, $params = array())
     {
         header("Pragma: private");
         header("Cache-Control: must-revalidate, post-check=0, pre-check=0");

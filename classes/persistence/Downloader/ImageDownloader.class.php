@@ -2,7 +2,7 @@
 
 namespace OpenSteam\Persistence\Downloader;
 
-class ImageDownloader extends DocumentDownloader
+class ImageDownloader extends Downloader
 {
 
 /*    public function init_document()
@@ -28,29 +28,29 @@ class ImageDownloader extends DocumentDownloader
         //check if thumbnail for object already exists
 		$mime = $document->get_attribute(DOC_MIME_TYPE);
 		if(empty($mime)){
-			$mime = MimetypeHelper::get_instance()->getMimeType($document->get_name());
+			$mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
 		}
-		$ext = MimetypeHelper::get_instance()->getExtension($mime);
+		$ext = \MimetypeHelper::get_instance()->getExtension($mime);
         $thumbnail_path = THUMBNAIL_PATH . $document->get_id() . "_" . $width . "x" . $height . "." . $ext;
 		$thumbnail_exists = file_exists($thumbnail_path);
 		
         if(!$cache || !$thumbnail_exists){
             $content = $document->get_content();
-            $thumbnail_path = Thumbnail_Helper::createThumbnail(
+            $thumbnail_path = \ThumbnailHelper::createThumbnail(
                 $document, $content, $mime, $thumbnail_path, $width, $height);
         }
 
         $filesize = filesize($thumbnail_path);
 
-        self::prepare_header($document, $filesize, $cache);
+        self::prepare_header($document, array("filesize" => $filesize, "cache" => $cache, "mimetype" => $mime));
         @ob_flush();
         readfile($thumbnail_path);
     }
 
-    protected static function prepare_header(\steam_document $document, $filesize, $cache)
+    protected static function prepare_header(\steam_document $document, $params = array())
     {
         header('Content-Description: File Transfer;');
-        if($cache){
+        if($params["cache"]){
             //cache 1 week
             header('Cache-Control: max-age=604800;');
         } else {
@@ -59,8 +59,8 @@ class ImageDownloader extends DocumentDownloader
 
         header('Pragma: public;');
 
-        header("Last-Modified: {$document->attributes['lastmodified']};");
-        header("Content-Type: {$document->attributes['mimetype']};");
-        header("Content-Length: {$filesize};");
+        header("Last-Modified: {$document->get_attribute(DOC_LAST_MODIFIED)};");
+        header("Content-Type: {$params["mimetype"]};");
+        header("Content-Length: {$params["filesize"]};");
     }
 }
