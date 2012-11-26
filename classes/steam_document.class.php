@@ -49,7 +49,7 @@ class steam_document extends steam_object
 			//new persistence
 			$newPersistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
 			//change persistence without creating a new document version
-			$newPersistence->save($this, $content, 0, true);
+			$newPersistence->initialSave($this, $content);
 
 			//change persistence type
 			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_FILE_UID);
