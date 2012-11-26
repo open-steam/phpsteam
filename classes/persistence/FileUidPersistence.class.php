@@ -61,7 +61,8 @@ class FileUidPersistence extends FilePersistence {
 
 	public function initialSave(\steam_document $document, &$content) {
 		$uid = $this->generate_id($document, $content);
-		$this->directDbSave($document, $uid);
+		$document->steam_command($document, "set_content", array($uid), 0);
+		//$this->directDbSave($document, $uid);
 		return $this->putToFile($document, $uid, $content);
 	}
 
@@ -74,11 +75,11 @@ class FileUidPersistence extends FilePersistence {
 			$document->steam_command($document, "set_content", array($uid), 0); //no change, but this will create a version
 		}
 
-		$this->putToFile($document, $uid, $content);
+		$result = $this->putToFile($document, $uid, $content);
 		if ($buffer) {
-			return $document->get_steam_connector()->add_to_buffer(strlen($content));
+			return $document->get_steam_connector()->add_to_buffer($result);
 		} else {
-			return strlen($content);
+			return strlen($result);
 		}
     }
 
@@ -106,6 +107,7 @@ class FileUidPersistence extends FilePersistence {
 		$steam_id = $document->get_id();
 		$content_id = $document->get_content_id();
 		file_put_contents($target_dir . $steam_id . "-" . $content_id, $content);
+		return strlen($content);
 	}
 
 	public function load(\steam_document $document, $buffer = 0) {
