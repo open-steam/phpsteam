@@ -86,7 +86,7 @@ class FileUidPersistence extends FilePersistence {
 		if ($buffer) {
 			return $document->get_steam_connector()->add_to_buffer($result);
 		} else {
-			return strlen($result);
+			return $result;
 		}
     }
 
