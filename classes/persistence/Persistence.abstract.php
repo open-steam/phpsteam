@@ -28,6 +28,8 @@ abstract class Persistence {
 
     public abstract function delete(\steam_document $document, $buffer = 0);
 
+	public abstract function initialSave(\steam_document $document, &$content);
+
     public abstract function save(\steam_document $document, &$content, $buffer = 0);
 
     public abstract function load(\steam_document $document, $buffer = 0);

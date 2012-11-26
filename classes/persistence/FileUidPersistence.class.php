@@ -59,9 +59,14 @@ class FileUidPersistence extends FilePersistence {
 		}
 	}
 
+	public function initialSave(\steam_document $document, &$content) {
+		$uid = $this->generate_id($document, $content);
+		return $this->lowSave($document, $uid, $content);
+	}
+
     public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
-        $uuid = $this->generate_id($document, $content);
-        $dir_array = str_split($uuid, 3);
+		$uid = $this->get_uid($document);
+        $dir_array = str_split($uid, 3);
 
         if (!FILE_PERSISTENCE_BASE_PATH) {
             throw \Exception('Have to set persistence base path!');
@@ -76,12 +81,9 @@ class FileUidPersistence extends FilePersistence {
         }
 
 		if ($noVersion) {
-			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
-			$databaseHelper->connect_to_mysql();
-			$databaseHelper->set_content($document->get_content_id(), $uuid);
-			$document->steam_command($document, "update_content_size", array(), 0);
+			$this->lowSave($document, $uid, $uid);
 		} else {
-			$document->steam_command($document, "set_content", array($uuid), 0);
+			$document->steam_command($document, "set_content", array($uid), 0);
 		}
 
 		$steam_id = $document->get_id();
@@ -94,6 +96,13 @@ class FileUidPersistence extends FilePersistence {
 			return strlen($content);
 		}
     }
+
+	private function lowSave(\steam_document $document, $uid, &$content) {
+		$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
+		$databaseHelper->connect_to_mysql();
+		$databaseHelper->set_content($document->get_content_id(), $uid);
+		$document->steam_command($document, "update_content_size", array(), 0);
+	}
 
 	public function load(\steam_document $document, $buffer = 0) {
 		$file_path = $this->get_file_path($document);
@@ -138,8 +147,12 @@ class FileUidPersistence extends FilePersistence {
 		return preg_match("/^[a-f0-9]{15}$/is", $uid);
 	}
 
+	public function get_uid(\steam_document $document) {
+		return $document->steam_command($document, "get_content", array(), 0);
+	}
+
     public function get_file_path(\steam_document $document) {
-        $uid = $document->steam_command($document, "get_content", array(), 0);
+        $uid = $this->get_uid($document);
 		if (!$this->isValidUid($uid)) {
 			throw new \Exception('this is not a uid: ' . $uid);
 		}

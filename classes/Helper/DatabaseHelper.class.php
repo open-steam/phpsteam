@@ -268,13 +268,13 @@ class DatabaseHelper {
 	}
 
 	function set_content($cid, &$content, $user = "") {
-		$content_id = $cid;//$this->get_content_id($oid);
+		$content_id = $cid;
 		if ($content_id == 0) {
-			//echo "Error: no content id found for #{$oid}";
+			trigger_error ("no content id set" , E_USER_WARNING);
 			return "";
 		}
-		$query = "update doc_data set rec_data='" . mysql_real_escape_string($content) . "' where doc_id=" . $content_id;
-		//$query = "select rec_data from doc_data where doc_id=" . $content_id . " order by rec_order";
+		$query = "delete from doc_data where doc_id = " . $content_id . ";";
+		$query .= "insert into doc_data values('" . mysql_real_escape_string($content) . "', " . $content_id . ", 1)";
 		try{
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();

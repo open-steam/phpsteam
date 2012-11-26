@@ -23,6 +23,10 @@ class DatabasePersistence extends Persistence {
         //no additional stuff needed
     }
 
+	public function initialSave(\steam_document $document, &$content) {
+		$this->save($document, $content);
+	}
+
     public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
 		if ($noVersion) {
 			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();

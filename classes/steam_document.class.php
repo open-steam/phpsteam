@@ -133,6 +133,11 @@ class steam_document extends steam_object
 		);
 	}
 
+	public function set_initial_content(&$pContent) {
+		$result = $this->getPersistence()->initalSave($this, $pContent);
+		return $result;
+	}
+
 	/**
 	 * function set_content:
 	 *
@@ -141,7 +146,7 @@ class steam_document extends steam_object
 	 * @param Boolean $pBuffer send now or buffer request?
 	 * @return int content size
 	 */
-	public function set_content($pContent, $pBuffer = 0) {
+	public function set_content(&$pContent, $pBuffer = 0) {
 		$result = $this->getPersistence()->save($this, $pContent, $pBuffer);
 		unset($this->attributes[OBJ_VERSIONOF]);
 		unset($this->attributes[DOC_VERSION]);
