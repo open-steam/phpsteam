@@ -134,7 +134,7 @@ class steam_document extends steam_object
 	}
 
 	public function set_initial_content(&$pContent) {
-		$result = $this->getPersistence()->initalSave($this, $pContent);
+		$result = $this->getPersistence()->initialSave($this, $pContent);
 		return $result;
 	}
 
