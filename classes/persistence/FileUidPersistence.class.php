@@ -61,15 +61,14 @@ class FileUidPersistence extends FilePersistence {
 
 	public function initialSave(\steam_document $document, &$content) {
 		$uid = $this->generate_id($document, $content);
-		$document->steam_command($document, "set_content", array($uid), 0);
+		$document->steam_command($document, "set_content", array($this->generateSaveContent($document->get_id(), $uid)), 0);
 		//$this->directDbSave($document, $uid);
 		return $this->putToFile($document, $uid, $content);
 	}
 
 	public function migrateSave(\steam_document $document, &$content) {
 		$uid = $this->generate_id($document, $content);
-		//$document->steam_command($document, "set_content", array($uid), 0);
-		$this->directDbSave($document, $uid);
+		$this->directDbSave($document, $this->generateSaveContent($document->get_id(), $uid));
 		return $this->putToFile($document, $uid, $content);
 	}
 
@@ -77,9 +76,9 @@ class FileUidPersistence extends FilePersistence {
 		$uid = $this->get_uid($document);
 
 		if ($noVersion) {
-			$this->directDbSave($document, $uid);
+			$this->directDbSave($document, $this->generateSaveContent($document->get_id(), $uid));
 		} else {
-			$document->steam_command($document, "set_content", array($uid), 0); //no change, but this will create a version
+			$document->steam_command($document, "set_content", array($this->generateSaveContent($document->get_id(), $uid)), 0); //no change, but this will create a version
 		}
 
 		$result = $this->putToFile($document, $uid, $content);
@@ -160,15 +159,37 @@ class FileUidPersistence extends FilePersistence {
 		return preg_match("/^[a-f0-9]{15}$/is", $uid);
 	}
 
+	private function generateSaveContent(\steam_document $document, $uid) {
+		if ($this->isValidUid($uid)) {
+			return $uid . "-" . md5($uid . $document->get_id());
+		}
+		throw new \Exception('this is not a uid: ' . $uid);
+	}
+
+	private function isValidSaveContent(\steam_document $document, $content) {
+		$array = explode("-", $content);
+		$uid = $array[0];
+		$md5 = $array[1];
+		if ($this->isValidUid($uid) && ($md5 === md5($uid . $document->get_id()))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public function get_uid(\steam_document $document) {
-		return $document->steam_command($document, "get_content", array(), 0);
+		$content = $document->steam_command($document, "get_content", array(), 0);
+		if ($this->isValidSaveContent($document, $content)) {
+			$array = explode("-", $content);
+			$uid = $array[0];
+			return $uid;
+		}
+		throw new \Exception('this is not a valid file uid content: ' . $content);
 	}
 
     public function get_file_path(\steam_document $document) {
         $uid = $this->get_uid($document);
-		if (!$this->isValidUid($uid)) {
-			throw new \Exception('this is not a uid: ' . $uid);
-		}
+
         $dir_array = str_split($uid, 3);
 		$target_dir = self::$persistenceBaseFolder;
         foreach ($dir_array as $subdir) {
