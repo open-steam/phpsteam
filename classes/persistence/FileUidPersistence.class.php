@@ -171,7 +171,13 @@ class FileUidPersistence extends FilePersistence {
 		$array = explode("-", $content);
 		$uid = $array[0];
 		$md5 = $array[1];
-		$testMd5 = md5($uid . $document->get_id());
+		$version_of = $document->get_attribute(OBJ_VERSIONOF);
+		if ($version_of instanceof \steam_document) {
+			$id = $version_of->get_id();
+		} else {
+			$id = $document->get_id();
+		}
+		$testMd5 = md5($uid . $id);
 		if ($this->isValidUid($uid) && ($md5 === $testMd5)) {
 			return true;
 		} else {
