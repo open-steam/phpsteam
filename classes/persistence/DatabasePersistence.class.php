@@ -28,7 +28,7 @@ class DatabasePersistence extends Persistence {
 	}
 
 	public function migrateSave(\steam_document $document, &$content) {
-		$this->save($document, $content);
+		$this->save($document, $content, 0, true);
 	}
 
     public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {

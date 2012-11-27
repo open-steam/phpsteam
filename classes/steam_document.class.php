@@ -52,7 +52,9 @@ class steam_document extends steam_object
 			$newPersistence->migrateSave($this, $content);
 
 			//change persistence type
+			$this->unlock_attribute(DOC_PERSISTENCE_TYPE);
 			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_FILE_UID);
+			$this->lock_attribute(DOC_PERSISTENCE_TYPE);
 			$this->_persistence = $newPersistence;
 		} else if (($currentPersistenceType === PERSISTENCE_FILE_UID) && ($toPersistenceType === PERSISTENCE_DATABASE)) {
 			//get content from database
@@ -64,7 +66,7 @@ class steam_document extends steam_object
 			//new persistence
 			$newPersistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			//change persistence without creating a new document version
-			$newPersistence->save($this, $content, 0, true);
+			$newPersistence->migrateSave($this, $content);
 
 			//change persistence type
 			$this->unlock_attribute(DOC_PERSISTENCE_TYPE);
