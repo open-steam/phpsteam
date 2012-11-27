@@ -61,14 +61,14 @@ class FileUidPersistence extends FilePersistence {
 
 	public function initialSave(\steam_document $document, &$content) {
 		$uid = $this->generate_id($document, $content);
-		$document->steam_command($document, "set_content", array($this->generateSaveContent($document->get_id(), $uid)), 0);
+		$document->steam_command($document, "set_content", array($this->generateSaveContent($document, $uid)), 0);
 		//$this->directDbSave($document, $uid);
 		return $this->putToFile($document, $uid, $content);
 	}
 
 	public function migrateSave(\steam_document $document, &$content) {
 		$uid = $this->generate_id($document, $content);
-		$this->directDbSave($document, $this->generateSaveContent($document->get_id(), $uid));
+		$this->directDbSave($document, $this->generateSaveContent($document, $uid));
 		return $this->putToFile($document, $uid, $content);
 	}
 
@@ -78,7 +78,7 @@ class FileUidPersistence extends FilePersistence {
 		if ($noVersion) {
 			$this->directDbSave($document, $this->generateSaveContent($document->get_id(), $uid));
 		} else {
-			$document->steam_command($document, "set_content", array($this->generateSaveContent($document->get_id(), $uid)), 0); //no change, but this will create a version
+			$document->steam_command($document, "set_content", array($this->generateSaveContent($document, $uid)), 0); //no change, but this will create a version
 		}
 
 		$result = $this->putToFile($document, $uid, $content);
