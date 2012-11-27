@@ -171,12 +171,16 @@ class FileUidPersistence extends FilePersistence {
 		$array = explode("-", $content);
 		$uid = $array[0];
 		$md5 = $array[1];
-		if ($this->isValidUid($uid) && ($md5 == md5($uid . $document->get_id()))) {
+		$testMd5 = md5($uid . $document->get_id());
+		if ($this->isValidUid($uid) && ($md5 === $testMd5)) {
 			return true;
 		} else {
 			echo "\n";
 			echo "uid: " . $uid . "\n";
 			echo "md5: " . $md5 . "\n";
+			echo "testMd5: " . $testMd5 . "\n";
+			var_dump($this->isValidUid($uid));
+			var_dump($md5 === $testMd5);
 			return false;
 		}
 	}
