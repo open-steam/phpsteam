@@ -181,12 +181,6 @@ class FileUidPersistence extends FilePersistence {
 		if ($this->isValidUid($uid) && ($md5 === $testMd5)) {
 			return true;
 		} else {
-			echo "\n";
-			echo "uid: " . $uid . "\n";
-			echo "md5: " . $md5 . "\n";
-			echo "testMd5: " . $testMd5 . "\n";
-			var_dump($this->isValidUid($uid));
-			var_dump($md5 === $testMd5);
 			return false;
 		}
 	}

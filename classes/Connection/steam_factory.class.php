@@ -582,6 +582,7 @@ class steam_factory {
 
 		$steam_document = steam_factory::create_object($pSteamConnectorID, $pName, CLASS_DOCUMENT, $pEnvironment, array("mimetype" => $pMimeType, "attributes" => array(OBJ_DESC => $pDescription, DOC_PERSISTENCE_TYPE => $doc_persistence_type)));
 		$steam_document->set_initial_content($pContent);
+		$steam_document->lock_attribute(DOC_PERSISTENCE_TYPE);
 
 		return $steam_document;
 	}

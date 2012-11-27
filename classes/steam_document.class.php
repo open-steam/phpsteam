@@ -67,7 +67,9 @@ class steam_document extends steam_object
 			$newPersistence->save($this, $content, 0, true);
 
 			//change persistence type
+			$this->unlock_attribute(DOC_PERSISTENCE_TYPE);
 			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_DATABASE);
+			$this->lock_attribute(DOC_PERSISTENCE_TYPE);
 			$this->_persistence = $newPersistence;
 
 		}
