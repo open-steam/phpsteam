@@ -162,8 +162,9 @@ class FileUidPersistence extends FilePersistence {
 	private function generateSaveContent(\steam_document $document, $uid) {
 		if ($this->isValidUid($uid)) {
 			return $uid . "-" . md5($uid . $document->get_id());
+		} else {
+			throw new \Exception('this is not a uid: ' . $uid);
 		}
-		throw new \Exception('this is not a uid: ' . $uid);
 	}
 
 	private function isValidSaveContent(\steam_document $document, $content) {
@@ -186,8 +187,9 @@ class FileUidPersistence extends FilePersistence {
 			$array = explode("-", $content);
 			$uid = $array[0];
 			return $uid;
+		} else {
+			throw new \Exception('this is not a valid file uid content: ' . $content);
 		}
-		throw new \Exception('this is not a valid file uid content: ' . $content);
 	}
 
     public function get_file_path(\steam_document $document) {
