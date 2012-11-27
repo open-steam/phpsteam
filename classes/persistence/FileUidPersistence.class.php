@@ -169,18 +169,18 @@ class FileUidPersistence extends FilePersistence {
 	private function isValidSaveContent(\steam_document $document, $content) {
 		$array = explode("-", $content);
 		$uid = $array[0];
-		echo "\n";
-		echo "uid: " . $uid . "\n";
 		$md5 = $array[1];
-		echo "md5: " . $md5 . "\n";
-		if ($this->isValidUid($uid) && ($md5 === md5($uid . $document->get_id()))) {
+		if ($this->isValidUid($uid) && ($md5 == md5($uid . $document->get_id()))) {
 			return true;
 		} else {
+			echo "\n";
+			echo "uid: " . $uid . "\n";
+			echo "md5: " . $md5 . "\n";
 			return false;
 		}
 	}
 
-	public function get_uid(\steam_document $document) {
+	private function get_uid(\steam_document $document) {
 		$content = $document->steam_command($document, "get_content", array(), 0);
 		if ($this->isValidSaveContent($document, $content)) {
 			$array = explode("-", $content);
