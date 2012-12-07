@@ -192,7 +192,7 @@ class FileUidPersistence extends FilePersistence {
 			$uid = $array[0];
 			return $uid;
 		} else {
-			throw new \Exception('this is not a valid file uid content: ' . $content);
+			throw new \Exception('this is not a valid file content (content: ' . $content . ' id: ' . $document->get_id() . ')');
 		}
 	}
 
