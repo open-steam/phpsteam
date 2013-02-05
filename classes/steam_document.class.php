@@ -26,7 +26,7 @@ class steam_document extends steam_object
 	public function getPersistence() {
 		if (!isset($_persistence)) {
 			$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
-			if ($docPersistenceType === PERSISTENCE_FILE_UID) {
+			if (ENABLE_FILE_PERSISTENCE && $docPersistenceType === PERSISTENCE_FILE_UID) {
 				$this->_persistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
 			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
 				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
