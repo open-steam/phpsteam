@@ -21,6 +21,62 @@
 
 class steam_document extends steam_object
 {
+	private $_persistence;
+
+	public function getPersistence() {
+		if (!isset($_persistence)) {
+			$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+			if (ENABLE_FILE_PERSISTENCE && $docPersistenceType === PERSISTENCE_FILE_UID) {
+				$this->_persistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
+			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
+				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
+			} else {
+				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
+			}
+		}
+		return $this->_persistence;
+	}
+
+	public function migratePersistence($toPersistenceType) {
+		$currentPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
+		if ($currentPersistenceType === $toPersistenceType) {
+			return;
+		}
+		if (($currentPersistenceType === PERSISTENCE_DATABASE) && ($toPersistenceType === PERSISTENCE_FILE_UID)) {
+			//get content from database
+			$content = $this->get_content();
+
+			//new persistence
+			$newPersistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
+			//change persistence without creating a new document version
+			$newPersistence->migrateSave($this, $content);
+
+			//change persistence type
+			$this->unlock_attribute(DOC_PERSISTENCE_TYPE);
+			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_FILE_UID);
+			$this->lock_attribute(DOC_PERSISTENCE_TYPE);
+			$this->_persistence = $newPersistence;
+		} else if (($currentPersistenceType === PERSISTENCE_FILE_UID) && ($toPersistenceType === PERSISTENCE_DATABASE)) {
+			//get content from database
+			$content = $this->get_content();
+
+			//cleanup file persistence
+			$this->_persistence->lowDeleteContentFile($this);
+
+			//new persistence
+			$newPersistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
+			//change persistence without creating a new document version
+			$newPersistence->migrateSave($this, $content);
+
+			//change persistence type
+			$this->unlock_attribute(DOC_PERSISTENCE_TYPE);
+			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_DATABASE);
+			$this->lock_attribute(DOC_PERSISTENCE_TYPE);
+			$this->_persistence = $newPersistence;
+
+		}
+	}
+
 	public function get_type() {
 		return CLASS_DOCUMENT | CLASS_OBJECT;
 	}
@@ -28,47 +84,35 @@ class steam_document extends steam_object
 	/**
 	 *function download:
 	 *
-	 * @return
+	 * @return success or not
 	 */
-	public function download() {
-		//first run server request
-		$request = new steam_request($this->get_steam_connector()->get_id(), $this->get_steam_connector()->get_transaction_id(), $this, 0, COAL_FILE_DOWNLOAD );
-		$command = $this->get_steam_connector()->command( $request );
-		$buffer = "";
-		$size = 0;
-		$args = $command->get_arguments();
-		 
-		//then get data
-		while ( $size < $args[ 0 ] )
-		{
-			$buffer .= $this->get_steam_connector()->read_socket( $args[ 0 ] );
-			$size = strlen( $buffer );
+	public function download($type = DOWNLOAD_ATTACHMENT, $params = array()) {
+		if ($type === DOWNLOAD_ATTACHMENT) {
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\AttachmentDownloader";
+		} else if ($type === DOWNLOAD_IMAGE)  {
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\ImageDownloader";
+		} else if ($type === DOWNLOAD_INLINE) {
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\InlineDownloader";
+		} else if ($type === DOWNLOAD_RANGE) {
+			$downloaderClass = "\\OpenSteam\\Persistence\\Downloader\\RangeDownloader";
 		}
-
-		//if no error send headers
-		header( "Pragma: private\n" );
-		header( "Cache-Control: must-revalidate, post-check=0, pre-check=0\n" );
-		header( "Content-Type: " . $this->get_attribute( "DOC_MIME_TYPE" ) . "\n");
-		header( "Content-Disposition: attachment; filename=\"" . $this->get_name() . "\"\n" );
-		header( "Content-Length: " . $this->get_content_size() . "\n");
-		//print data
-		echo $buffer;
-		return "";
+		array_unshift($params, $this);
+		return call_user_func_array(array($downloaderClass , "download"), $params);
 	}
 
 	/**
-	 * function get_reader:
+	 * function get_readers:
 	 *
 	 * @param $pBuffer
 	 *
 	 * @return
 	 */
-	public function get_reader( $pBuffer = 0 )
+	public function get_readers( $pBuffer = 0 )
 	{
-		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
+		$module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
 		return $this->steam_command(
 		$module_read_doc,
-			"get_reader",
+			"get_readers",
 		array( $this ),
 		$pBuffer
 		);
@@ -82,10 +126,10 @@ class steam_document extends steam_object
 	 *
 	 * @return
 	 */
-	public function is_read( $pUser = "", $pBuffer = 0  )
+	public function is_reader( $pUser = "", $pBuffer = 0  )
 	{
 		$pUser = ( empty( $pUser ) ) ? $this->get_steam_connector()->get_current_steam_user() : $pUser;
-		$module_read_doc = $this->get_steam_connector()->get_module( "table:read_documents" );
+		$module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
 		return $this->steam_command(
 		$module_read_doc,
 			"is_reader",
@@ -94,22 +138,28 @@ class steam_document extends steam_object
 		);
 	}
 
+	public function set_initial_content(&$pContent) {
+		$result = $this->getPersistence()->initialSave($this, $pContent);
+		return $result;
+	}
+
 	/**
 	 * function set_content:
 	 *
 	 * Sets the content of this document
 	 * @param string $pContent document's content
 	 * @param Boolean $pBuffer send now or buffer request?
-	 * @return boolean TRUE|FALSE
+	 * @return int content size
 	 */
-	public function set_content( $pContent, $pBuffer = 0 )
-	{
-		return $this->steam_command(
-		$this,
-			"set_content",
-		array( $pContent ),
-		$pBuffer
-		);
+	public function set_content($pContent, $pBuffer = 0) {
+		$result = $this->getPersistence()->save($this, $pContent, $pBuffer);
+		unset($this->attributes[OBJ_VERSIONOF]);
+		unset($this->attributes[DOC_VERSION]);
+		unset($this->attributes[DOC_VERSIONS]);
+		unset($this->attributes[DOC_LAST_MODIFIED]);
+		unset($this->attributes[DOC_USER_MODIFIED]);
+		unset($this->attributes[DOC_SIZE]);
+		return $result;
 	}
 
 	/**
@@ -125,19 +175,9 @@ class steam_document extends steam_object
 	 *
 	 * @return Integer the content size in Byte
 	 */
-	public function get_content_size( $pBuffer = 0 )
+	public function get_content_size($pBuffer = 0)
 	{
-		$result = $this->steam_command(
-		$this,
-			"get_content_size",
-		array(),
-		$pBuffer
-		);
-		if ( $pBuffer == 0 )
-		{
-			$this->attributes[ "DOC_SIZE" ] = $result;
-		}
-		return $result;
+		return $this->getPersistence()->getSize($this, $pBuffer);
 	}
 
 	/**
@@ -182,177 +222,14 @@ class steam_document extends steam_object
 	 * @return String content of the document
 	 *
 	 */
-	public function get_content( $pBuffer = 0 )
+	public function get_content($pBuffer = 0)
 	{
-		return $this->steam_command(
-		$this,
-			"get_content",
-		array(),
-		$pBuffer
-		);
+		return $this->getPersistence()->load($this, $pBuffer);
 	}
 
-	/**
-	 * function delete_thumbnail:
-	 *
-	 * Delete a specific thumbnail of this object
-	 *
-	 * Using this method is only possible on servers with server version >= 2.2.39
-	 *
-	 * @param integer $Width Width of the thumbnail to delete
-	 * @param integer $Height height of the thumbnail to delete
-	 * @param Boolean $pBuffer send now or buffer request?
-	 *
-	 */
-	public function delete_thumbnail( $pWidth = -1, $pHeight = -1, $pBuffer = FALSE )
-	{
-		$version = $this->get_steam_connector()->get_server_version();
-		list($major, $minor, $micro) = split('[.]', $version);
-		if (((int)$major < 2) || ((int)$major == 2 && (int)$minor < 2) || ((int)$major == 2 && (int)$minor == 2 && (!isset($micro) ||  (int)$micro < 39) )) {
-			throw new steam_exception( $this->get_steam_connector()->get_login_user_name(), "Error: get_thumbnail_data is not available on servers with version < 2.2.39 (actual server version is " . $version . ").", 404 );
-		}
-		$thumbnailsmodule = $this->get_steam_connector()->get_module("thumbnails");
-		if (is_object($thumbnailsmodule)) {
-			return $this->get_steam_connector()->predefined_command( $thumbnailsmodule, "delete_thumbnail", array( $this, $pWidth, $pHeight ), $pBuffer);
-		}
-		throw new steam_exception( $this->get_steam_connector()->get_login_user_name(), "Error: cant get module \"wiki\" from server.", 404 );
-	}
-
-
-	/**
-	 * function delete_thumbnails:
-	 *
-	 * Deletes all thumbnails of this object
-	 *
-	 * Using this method is only possible on servers with server version >= 2.2.39
-	 *
-	 */
-	public function delete_thumbnails( $pBuffer = 0 )
-	{
-		$version = $this->get_steam_connector()->get_server_version();
-		list($major, $minor, $micro) = split('[.]', $version);
-		if (((int)$major < 2) || ((int)$major == 2 && (int)$minor < 2) || ((int)$major == 2 && (int)$minor == 2 && (!isset($micro) ||  (int)$micro < 39) )) {
-			throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "Error: delete_thumbnails is not available on servers with version < 2.2.39 (actual server version is " . $version . ").", 404 );
-		}
-		$thumbnailsmodule = $this->get_steam_connector()->get_module("thumbnails");
-		if (is_object($thumbnailsmodule)) {
-			return $this->get_steam_connector()->predefined_command( $thumbnailsmodule, "delete_thumbnails", array( $this ), $pBuffer);
-		}
-		throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "Error: cant get module \"wiki\" from server.", 404 );
-	}
-
-
-	/**
-	 * function get_thumbnail:
-
-	 * This function returns the content of an image document by using the
-	 * thumbnails module of the server. Asking for a thumbnail of given width
-	 * and/or height triggers the server to generate a matching thumbnail.
-	 * Thumbnails will be handled completely by the server module thumbnails, so *
-	 * generating thumbnails and cache them is up to the server
-	 *
-	 * Please make sure to call this method on image documents only. Otherwise
-	 * a server side exception will be thrown indication this issue.
-	 *
-	 * Important notes:
-	 * -Using this method is only possible on servers with server version >= 2.2.39
-	 * -the generated thumbnails may not be from the same mime type as the source,
-	 * so make sure to check the DOC_MIME_TYPE of the resulting image. (In the case
-	 * you use this on a .tif image with -1,-1 the result is the tif image (no
-	 * thumb generation necessary), if you call this method on a tif with 10,10 the * result may be from type jpg depending on the graphics features of your
-	 * system. Type Safe thumbnail generation will be done for jpg, gif, png and
-	 * bmp
-	 * - To prevent thumbnail service from "out of memory"- problems, scaling
-	 * images is limited to 25 Megapixels (5000x5000)
-	 *
-	 * @param integer $pWidth the required width of the thumbnail, -1 to determine
-	 *        width by scaling to given height
-	 * @param integer $pHeight the required height of the thumbnail, -1 to
-	 *        determine height by scaling to given width
-	 * @param integer $pIgnore_aspect_ratio Aspect ratio was respected by default,
-	 *        pass 0 here to ignore aspect ratio.
-	 * @param Boolean $pBuffer send now or buffer request?
-	 *
-	 * @return steam_object the thumbnail object
-	 *
-	 */
-	public function get_thumbnail($pWidth = -1, $pHeight = -1, $pIgnore_aspect_ratio = 0 , $pBuffer = FALSE )
-	{
-		$version = $this->get_steam_connector()->get_server_version();
-		list($major, $minor, $micro) = split('[.]', $version);
-		if (((int)$major < 2) || ((int)$major == 2 && (int)$minor < 2) || ((int)$major == 2 && (int)$minor == 2 && (!isset($micro) ||  (int)$micro < 39) )) {
-			throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "Error: get_thumbnail is not available on servers with version < 2.2.39 (actual server version is " . $version . ").", 404 );
-		}
-		$thumbnailsmodule = $this->get_steam_connector()->get_module("thumbnails");
-		if (is_object($thumbnailsmodule)) {
-			$vars = array(
-                "width" => $pWidth,
-                "height" => $pHeight,
-                "ignore_aspect_ratio" => $pIgnore_aspect_ratio
-			);
-			return $this->get_steam_connector()->predefined_command( $thumbnailsmodule, "get_image", array( $this, $vars ), $pBuffer);
-		}
-		throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "Error: cant get module \"wiki\" from server.", 404 );
-	}
-
-
-	/**
-	 * function get_thumbnail_data:
-	 *
-	 * This function returns the content of an image document by using the
-	 * thumbnails module of the server. Asking for a thumbnail of given width
-	 * and/or height triggers the server to generate a matching thumbnail.
-	 * Thumbnails will be handled completely by the server module thumbnails, so *
-	 * generating thumbnails and cache them is up to the server
-	 *
-	 * Please make sure to call this method on image documents only. Otherwise
-	 * a server side exception will be thrown indication this issue.
-	 *
-	 * Important notes:
-	 * -Using this method is only possible on servers with server version >= 2.2.39
-	 * -Using this method on an animated gif results in a still (not animated)
-	 * thumbnail
-	 * -the generated thumbnails may not be from the same mime type as the source,
-	 * so make sure to check the mimetype of the resulting image. (In the case
-	 * you use this on a .tif image with -1,-1 the result is the tif image (no
-	 * thumb generation necessary), if you call this method on a tif with 10,10 the * result may be from type jpg depending on the graphics features of your
-	 * system. Type Safe thumbnail generation will be done for jpg, gif, png and
-	 * bmp
-	 * - To prevent thumbnail service from "out of memory"- problems, scaling
-	 * images is limited to 25 Megapixels (5000x5000)
-	 *
-	 * @param integer $pWidth the required width of the thumbnail, -1 to determine
-	 *        width by scaling to given height
-	 * @param integer $pHeight the required height of the thumbnail, -1 to
-	 *        determine height by scaling to given width
-	 * @param integer $pIgnore_aspect_ratio Aspect ratio was respected by default,
-	 *        pass 0 here to ignore aspect ratio.
-	 * @param Boolean $pBuffer send now or buffer request?
-	 *
-	 * @return array data of the thumbnail image with keys:
-	 *         "content" : contains the content of the thumbnail
-	 *         "mimetype": contains the mimetype of the thumbnail (please note that
-	 *                     it is possible to get a jpg-thumbnail of a png image)
-	 *         "timestamp":last modified timestamp of the thumbnail
-	 *
-	 */
-	public function get_thumbnail_data( $pWidth = -1, $pHeight = -1, $pIgnore_aspect_ratio = 0 , $pBuffer = FALSE )
-	{
-		$version = $this->get_steam_connector()->get_server_version();
-		list($major, $minor, $micro) = @split('[.]', $version);
-		if (((int)$major < 2) || ((int)$major == 2 && (int)$minor < 2) || ((int)$major == 2 && (int)$minor == 2 && (!isset($micro) ||  (int)$micro < 39) )) {
-			throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "Error: get_thumbnail_data is not available on servers with version < 2.2.39 (actual server version is " . $version . ").", 404 );
-		}
-		$thumbnailsmodule = $this->get_steam_connector()->get_module("thumbnails");
-		if (is_object($thumbnailsmodule)) {
-			$vars = array(
-                "width" => $pWidth,
-                "height" => $pHeight,
-                "ignore_aspect_ratio" => $pIgnore_aspect_ratio
-			);
-			return $this->get_steam_connector()->predefined_command( $thumbnailsmodule, "get_image_data", array( $this, $vars ), $pBuffer);
-		}
-		throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "Error: cant get module \"thumbnails\" from server.", 404 );
+	public function delete($pBuffer = 0) {
+		$this->getPersistence()->delete($this, $pBuffer);
+		return parent::delete($pBuffer);
 	}
 
 	/**
@@ -373,38 +250,51 @@ class steam_document extends steam_object
 	 * @return html representation of the wikis content
 	 */
 	public function get_content_html($pBuffer = FALSE) {
-		$wikimodule = $steam_connector->get_module("wiki");
+		$wikimodule = $this->get_steam_connector()->get_module("wiki");
 		if (is_object($wikimodule)) {
-			return $steam_connector->predefined_command( $wikimodule, "wiki_to_html_plain", array( $document ), $pBuffer);
+			return $this->get_steam_connector()->predefined_command( $wikimodule, "wiki_to_html_plain", array( $this ), $pBuffer);
 		}
 		throw new steam_exception( $this->steam_connector->get_login_user_name(), "Error: cant get module \"wiki\" from server.", 404 );
 	}
 
-	public function get_version()
+	public function get_version($pBuffer = 0)
 	{
-		$version = (int) $this->get_attribute( "DOC_VERSION" );
+		$version = (int) $this->get_attribute("DOC_VERSION", $pBuffer);
 		return $version;
 	}
 
-	public function get_previous_versions()
-	{
-		$versions = $this->get_attribute( "DOC_VERSIONS" );
-		 
-		if(is_array($versions) && !empty($versions) && count($versions) > 0)
-  	{
-  		krsort($versions);
-  		$versions = array_values($versions);
-  		return $versions;	
-  	}
-  	return FALSE;
-  }
+	public function get_previous_versions($pBuffer = 0){
+		$callback = function($versions) {
+			$result = array();
+			if(is_array($versions) && !empty($versions)){
+				krsort($versions);
+				$versions = array_values($versions);
+				$result = $versions;
+			}
+			return $result;
+		};
+
+		if ($pBuffer) {
+			$tid = $this->get_attribute("DOC_VERSIONS", $pBuffer);
+			$this->get_steam_connector()->add_buffer_result_callback($tid, $callback);
+			return $tid;
+		} else {
+			$versions = $this->get_attribute("DOC_VERSIONS");
+			$versions = $callback($versions);
+			return $versions;
+		}
+	}
   
-  public function is_previous_version_of()
-  {
-  	$doc = $this->get_attribute("OBJ_VERSIONOF");
-  	if(is_object($doc))
-  		return $doc;
-  	return FALSE;
-  }
+	public function is_previous_version_of($pBuffer = 0) {
+		return $this->get_attribute("OBJ_VERSIONOF", $pBuffer);
+	}
+
+	public function get_mimetype($pBuffer = 0) {
+		$mime = $this->get_attribute(DOC_MIME_TYPE);
+		if(empty($mime)){
+			$mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
+		}
+		return $mime;
+	}
 }
 ?>

@@ -168,7 +168,7 @@ class steam_container extends steam_object
 	 * Due to a container acting as environment for some objects,
 	 * this function returns all objects located inside.
 	 *
-	 * @param int $pClass if you ask for objects of a specific type, you can optionally use this int for the typedefinition (see steam_types.conf.php)
+	 * @param int $pClass if you ask for objects of a specific type, you can optionally use this int for the typedefinition (see steam_types.def.php)
 	 * @return mixed Array of steam_objects
 	 */
 	public function get_inventory_data( $pClass = FALSE )
@@ -235,7 +235,7 @@ class steam_container extends steam_object
 	 * Due to a container acting as environment for some objects,
 	 * this function returns all objects located inside.
 	 *
-	 * @param int $pClass if you ask for objects of a specific type, you can optionally use this int for the typedefinition (see steam_types.conf.php)
+	 * @param int $pClass if you ask for objects of a specific type, you can optionally use this int for the typedefinition (see steam_types.def.php)
 	 * @param Boolean $pBuffer use command buffer or not
 	 * @return mixed Array of steam_objects
 	 */
@@ -332,7 +332,7 @@ class steam_container extends steam_object
 	 * Due to a container acting as environment for some objects,
 	 * this function returns all objects located inside.
 	 *
-	 * @param int $pClass if you ask for objects of a specific type, you can optionally use this int for the typedefinition (see steam_types.conf.php)
+	 * @param int $pClass if you ask for objects of a specific type, you can optionally use this int for the typedefinition (see steam_types.def.php)
 	 * @param mixed $pAttributes define additional attributes for the object instances. Following are default: OBJ_NAME, OBJ_DESC, OBJ_CREATION_TIME, OBJ_LAST_CHANGED, OBJ_KEYWORDS, DOC_TYPE, DOC_LAST_ACCESSED
 	 * @param int $pOrder sort order, combination of SORT_DATE, SORT_DESC, SORT_NAME, SORT_SIZE, SORT_TYPE (constants definend in steam_container.class.php )
 	 * @param boolean $pFollowLinks Optional, get attributes from source in case of steam_link-instances. TRUE as default.

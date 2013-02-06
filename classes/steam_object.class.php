@@ -17,7 +17,7 @@
 /**
  *
  */
-require_once( "steam_types.conf.php" );
+require_once(dirname(dirname(__FILE__)) . "/etc/steam_types.def.php");
 
 /**
  * Root class for all objects in the metaphor of virtual knowledge rooms
@@ -38,7 +38,7 @@ class steam_object implements Serializable {
 
 	/**
 	 * Binary string which defines the type of object.
-	 * @see steam_types.conf.php for more details about the types.
+	 * @see steam_types.def.php for more details about the types.
 	 */
 	protected $type = CLASS_OBJECT;
 
@@ -119,7 +119,7 @@ class steam_object implements Serializable {
 	 * a mixture of several CLASS_* types, whereas get_type() only
 	 * returns the major type.
 	 *
-	 * @see steam_types.conf.php
+	 * @see steam_types.def.php
 	 *
 	 * Example:
 	 *   $user->get_type() == CLASS_USER
