@@ -581,6 +581,20 @@ class steam_group extends steam_object
 	public function drop_subGroupsLookupCache() {
 		$this->subGroupsLookupCache = null;
 	}
+	
+	public function move( $pParent, $pBuffer = FALSE )
+	{
+		$myConnector = steam_connector::get_instance($this->steam_connectorID);
+		return $this->steam_command(
+		$myConnector->get_factory(CLASS_GROUP),
+      	"move_group",
+		array(
+		$this,
+		$pParent
+		),
+		$pBuffer
+		);
+	}
 }
 
 ?>
