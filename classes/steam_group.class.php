@@ -382,6 +382,16 @@ class steam_group extends steam_object
 		$pBuffer
 		);
 	}
+	
+	public function get_groups($pBuffer = 0)
+	{
+		return $this->steam_command(
+		$this,
+				"get_groups",
+		array(),
+		$pBuffer
+		);
+	}
 
 	public function is_parent( $pGroup )
 	{
