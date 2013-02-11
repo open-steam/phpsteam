@@ -12,4 +12,8 @@ class CoalContentProvider extends  SteamContentProvider {
 			$buffer
         );
     }
+	
+    public function printContent(\steam_document $document) {
+        print $document->steam_command($document, "get_content", array(), false);
+    }
 }

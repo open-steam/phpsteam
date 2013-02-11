@@ -9,6 +9,6 @@ abstract class Downloader {
     public static function download(\steam_document $document) {
         static::prepare_header($document);
         @ob_flush();
-        print $document->get_content();
+        $document->print_content();
     }
 }

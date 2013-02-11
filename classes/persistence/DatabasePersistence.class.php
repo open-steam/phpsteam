@@ -50,6 +50,10 @@ class DatabasePersistence extends Persistence {
     public function load(\steam_document $document, $buffer = 0) {
         return self::$_contentProvider->getContent($document, $buffer);
     }
+	
+	public function printContent(\steam_document $document) {
+		self::$_contentProvider->printContent($document);
+	}
 
     public function getSize(\steam_document $document , $buffer = 0) {
 		if (($buffer == 0) && isset($document->attributes["DOC_SIZE"])) {
