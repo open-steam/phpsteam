@@ -1,4 +1,11 @@
 
+4.0.5 / 2013-02-11 
+==================
+
+  * adding print_download
+  * adding new move method for groups
+  * adding method get_groups
+
 4.0.2 / 2013-02-06 
 ==================
 

@@ -226,6 +226,10 @@ class steam_document extends steam_object
 	{
 		return $this->getPersistence()->load($this, $pBuffer);
 	}
+	
+	public function print_content() {
+		return $this->getPersistence()->printContent($this);
+	}
 
 	public function delete($pBuffer = 0) {
 		$this->getPersistence()->delete($this, $pBuffer);

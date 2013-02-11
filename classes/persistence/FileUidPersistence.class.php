@@ -125,6 +125,11 @@ class FileUidPersistence extends FilePersistence {
 			return $content;
 		}
 	}
+	
+	public function printContent(\steam_document $document) {
+		$file_path = $this->get_file_path($document);
+		print file_get_contents($file_path);
+	}
 
 	public function getSize(\steam_document $document, $buffer = 0) {
 		$file_path = $this->get_file_path($document);

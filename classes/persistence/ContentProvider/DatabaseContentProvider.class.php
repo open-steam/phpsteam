@@ -11,8 +11,7 @@ class DatabaseContentProvider extends SteamContentProvider
         $callback = function(\steam_document $document) {
 			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 			$databaseHelper->connect_to_mysql();
-			$content = $databaseHelper->get_content($document->get_content_id());
-			return $content;
+			return $databaseHelper->get_content($document->get_content_id()); 
 		};
 
 		if ($buffer) {
@@ -23,4 +22,10 @@ class DatabaseContentProvider extends SteamContentProvider
 			return $callback($document);
 		}
     }
+	
+	public function printContent(\steam_document $document) {
+		$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
+		$databaseHelper->connect_to_mysql();
+		$databaseHelper->print_content($document->get_content_id());
+	}
 }

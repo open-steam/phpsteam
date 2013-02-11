@@ -266,6 +266,24 @@ class DatabaseHelper {
 			echo 'Query failed: ' . $e->getMessage();
 		}
 	}
+	
+	function print_content($cid) {
+		$content_id = $cid;//$this->get_content_id($oid);
+		if ($content_id == 0) {
+			//echo "Error: no content id found for #{$oid}";
+			return "";
+		}
+		$query = "select rec_data from doc_data where doc_id=" . $content_id . " order by rec_order";
+		try{
+			$statement = $this->pdo->prepare($query);
+			$statement->execute();
+			while ($arr = $stmt->fetch()) { 
+				print $arr[0];
+			}
+		} catch (\PDOException $e) {
+			echo 'Query failed: ' . $e->getMessage();
+		}
+	}
 
 	function set_content($cid, &$content, $user = "") {
 		$content_id = $cid;
