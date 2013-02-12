@@ -277,7 +277,7 @@ class DatabaseHelper {
 		try{
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
-			while ($arr = $stmt->fetch()) { 
+			while ($arr = $statement->fetch()) { 
 				print $arr[0];
 			}
 		} catch (\PDOException $e) {
