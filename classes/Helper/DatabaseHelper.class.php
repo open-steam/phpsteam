@@ -260,8 +260,11 @@ class DatabaseHelper {
 		try{
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
-			$results = $statement->fetchAll();
-			return $results[0][0];
+			$result = "";
+			while ($arr = $statement->fetch()) { 
+				$result .= $arr[0];
+			}
+			return $result;
 		} catch (\PDOException $e) {
 			echo 'Query failed: ' . $e->getMessage();
 		}
