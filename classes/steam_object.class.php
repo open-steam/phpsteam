@@ -1005,6 +1005,24 @@ class steam_object implements Serializable {
 		$pBuffer
 		);
 	}
+	
+	/**
+	 * function query_meta_sanction:
+	 *
+	 * @param $pPeronOrGroup
+	 * @param $pBuffer
+	 *
+	 * @return
+	 */
+	public function query_meta_sanction( $pPersonOrGroup, $pBuffer = 0 )
+	{
+		return $this->steam_command(
+		$this,
+			"query_meta_sanction",
+		array( $pPersonOrGroup ),
+		$pBuffer
+		);
+	}
 
 	/**
 	 * function get_sanction:
