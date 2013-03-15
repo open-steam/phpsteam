@@ -5,7 +5,7 @@
  * COAL-protocol.
  *
  * PHP versions 5
- * 
+ *
  * @package 	PHPsTeam
  * @license	http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author	Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
@@ -100,7 +100,7 @@ class steam_request
 		$data = CMD_TYPE_OBJECT .
 		pack("C*", $id >> 24, $id >> 16, $id >> 8, $id) .
 		pack("C*", $class >> 24, $class >> 16, $class >> 8, $class);
-		return $data; 
+		return $data;
 	}
 
 	/**
@@ -235,8 +235,10 @@ class steam_request
 		// detect if result is an error
 		if ( $this->coalcommand == COAL_ERROR ) {
 			if ( is_array($this->arguments) ) {
-				//var_dump($this->arguments);
-				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1], 120);
+				if (isset($this->arguments[4]) && is_string($this->arguments[4])) {
+                    $server_backtrace = $this->arguments[4];
+                }
+				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1] . " server backtrace=" . $server_backtrace, 120);
 			} else {
 				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
 			}if (!$flushing) throw $sex;
@@ -245,13 +247,13 @@ class steam_request
 		return $this->arguments;
 	} //function decode($command)
 
-	function mybin2dec($str) {		
+	function mybin2dec($str) {
 		$result = 0;
 		$pos = true;
 		if (($str[0] & chr(pow(2,7))) == chr(pow(2,7))) {
 			$pos = false;
 		}
-		 
+
 		for($i=3; $i > -1; $i--) {
 			$byte = $str[$i];
 			for($j=0; $j < 8; $j++) {
@@ -270,7 +272,7 @@ class steam_request
 				}
 			}
 		}
-		
+
 
 		return $result;
 	}
