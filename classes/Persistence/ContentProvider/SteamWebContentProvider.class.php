@@ -24,6 +24,9 @@ class SteamWebContentProvider extends  SteamContentProvider {
 			return $result;
 		};
 
+	   $module_read_doc = $document->get_steam_connector()->get_module("table:read-documents");
+	   $document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
+
 	   if ($buffer) {
 		   $tid = $document->get_steam_connector()->add_to_buffer($document);
 		   $document->get_steam_connector()->add_buffer_result_callback($tid, $callback);
@@ -32,8 +35,11 @@ class SteamWebContentProvider extends  SteamContentProvider {
 		   return $callback($document);
 	   }
     }
-	
+
     public function printContent(\steam_document $document) {
+    	    $module_read_doc = $document->get_steam_connector()->get_module("table:read-documents");
+			$document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
+
  			$https_port = (int) $document->get_steam_connector()->get_config_value("https_port");
  			if ($https_port == 443 || $https_port == 0)
  				$https_port = "";
