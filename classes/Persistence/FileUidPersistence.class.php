@@ -117,6 +117,9 @@ class FileUidPersistence extends FilePersistence {
 	}
 
 	public function load(\steam_document $document, $buffer = 0) {
+		$module_read_doc = $document->get_steam_connector()->get_module("table:read-documents");
+		$document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
+
 		$file_path = $this->get_file_path($document);
 		$content = file_get_contents($file_path);
 		if ($buffer) {
@@ -125,8 +128,11 @@ class FileUidPersistence extends FilePersistence {
 			return $content;
 		}
 	}
-	
+
 	public function printContent(\steam_document $document) {
+		$module_read_doc = $document->get_steam_connector()->get_module("table:read-documents");
+		$document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
+
 		$file_path = $this->get_file_path($document);
 		print file_get_contents($file_path);
 	}
