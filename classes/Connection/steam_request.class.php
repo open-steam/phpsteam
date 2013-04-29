@@ -238,7 +238,7 @@ class steam_request
 				if (isset($this->arguments[4]) && is_string($this->arguments[4])) {
                     $server_backtrace = $this->arguments[4];
                 }
-				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1] . " server backtrace=" . $server_backtrace, 120);
+				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1] . (isset($server_backtrace) ? " server backtrace=" . $server_backtrace : ""), 120);
 			} else {
 				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
 			}if (!$flushing) throw $sex;
