@@ -26,19 +26,19 @@ abstract class Persistence {
 
 	public abstract static function init();
 
-    public abstract function delete(\steam_document $document, $buffer = 0);
-
 	public abstract function initialSave(\steam_document $document, &$content);
-
-	public abstract function migrateSave(\steam_document $document, &$content);
 
     public abstract function save(\steam_document $document, &$content, $buffer = 0);
 
+    public abstract function migrateSave(\steam_document $document, &$content);
+
     public abstract function load(\steam_document $document, $buffer = 0);
-	
+
 	public abstract function printContent(\steam_document $document);
 
 	public abstract function getSize(\steam_document $document, $buffer = 0);
+
+	public abstract function delete(\steam_document $document, $buffer = 0);
 
 	public abstract static function getContentProvider();
 }
