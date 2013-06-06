@@ -148,7 +148,7 @@ class FileContentIdPersistence extends FilePersistence {
 		}
 	}
 
-    private function get_file_path(\steam_document $document) {
+    public function get_file_path(\steam_document $document) {
         $dir = $document->get_id();
 		$dir = str_pad((string)$dir, 10, "0", STR_PAD_LEFT);
 		$dir_array = str_split($dir, 2);
