@@ -149,7 +149,12 @@ class FileContentIdPersistence extends FilePersistence {
 	}
 
     public function get_file_path(\steam_document $document) {
-        $dir = $document->get_id();
+    	$version_of = $document->get_attribute(OBJ_VERSIONOF);
+        if ($version_of instanceof \steam_document) {
+            $dir = $version_of->get_id();
+        } else {
+            $dir = $document->get_id();
+        }
 		$dir = str_pad((string)$dir, 10, "0", STR_PAD_LEFT);
 		$dir_array = str_split($dir, 2);
 
@@ -158,12 +163,6 @@ class FileContentIdPersistence extends FilePersistence {
             $target_dir .= $subdir . "/";
         }
 
-		/*$version_of = $document->get_attribute(OBJ_VERSIONOF);
-        if ($version_of instanceof \steam_document) {
-            $target_dir .= $document->get_content_id();
-        } else {
-            $target_dir .= $document->get_content_id();
-        }*/
         $target_dir .= $document->get_content_id();
 		return $target_dir;
     }
