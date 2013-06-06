@@ -569,6 +569,8 @@ class steam_factory {
 		} else if (((DEFAULT_PERSISTENCE_TYPE & PERSISTENCE_FILE) == PERSISTENCE_FILE) && ENABLE_FILE_PERSISTENCE && FILE_PERSISTENCE_BASE_PATH) {
 			if(DEFAULT_PERSISTENCE_TYPE == PERSISTENCE_FILE_UID) {
 				$doc_persistence_type = PERSISTENCE_FILE_UID;
+			} else if (DEFAULT_PERSISTENCE_TYPE == PERSISTENCE_FILE_CONTENTID) {
+				$doc_persistence_type = PERSISTENCE_FILE_CONTENTID;
 			} else {
 				$doc_persistence_type = PERSISTENCE_DATABASE;
 			}
@@ -578,6 +580,10 @@ class steam_factory {
 
 		if (!isset($pMimeType) || empty($pMimeType)) {
 			$pMimeType =  MimetypeHelper::get_instance()->getMimeType($pName);
+		}
+
+		if (strpos($pMimeType, "text") !== false) { //text documents should be persisted in database
+			$doc_persistence_type = PERSISTENCE_DATABASE;
 		}
 
 		$steam_document = steam_factory::create_object($pSteamConnectorID, $pName, CLASS_DOCUMENT, $pEnvironment, array("mimetype" => $pMimeType, "attributes" => array(OBJ_DESC => $pDescription, DOC_PERSISTENCE_TYPE => $doc_persistence_type)));

@@ -28,6 +28,8 @@ class steam_document extends steam_object
 			$docPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
 			if (ENABLE_FILE_PERSISTENCE && $docPersistenceType === PERSISTENCE_FILE_UID) {
 				$this->_persistence = \OpenSteam\Persistence\FileUidPersistence::getInstance();
+			} else if (ENABLE_FILE_PERSISTENCE && $docPersistenceType === PERSISTENCE_FILE_CONTENTID) {
+				$this->_persistence = \OpenSteam\Persistence\FileContentIdPersistence::getInstance();
 			} else if ($docPersistenceType === PERSISTENCE_DATABASE) {
 				$this->_persistence = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 			} else {
@@ -80,7 +82,7 @@ class steam_document extends steam_object
 	public function get_type() {
 		return CLASS_DOCUMENT | CLASS_OBJECT;
 	}
-	
+
 	/**
 	 *function download:
 	 *
@@ -226,7 +228,7 @@ class steam_document extends steam_object
 	{
 		return $this->getPersistence()->load($this, $pBuffer);
 	}
-	
+
 	public function print_content() {
 		return $this->getPersistence()->printContent($this);
 	}
@@ -288,7 +290,7 @@ class steam_document extends steam_object
 			return $versions;
 		}
 	}
-  
+
 	public function is_previous_version_of($pBuffer = 0) {
 		return $this->get_attribute("OBJ_VERSIONOF", $pBuffer);
 	}
