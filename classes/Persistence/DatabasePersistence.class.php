@@ -50,7 +50,7 @@ class DatabasePersistence extends Persistence {
     public function load(\steam_document $document, $buffer = 0) {
         return self::$_contentProvider->getContent($document, $buffer);
     }
-	
+
 	public function printContent(\steam_document $document) {
 		self::$_contentProvider->printContent($document);
 	}
@@ -69,4 +69,8 @@ class DatabasePersistence extends Persistence {
 	public static function getContentProvider() {
 		return self::$_contentProvider;
 	}
+
+    public function low_copy(\steam_document $orig, \steam_document $copy) {
+        //nothing to do
+    }
 }

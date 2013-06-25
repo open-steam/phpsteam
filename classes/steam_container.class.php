@@ -83,8 +83,8 @@ class steam_container extends steam_object
 	 *
 	 * @param mixed $pSteamObjects Array of steam_objects
 	 * @param integer $pType 0 = take originals, 1 = create links, 2 = take copies
-	 **/
-	public function insert( $pSteamObjects, $pType = 0 )
+	 */
+/*	public function insert( $pSteamObjects, $pType = 0 )
 	{
 		$objects_to_insert = array();
 		if ( ! is_array( $pSteamObjects ) )
@@ -119,7 +119,7 @@ class steam_container extends steam_object
 			$steam_object->move( $this, 1 );
 		}
 		return $this->steam_buffer_flush();
-	}
+	}*/
 
 	/**
 	 * function upload

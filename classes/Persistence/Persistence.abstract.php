@@ -41,4 +41,6 @@ abstract class Persistence {
 	public abstract function delete(\steam_document $document, $buffer = 0);
 
 	public abstract static function getContentProvider();
+
+	public abstract function low_copy(\steam_document $orig, \steam_document $copy);
 }

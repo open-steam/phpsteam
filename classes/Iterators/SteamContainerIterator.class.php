@@ -38,10 +38,10 @@ class SteamContainerIterator implements RecursiveIterator {
             } else {
                 $this->childObjs = $steam_container->get_inventory();
             }
-            $GLOBALS["MONOLOG"]->addDebug("\t".count($this->childObjs));
+            //$GLOBALS["MONOLOG"]->addDebug("\t".count($this->childObjs));
         }
 
-        $GLOBALS["MONOLOG"]->addDebug("\tConstruct SteamContainerIterator successfull");
+        //$GLOBALS["MONOLOG"]->addDebug("\tConstruct SteamContainerIterator successfull");
     }
 
     public function current() {
@@ -56,7 +56,7 @@ class SteamContainerIterator implements RecursiveIterator {
         $current = $this->current();
         if ($current instanceof steam_container) {
             $count = $current->count_inventory();
-            $GLOBALS["MONOLOG"]->addDebug("\tCount children: " . $count . " Obj:" . $current->get_id());
+            //$GLOBALS["MONOLOG"]->addDebug("\tCount children: " . $count . " Obj:" . $current->get_id());
 
             if ($count > 0) {
                 return true;
