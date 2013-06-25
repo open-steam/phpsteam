@@ -2,6 +2,9 @@
 
 namespace OpenSteam\Helper;
 
+use PDO,
+	PDOException;
+
 class DatabaseHelper {
 
 	private static $instance;
@@ -20,7 +23,7 @@ class DatabaseHelper {
 	public static function getAllUsers(){
 		$query = "SELECT * FROM i_users;";
 
-		$dsn = "mysql:dbname=steam;host=" . STEAM_DATABASE_HOST;
+		$dsn = "mysql:dbname=" . STEAM_DATABASE . ";host=" . STEAM_DATABASE_HOST;
 		try{
 			$pdo = new PDO($dsn, STEAM_DATABASE_USER, STEAM_DATABASE_PASS);
 
@@ -44,7 +47,7 @@ class DatabaseHelper {
 	public static function getObjCount() {
 		$query = "SELECT COUNT(DISTINCT ob_id) AS cardinality FROM ob_class;";
 
-		$dsn = "mysql:dbname=steam;host=" . STEAM_DATABASE_HOST;
+		$dsn = "mysql:dbname=" . STEAM_DATABASE . ";host=" . STEAM_DATABASE_HOST;
 		try{
 			$pdo = new PDO($dsn, STEAM_DATABASE_USER, STEAM_DATABASE_PASS);
 
@@ -61,7 +64,7 @@ class DatabaseHelper {
 	public static function getLastObjId() {
 		$query = "SELECT MAX(ob_id) AS count FROM ob_class;";
 
-		$dsn = "mysql:dbname=steam;host=" . STEAM_DATABASE_HOST;
+		$dsn = "mysql:dbname=" . STEAM_DATABASE . ";host=" . STEAM_DATABASE_HOST;
 		try{
 			$pdo = new PDO($dsn, STEAM_DATABASE_USER, STEAM_DATABASE_PASS);
 
@@ -78,7 +81,7 @@ class DatabaseHelper {
 	public static function getDocDataSize() {
 		$query = "SELECT SUM(LENGTH(rec_data)) as size from doc_data;";
 
-		$dsn = "mysql:dbname=steam;host=" . STEAM_DATABASE_HOST;
+		$dsn = "mysql:dbname=" . STEAM_DATABASE . ";host=" . STEAM_DATABASE_HOST;
 		try{
 			$pdo = new PDO($dsn, STEAM_DATABASE_USER, STEAM_DATABASE_PASS);
 
@@ -99,7 +102,7 @@ class DatabaseHelper {
 			die("Probleme mit der Datenbank. Wir arbeiten an einer L&ouml;sung.");
 		}
 
-		mysql_select_db("steam", $link);
+		mysql_select_db(STEAM_DATABASE, $link);
 		$result = mysql_query("SELECT login, ob_id FROM i_userlookup WHERE login='".$userName."'");
 
 
@@ -261,7 +264,7 @@ class DatabaseHelper {
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
 			$result = "";
-			while ($arr = $statement->fetch()) { 
+			while ($arr = $statement->fetch()) {
 				$result .= $arr[0];
 			}
 			return $result;
@@ -269,7 +272,7 @@ class DatabaseHelper {
 			echo 'Query failed: ' . $e->getMessage();
 		}
 	}
-	
+
 	function print_content($cid) {
 		$content_id = $cid;//$this->get_content_id($oid);
 		if ($content_id == 0) {
@@ -280,7 +283,7 @@ class DatabaseHelper {
 		try{
 			$statement = $this->pdo->prepare($query);
 			$statement->execute();
-			while ($arr = $statement->fetch()) { 
+			while ($arr = $statement->fetch()) {
 				print $arr[0];
 			}
 		} catch (\PDOException $e) {
@@ -289,6 +292,7 @@ class DatabaseHelper {
 	}
 
 	function set_content($cid, &$content, $user = "") {
+		//echo "set content " . $content . " for " . $cid . "\n";
 		$content_id = $cid;
 		if ($content_id == 0) {
 			trigger_error ("no content id set" , E_USER_WARNING);

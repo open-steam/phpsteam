@@ -582,7 +582,7 @@ class steam_factory {
 			$pMimeType =  MimetypeHelper::get_instance()->getMimeType($pName);
 		}
 
-		if (strpos($pMimeType, "text") !== false) { //text documents should be persisted in database
+		if (($doc_persistence_type == PERSISTENCE_FILE_UID || $doc_persistence_type == PERSISTENCE_FILE_CONTENTID) && !\OpenSteam\Persistence\FilePersistence::allowed($pMimeType)) {
 			$doc_persistence_type = PERSISTENCE_DATABASE;
 		}
 

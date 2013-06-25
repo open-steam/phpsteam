@@ -73,11 +73,11 @@ function sort_documents( $pDocA, $pDocB )
 
 class steam_container extends steam_object
 {
-	
+
 	public function get_type() {
 		return CLASS_CONTAINER | CLASS_OBJECT;
 	}
-	
+
 	/**
 	 * function insert:
 	 *
@@ -429,12 +429,16 @@ class steam_container extends steam_object
 	 */
 	public function count_inventory( $pBuffer = FALSE )
 	{
-		$invsize = $this->steam_command(
-		$this,
-				"get_size",
-		array(),
-		$pBuffer
-		);
+		try {
+			$invsize = $this->steam_command(
+			$this,
+					"get_size",
+			array(),
+			$pBuffer
+			);
+		} catch (steam_exception $e) { //this will happen on e.g. /home; function not allowed for this folder
+			$invsize = sizeof($this->get_inventory());
+		}
 		return $invsize;
 	}
 

@@ -39,12 +39,16 @@ class steam_document extends steam_object
 		return $this->_persistence;
 	}
 
-	public function migratePersistence($toPersistenceType) {
+	public function migratePersistence($toPersistenceType, $migrateVerions = true) {
 		$currentPersistenceType = $this->get_attribute(DOC_PERSISTENCE_TYPE);
 		if ($currentPersistenceType === $toPersistenceType) {
-			return;
+			return 0;
 		}
 		if (($currentPersistenceType === PERSISTENCE_DATABASE) && ($toPersistenceType === PERSISTENCE_FILE_UID)) {
+			if (!\OpenSteam\Persistence\FilePersistence::allowed($this->get_attribute("DOC_MIME_TYPE"))) {
+				return -1;
+			}
+
 			//get content from database
 			$content = $this->get_content();
 
@@ -58,6 +62,31 @@ class steam_document extends steam_object
 			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_FILE_UID);
 			$this->lock_attribute(DOC_PERSISTENCE_TYPE);
 			$this->_persistence = $newPersistence;
+		} else if (($currentPersistenceType === PERSISTENCE_DATABASE) && ($toPersistenceType === PERSISTENCE_FILE_CONTENTID)) {
+			if (!\OpenSteam\Persistence\FilePersistence::allowed($this->get_attribute("DOC_MIME_TYPE"))) {
+				return -1;
+			}
+
+			//get content from database
+			$content = $this->get_content();
+
+			//new persistence
+			$newPersistence = \OpenSteam\Persistence\FileContentIdPersistence::getInstance();
+			//change persistence without creating a new document version
+			$newPersistence->migrateSave($this, $content);
+
+			//change persistence type
+			$this->unlock_attribute(DOC_PERSISTENCE_TYPE);
+			$this->set_attribute(DOC_PERSISTENCE_TYPE, PERSISTENCE_FILE_CONTENTID);
+			$this->lock_attribute(DOC_PERSISTENCE_TYPE);
+			$this->_persistence = $newPersistence;
+			if ($migrateVerions) {
+				$versions = $this->get_attribute(DOC_VERSIONS);
+				foreach ($versions as $i => $version) {
+					$version->migratePersistence($toPersistenceType, false);
+				}
+			}
+
 		} else if (($currentPersistenceType === PERSISTENCE_FILE_UID) && ($toPersistenceType === PERSISTENCE_DATABASE)) {
 			//get content from database
 			$content = $this->get_content();
@@ -77,6 +106,7 @@ class steam_document extends steam_object
 			$this->_persistence = $newPersistence;
 
 		}
+		return 1;
 	}
 
 	public function get_type() {
@@ -233,7 +263,63 @@ class steam_document extends steam_object
 		return $this->getPersistence()->printContent($this);
 	}
 
-	public function delete($pBuffer = 0) {
+	public function delete_all_versions($pBuffer = 0) {
+		$parent = $this->get_attribute(OBJ_VERSIONOF);
+		if (!$parent instanceof steam_document) {
+			$versions = $this->get_attribute(DOC_VERSIONS);
+			$count = sizeof($versions);
+			if (!empty($versions)) {
+				foreach ($versions as $i => $version) {
+					if (!($version instanceof steam_document)) {
+						continue;
+					}
+					$version->delete(false, $pBuffer);
+				}
+				$this->set_attribute("DOC_VERSIONS", new stdClass(), $pBuffer);
+				$this->set_attribute("DOC_VERSION", 1, $pBuffer);
+			}
+			return $count;
+		} else {
+			return false;
+		}
+	}
+
+	public function delete($handleVersions = true, $pBuffer = 0) {
+		if ($handleVersions) {
+			$parent = $this->get_attribute(OBJ_VERSIONOF);
+			if ($parent instanceof steam_document) { //is version?
+				$all_versions = $parent->get_attribute(DOC_VERSIONS);
+				$keys = array_keys($all_versions);
+				sort($keys);
+				$new_array = array();
+				$new_key = 1;
+				foreach ($keys as $key) { // renumber other versions
+					$version = $all_versions[$key];
+					if (!($version instanceof steam_document) || $version->get_id() == $this->get_id()) {
+						continue;
+					}
+					$version->set_attribute("DOC_VERSION", $new_key);
+					$new_array[$new_key] = $version;
+					$new_key++;
+				}
+
+				if (empty($new_array)) {
+					$parent->set_attribute("DOC_VERSIONS", new stdClass());
+					$parent->set_attribute("DOC_VERSION", 1);
+				} else {
+					$parent->set_attribute("DOC_VERSIONS", $new_array);
+					$parent->set_attribute("DOC_VERSION", count($new_array) + 1);
+				}
+			} else { //delete versions if not is version
+	            $versions = $this->get_previous_versions();
+				foreach ($versions as $version) {
+					if($version instanceof steam_document){
+						$version->delete(false);
+					}
+	        	}
+			}
+		}
+
 		$this->getPersistence()->delete($this, $pBuffer);
 		return parent::delete($pBuffer);
 	}

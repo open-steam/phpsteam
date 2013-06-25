@@ -5,12 +5,12 @@ class MimetypeHelper {
     protected $source = "http://svn.apache.org/repos/asf/httpd/httpd/branches/1.3.x/conf/mime.types";
     public $target;
     public $mimetype_table;
-    
+
     private static $instance;
 
     /**
      *
-     * @return MimetypeHelper 
+     * @return MimetypeHelper
      */
     public static function get_instance(){
         if(!self::$instance){
@@ -34,7 +34,7 @@ class MimetypeHelper {
         if($file_ext){
             $extension = $file_ext;
         }
-        
+
         if(isset($this->mimetype_table[$extension])){
             return $this->mimetype_table[$extension];
         } else {
@@ -42,7 +42,7 @@ class MimetypeHelper {
             //throw new Exception('Unknown mimetype');
         }
     }
-	
+
 	public function getExtension($mime){
 		foreach($this->mimetype_table as $key => $value){
 			if($value == $mime){
@@ -61,6 +61,10 @@ class MimetypeHelper {
                     $s[$out[1][$i]]=$out[1][0];
             }
         }
+        // adding customs types
+        $s["pike"] = "source/pike";
+        $s["bb"] = "text/bb";
+        $s["wiki"] = "text/wiki";
         return $s;
     }
 

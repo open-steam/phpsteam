@@ -279,7 +279,7 @@ class steam_connection {
 			return FALSE;
 		}
 		$this->login_status = !($request->is_error());
-		/**
+		/*
 		$login_arguments contains the following:
 		0  => user name
 		1  => server version
@@ -362,6 +362,10 @@ class steam_connection {
 			$orignalRequests[$key] = clone $req;
 		}
 		// send command to steam-server
+		if (!is_resource($this->socket)) {
+			echo "connection timed out!! socket lost!";
+			die;
+		}
 		isset($this->socket_timeout) ? stream_set_timeout($this->socket, $this->socket_timeout) : stream_set_timeout($this->socket, STEAM_SOCKET_TIMEOUT_DEFAULT);
 		$this->sentrequests++;
 		self::$globalRequests++;
@@ -429,12 +433,10 @@ class steam_connection {
 					}
 					try {
 						$pCommandBuffer[$i]->decode($res, $flushing);
+					} catch (steam_exception $e) {
+						throw $e; //rethrow exception and maintain original stack trace
 					} catch (Exception $exception) {
-						if (method_exists($exception, "get_message")) {
-							throw new steam_exception($this->get_login_user_name(), $exception->get_message(), 300);
-						} else {
-							throw new steam_exception($this->get_login_user_name(), $exception->getMessage(), 300);
-						}
+						throw new steam_exception($this->get_login_user_name(), $exception->getMessage(), 300);
 					}
 				} else {
 					// if tid < commandtid skipping may help
@@ -685,8 +687,12 @@ class steam_connection {
 	 * @param boolean $pBuffer 0 = send now, 1 = buffer command and send later
 	 * @return steam_request | integer Depending on the buffer argument either a steam_request instance or a unique transaction id is given back
 	 */
-	public function predefined_command($pObject, $pMethod, $pArgs, $pBuffer) {
-		$request = new steam_request($this->get_id(), $this->get_transaction_id(), $pObject, array($pMethod, $pArgs));
+	public function predefined_command($pObject, $pMethod, $pArgs, $pBuffer, $raw = false) {
+		if ($raw) {
+			$request = new steam_request($this->get_id(), $this->get_transaction_id(), $pObject, array($pMethod, $pArgs));
+		} else {
+			$request = new steam_request($this->get_id(), $this->get_transaction_id(), $pObject, array($pMethod, $pArgs));
+		}
 
 		if ($pBuffer == 0) {
 			$request = $this->command($request);

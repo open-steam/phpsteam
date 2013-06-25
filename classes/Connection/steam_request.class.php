@@ -60,9 +60,16 @@ class steam_request
 		//set class variables
 		$this->steam_connectorID = $pSteamConnectorID;
 		$this->set_transactionid($transactionid);
-		$this->set_coalcommand($coalcommand);
 		$this->set_object($object);
-		$this->set_arguments($arguments);
+		if ($coalcommand == COAL_COMMAND_RAW) {
+			$this->set_coalcommand(COAL_COMMAND);
+			$this->set_arguments($arguments, true);
+		} else {
+			$this->set_coalcommand($coalcommand);
+			$this->set_arguments($arguments);
+		}
+
+
 
 	} //function steam_request($transactionid, $coalcommand, $object, $arguments)
 
@@ -113,9 +120,9 @@ class steam_request
 	 */
 	function encode_data($data, $object_keys = FALSE)
 	{
-		//encode array/mapping
-		if(is_array($data))
-		{
+		if (is_object($data) && !($data instanceof steam_object)) {
+			$newdata = CMD_TYPE_MAPPING . pack("C*", 0 >> 8, 0); // empty mapping
+		} else if(is_array($data)) { //encode array/mapping
 			//check if its an  array or mapping
 			$array = true;
 			$j = 0;
@@ -238,11 +245,18 @@ class steam_request
 				if (isset($this->arguments[4]) && is_string($this->arguments[4])) {
                     $server_backtrace = $this->arguments[4];
                 }
-				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer. COAL_ERROR : args[0]=" . $this->arguments[0] . " args[1]=" . $this->arguments[1] . (isset($server_backtrace) ? " server backtrace=" . $server_backtrace : ""), 120);
+                /*$log = "";
+				$trace = debug_backtrace();
+				foreach ($trace as $i=>$t) {
+				   $log .= $i .'=>'.$t['file'].' '.$t['line']."\n";
+				}
+				echo $log;
+				echo $this->object->get_path();
+                die;*/
+				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer.\nCOAL_ERROR : args[0]=" . $this->arguments[0] . "\nargs[1]=" . $this->arguments[1] . (isset($server_backtrace) ? "\nserver backtrace=" . $server_backtrace : ""), 120);
 			} else {
-				$sex = new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
-			}if (!$flushing) throw $sex;
-			else return $sex;
+				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
+			}
 		}
 		return $this->arguments;
 	} //function decode($command)
@@ -425,10 +439,14 @@ class steam_request
 	 *
 	 * @param $arguments
 	 */
-	function set_arguments($arguments)
+	function set_arguments($arguments, $raw = false)
 	{
 		$this->arguments = $arguments;
-		$this->arguments_encoded = $this->encode_data($arguments);
+		if ($raw) {
+			$this->arguments_encoded = $arguments;
+		} else {
+			$this->arguments_encoded = $this->encode_data($arguments);
+		}
 
 		$this->length = strlen($this->arguments_encoded) + 18;
 		$this->length_encoded = pack("C*", $this->length >> 24, $this->length >> 16, $this->length >> 8, $this->length);
