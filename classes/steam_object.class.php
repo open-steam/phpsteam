@@ -1226,7 +1226,6 @@ class steam_object implements Serializable {
 					$steam_documents[] = $steam_object;
 				}
 			}
-
 			foreach ($steam_documents as $steam_document) {
 				$steam_document->delete();
 			}
@@ -1377,6 +1376,36 @@ class steam_object implements Serializable {
 
 	public function set_prefetched() {
 		$this->prefetched = true;
+	}
+
+		/**
+	 * function copy
+	 *
+	 * @param $recursive
+	 * @param $pBuffer
+	 *
+	 * @return
+	 */
+	public function copy($recursive = true) {
+		if (($this->get_type() & CLASS_CONTAINER) || ($this->get_type() & CLASS_ROOM)) {
+			$inventory = $this->get_inventory();
+			$copyinventory = array();
+			foreach ($inventory as $object) {
+				$copyinventory[] = $object->copy();
+			}
+			$copy = $this->low_copy();
+			foreach ($copyinventory as $object) {
+				$object->move($copy);
+			}
+		} else {
+			$copy = $this->low_copy();
+		}
+		return $copy;
+	}
+
+	public function low_copy() {
+		$backendRecursive = false; //never copy recursive on backend
+		return $this->steam_command($this, "duplicate", array($backendRecursive), 0);
 	}
 }
 ?>

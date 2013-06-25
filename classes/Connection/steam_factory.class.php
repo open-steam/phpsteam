@@ -355,26 +355,6 @@ class steam_factory {
 		return $res;
 	}
 
-
-	/**
-	 * function create_copy
-	 *
-	 * @param $pSteamConnector
-	 * @param $pObject
-	 * @param $pBuffer
-	 *
-	 * @return
-	 */
-	public static function create_copy($pSteamConnectorID, $pObject, $pBuffer = 0) {
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		if (($pObject->get_type() & CLASS_CONTAINER) || ($pObject->get_type() & CLASS_ROOM)) {
-			$copy_recursively = TRUE;
-		} else {
-			$copy_recursively = FALSE;
-		}
-		return steam_connector::get_instance($pSteamConnectorID)->predefined_command($pObject, "duplicate", array($copy_recursively), $pBuffer);
-	}
-
 	/**
 	 * function create_object:
 	 *

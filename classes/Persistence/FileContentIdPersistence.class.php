@@ -98,7 +98,11 @@ class FileContentIdPersistence extends FilePersistence {
 		$document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
 
 		$file_path = $this->get_file_path($document);
-		print file_get_contents($file_path);
+		if (file_exists($file_path)) {
+			print file_get_contents($file_path);
+		} else {
+			throw new \Exception("content file is missing (id: " . $document->get_id() ."; file: " . $file_path . ")");
+		}
 	}
 
 	public function getSize(\steam_document $document, $buffer = 0) {
@@ -169,5 +173,9 @@ class FileContentIdPersistence extends FilePersistence {
 
 	public static function getContentProvider() {
 		return null;
+	}
+
+	public function low_copy(\steam_document $orig, \steam_document $copy) {
+		$this->save($copy, $orig->get_content(), 0, true);
 	}
 }

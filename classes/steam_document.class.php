@@ -324,6 +324,13 @@ class steam_document extends steam_object
 		return parent::delete($pBuffer);
 	}
 
+	public function low_copy() {
+		$copy = parent::low_copy();
+
+		$this->getPersistence()->low_copy($this, $copy);
+		return $copy;
+	}
+
 	/**
 	 * get wiki content as html
 	 *
