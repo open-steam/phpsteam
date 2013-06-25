@@ -1,7 +1,7 @@
 <?php
 /**
  * Type definitions for PHPsTeam
- * 
+ *
  * all types for COAL protocol
  * all types of CLASS definition
  * all types of Serialization
@@ -9,12 +9,12 @@
  * PHP versions 5
  *
  * @package     PHPsTeam
- * @license     http://opensource.org/licenses/gpl-license.php GNU Public License   
+ * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author Henrik Beige <hebeige@gmx.de>
  */
 
 /**
- * 
+ *
  */
   //define COAL command
   define("COAL_QUERY_COMMANDS", "\x00");
@@ -31,7 +31,8 @@
   define("COAL_UPLOAD_START",   "\x0a");
   define("COAL_UPLOAD_PACKAGE", "\x0b");
   define("COAL_CRYPT",          "\x0c");
-  
+  define("COAL_COMMAND_RAW",    "\x0d");
+
 
 
   //define CLASS ids

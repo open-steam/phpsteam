@@ -27,7 +27,7 @@ class FileContentIdPersistence extends FilePersistence {
 	}
 
 	private function putToFile(\steam_document $document, &$content) {
-		$dir = $document->get_id();
+		$dir = $this->getSaveId($document);
 		$dir = str_pad((string)$dir, 10, "0", STR_PAD_LEFT);
 		$dir_array = str_split($dir, 2);
 
@@ -41,7 +41,11 @@ class FileContentIdPersistence extends FilePersistence {
 		}
 
 		$fileName = $document->get_content_id();
-		file_put_contents($target_dir . $fileName, $content);
+		$contentFile = $target_dir . $fileName;
+		if (file_exists($contentFile)) {
+			throw new \Exception("content file already exists (id: " . $document->get_id() ."; file: " . $contentFile . ")");
+		}
+		file_put_contents($contentFile, $content);
 		return strlen($content);
 	}
 
@@ -63,8 +67,10 @@ class FileContentIdPersistence extends FilePersistence {
 	public function migrateSave(\steam_document $document, &$content) {
 		//save content to new persistence
 		$this->save($document, $content, 0, true);
+
 		//remove old Content from DB
-		$this->directDbSave($document, "");
+		$newContent = "";
+		$this->directDbSave($document, $newContent);
 	}
 
 	private function directDbSave(\steam_document $document, &$content) {
@@ -112,19 +118,6 @@ class FileContentIdPersistence extends FilePersistence {
 
 	public function delete(\steam_document $document, $buffer = 0) {
         $this->lowDeleteContentFile($document);
-
-		//delete versions if not is version
-		$version_of = $document->get_attribute(OBJ_VERSIONOF);
-        if (!($version_of instanceof \steam_document)) {
-            //get versions
-            $versions = $document->get_previous_versions();
-			foreach ($versions as $version) {
-				if(!empty($version)){
-					$this->delete($version);
-				}
-
-			}
-        }
     }
 
     public function lowDeleteContentFile($document) {
@@ -133,6 +126,7 @@ class FileContentIdPersistence extends FilePersistence {
 		if(file_exists($contentFile)){
 			unlink($contentFile);
 		} else {
+			//echo "***********CONTENTFILE MISSING**************\n";
 			throw new \Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
 		}
 
@@ -148,13 +142,19 @@ class FileContentIdPersistence extends FilePersistence {
 		}
 	}
 
-    public function get_file_path(\steam_document $document) {
-    	$version_of = $document->get_attribute(OBJ_VERSIONOF);
+	private function getSaveId(\steam_document $document) {
+		$id = $document->get_id();
+		/*$version_of = $document->get_attribute(OBJ_VERSIONOF);
         if ($version_of instanceof \steam_document) {
-            $dir = $version_of->get_id();
+            $id = $version_of->get_id();
         } else {
-            $dir = $document->get_id();
-        }
+            $id = $document->get_id();
+        }*/
+        return $id;
+	}
+
+    public function get_file_path(\steam_document $document) {
+    	$dir = $this->getSaveId($document);
 		$dir = str_pad((string)$dir, 10, "0", STR_PAD_LEFT);
 		$dir_array = str_split($dir, 2);
 

@@ -58,9 +58,9 @@ class steam_object implements Serializable {
 	 */
 	protected $additional = array();
 
-	
+
 	private $prefetched = false;
-	
+
 	/**
 	 * ID of steam_connector. Connection to sTeam-server
 	 */
@@ -81,7 +81,7 @@ class steam_object implements Serializable {
 		$this->id = (int) $id;
 		$this->steam_connectorID = $steamConnectorId;
 	}
-	
+
 	public function get_type() {
 		return CLASS_OBJECT;
 	}
@@ -89,7 +89,7 @@ class steam_object implements Serializable {
 	public function __toString() {
 		return "#" . $this->get_id();
 	}
-	
+
 	/**
 	 * function get_id:
 	 *
@@ -104,7 +104,7 @@ class steam_object implements Serializable {
 	public function serialize() {
 		return serialize(array($this->id, $this->steam_connectorID));
 	}
-		
+
 	public function unserialize($data) {
 		$values = unserialize($data);
 		$this->id = $values[0];
@@ -178,7 +178,7 @@ class steam_object implements Serializable {
 				if ( $pFollowLinks && ( ( CLASS_LINK & $this->get_type() ) == CLASS_LINK ) )
 				{
 					$object = $this->get_source_object();
-					$source_id = $object->get_id();				                        
+					$source_id = $object->get_id();
 				}
 					else {
 						$object = $this;
@@ -247,7 +247,7 @@ class steam_object implements Serializable {
 	 * @return mixed the local attribute cache for this object
 	 */
 	public function get_attribute_cached($key) {
-		if (!array_key_exists($key, $this->attributes)) 
+		if (!array_key_exists($key, $this->attributes))
 			return FALSE;
 		return $this->attributes[$key];
 	}
@@ -399,7 +399,7 @@ class steam_object implements Serializable {
 	public function unlock_attribute($pKey, $pBuffer = 0){
 		return $this->steam_command($this,"unlock_attribute",array((string) $pKey), $pBuffer);
 	}
-	
+
 	/**
 	 *function lock_attribute:
 	 *
@@ -411,7 +411,7 @@ class steam_object implements Serializable {
 	public function lock_attribute($pKey, $pBuffer = 0){
 		return $this->steam_command($this,"lock_attribute",array((string) $pKey), $pBuffer);
 	}
-	
+
 	/**
 	 *function is_locked:
 	 *
@@ -508,7 +508,7 @@ class steam_object implements Serializable {
 	public function set_additional_values( $pValues ) {
 		$this->additional = array_merge( $this->additional, $pValues );
 	}
-		
+
 	/**
 	 * function get_additional_values:
 	 *
@@ -1005,7 +1005,7 @@ class steam_object implements Serializable {
 		$pBuffer
 		);
 	}
-	
+
 	/**
 	 * function query_meta_sanction:
 	 *
@@ -1217,7 +1217,26 @@ class steam_object implements Serializable {
 	 *
 	 * @return int returns 1 if successful
 	 */
-	public function delete($pBuffer = 0 )
+	public function delete() {
+		if ($this instanceof steam_container) {
+			$steam_documents = array();
+			$iterator = new OpenSteam\Iterators\SteamContainerIterator($this);
+			foreach (new RecursiveIteratorIterator($iterator) as $steam_object) {
+				if ($steam_object instanceof steam_document) {
+					$steam_documents[] = $steam_object;
+				}
+			}
+
+			foreach ($steam_documents as $steam_document) {
+				$steam_document->delete();
+			}
+		}
+		$this->low_delete();
+	}
+
+
+
+	public function low_delete($pBuffer = 0 )
 	{
 		// TODO: CHECK!!!
 		// TODO: If this was needed it must be moved to a separate function to avoid problems with the buffer !
@@ -1351,11 +1370,11 @@ class steam_object implements Serializable {
 		$pBuffer
 		);
 	}
-	
+
 	public function is_prefetched() {
 		return $this->prefetched;
 	}
-	
+
 	public function set_prefetched() {
 		$this->prefetched = true;
 	}

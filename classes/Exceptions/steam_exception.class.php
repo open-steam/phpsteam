@@ -38,7 +38,8 @@ class steam_exception extends Exception {
 		}
 		$this->user = $pUser;
 		$this->allow_backtrace = $pallow_backtrace;
-		if ($pallow_backtrace) $this->backtrace = debug_backtrace();
+		if ($pallow_backtrace)
+			$this->backtrace = debug_backtrace();
 		else $this->backtrace = $this->security_issue;
 		parent::__construct( $pMessage, $pCode );
 	}
@@ -50,7 +51,13 @@ class steam_exception extends Exception {
 	 */
 	public function get_backtrace()
 	{
-		return var_dump( $this->backtrace );
+		$log = "";
+		$trace = $this->backtrace;
+		foreach ($trace as $i=>$t) {
+		   $log .= $i .'=>'.$t['file'].' '.$t['line']."\n";
+		}
+		return $log;
+		//return print_r($this->backtrace, true);
 	}
 
 	/**
@@ -89,8 +96,10 @@ class steam_exception extends Exception {
 	 * catched
 	 */
 	function __toString() {
-		if ($this->allow_backtrace) return $this->get_message();
-		else return $this->security_issue;
+		if ($this->allow_backtrace)
+			return $this->get_message() . "\n" . $this->get_backtrace();
+		else
+			return $this->security_issue;
 	}
 
 }
