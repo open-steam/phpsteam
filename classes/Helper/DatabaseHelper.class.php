@@ -8,6 +8,7 @@ use PDO,
 class DatabaseHelper {
 
 	private static $instance;
+	private $pdo;
 
 	private function __construct() {
 
@@ -20,14 +21,10 @@ class DatabaseHelper {
 		return self::$instance;
 	}
 
-	public static function getAllUsers(){
+	public function getAllUsers(){
 		$query = "SELECT * FROM i_users;";
-
-		$dsn = "mysql:dbname=" . STEAM_DATABASE . ";host=" . STEAM_DATABASE_HOST;
 		try{
-			$pdo = new PDO($dsn, STEAM_DATABASE_USER, STEAM_DATABASE_PASS);
-
-			$statement = $pdo->prepare($query);
+			$statement = $this->pdo->prepare($query);
 			$statement->execute();
 			$results = $statement->fetchAll();
 
@@ -44,14 +41,10 @@ class DatabaseHelper {
 		}
 	}
 
-	public static function getObjCount() {
+	public function getObjCount() {
 		$query = "SELECT COUNT(DISTINCT ob_id) AS cardinality FROM ob_class;";
-
-		$dsn = "mysql:dbname=" . STEAM_DATABASE . ";host=" . STEAM_DATABASE_HOST;
 		try{
-			$pdo = new PDO($dsn, STEAM_DATABASE_USER, STEAM_DATABASE_PASS);
-
-			$statement = $pdo->prepare($query);
+			$statement = $this->pdo->prepare($query);
 			$statement->execute();
 			$results = $statement->fetchAll();
 
@@ -170,9 +163,6 @@ class DatabaseHelper {
 		$unreadMails = $mailsCount-$readMailsCount;
 		return $unreadMails;
 	}
-
-	//private $content_id = -1;
-	private $pdo;
 
 	function connect_to_mysql() {
 		$db_host = STEAM_DATABASE_HOST;

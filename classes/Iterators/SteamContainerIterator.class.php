@@ -14,7 +14,7 @@ class SteamContainerIterator implements RecursiveIterator {
 
     private static $homeID;
 
-    public function __construct($steam_container) {
+    public function __construct(steam_container $steam_container) {
         if (!self::$homeID) {
             self::$homeID = steam_factory::get_object_by_name($steam_container->steam_connectorID, "/home")->get_id();
         }
