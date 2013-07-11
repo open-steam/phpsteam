@@ -43,6 +43,9 @@ class DatabasePersistence extends Persistence {
 				return strlen($content);
 			}
 		} else {
+            if (is_resource($content)) {
+                $content = stream_get_contents($content);
+            }
 			return $document->steam_command($document, "set_content", array($content), $buffer);
 		}
     }

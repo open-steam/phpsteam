@@ -1230,7 +1230,7 @@ class steam_object implements Serializable {
 				$steam_document->delete();
 			}
 		}
-		$this->low_delete();
+		return $this->low_delete();
 	}
 
 

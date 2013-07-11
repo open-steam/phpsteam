@@ -46,7 +46,7 @@ class FileContentIdPersistence extends FilePersistence {
 			throw new \Exception("content file already exists (id: " . $document->get_id() ."; file: " . $contentFile . ")");
 		}
 		file_put_contents($contentFile, $content);
-		return strlen($content);
+		return filesize($contentFile);
 	}
 
 	public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
@@ -148,12 +148,12 @@ class FileContentIdPersistence extends FilePersistence {
 
 	private function getSaveId(\steam_document $document) {
 		$id = $document->get_id();
-		/*$version_of = $document->get_attribute(OBJ_VERSIONOF);
+		$version_of = $document->get_attribute(OBJ_VERSIONOF);
         if ($version_of instanceof \steam_document) {
             $id = $version_of->get_id();
         } else {
             $id = $document->get_id();
-        }*/
+        }
         return $id;
 	}
 
