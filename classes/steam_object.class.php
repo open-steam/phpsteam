@@ -856,9 +856,23 @@ class steam_object implements Serializable {
 	 */
 	public function move( $pNewEnvironment, $pBuffer = 0 )
 	{
+		$name = $this->get_name();
+
+		$steam_object = $pNewEnvironment->get_object_by_name($name);
+		if (API_DOUBLE_FILENAME_NOT_ALLOWED && $steam_object instanceof steam_object) {
+			// object with same name already exists
+			throw new DoubleFilenameException();
+		}
+
+		$inventory = $pNewEnvironment->get_inventory();
+		if (API_MAX_INVENTORY_COUNT > 0 && sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
+			// max limit of inventory count reached
+			throw new Exception("Error Processing Request", 1);
+		}
+
 		return $this->steam_command(
 		$this,
-																"move",
+		"move",
 		array( $pNewEnvironment ),
 		$pBuffer
 		);

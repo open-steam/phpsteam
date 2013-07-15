@@ -374,7 +374,13 @@ class steam_factory {
 		$arguments = array_merge(array("name" => $pName), $pArguments);
 		$obj = steam_connector::get_instance($pSteamConnectorID)->predefined_command($steam_factory, "execute", $arguments, 0);
 		if ($pEnvironment != FALSE) {
-			$obj->move($pEnvironment);
+			try {
+				$obj->move($pEnvironment);
+			} catch (Exception $e) {
+				$obj->delete();
+				throw $e;
+
+			}
 		}
 		return $obj;
 	}
