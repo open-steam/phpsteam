@@ -17,7 +17,7 @@ defined("API_MAX_PATH_LENGTH") or define("API_MAX_PATH_LENGTH", 0); //TODO
 defined("API_TEMP_DIR") or define("API_TEMP_DIR", sys_get_temp_dir());
 defined("API_VIRUS_SCAN") or define("API_VIRUS_SCAN", FALSE);
 defined("DEFAULT_VIRUS_SCAN") or define("DEFAULT_VIRUS_SCAN", "ClamAvScanner");
-defined("CLAMAV_BIN") or define("CLAMAV_BIN", "/usr/local/bin/clamscan")
+defined("CLAMAV_BIN") or define("CLAMAV_BIN", "/usr/local/bin/clamscan");
 
 // define download types
 define("DOWNLOAD_ATTACHMENT", "attachment");
