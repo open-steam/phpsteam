@@ -866,19 +866,21 @@ class steam_object implements Serializable {
 	 */
 	public function move($pNewEnvironment, $pBuffer = 0)
 	{
-		API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
-		$name = $this->get_name();
+		if ($pNewEnvironment instanceof steam_container) {
+			API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
+			$name = $this->get_name();
 
-		$steam_object = $pNewEnvironment->get_object_by_name($name);
-		if (API_DOUBLE_FILENAME_NOT_ALLOWED && $steam_object instanceof steam_object) {
-			// object with same name already exists
-			throw new DoubleFilenameException();
-		}
+			$steam_object = $pNewEnvironment->get_object_by_name($name);
+			if (API_DOUBLE_FILENAME_NOT_ALLOWED && $steam_object instanceof steam_object) {
+				// object with same name already exists
+				throw new DoubleFilenameException();
+			}
 
-		$inventory = $pNewEnvironment->get_inventory();
-		if (API_MAX_INVENTORY_COUNT > 0 && sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
-			// max limit of inventory count reached
-			throw new TooManyFilesPerContainerException();
+			$inventory = $pNewEnvironment->get_inventory();
+			if (API_MAX_INVENTORY_COUNT > 0 && sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
+				// max limit of inventory count reached
+				throw new TooManyFilesPerContainerException();
+			}
 		}
 
 		return $this->steam_command(
