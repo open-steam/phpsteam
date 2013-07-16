@@ -84,8 +84,7 @@ class steam_factory {
 			$object = self::$objectCache[$globalID];
 			if ($pType !== FALSE) {
 				if (($object->get_type() & $pType)) {
-					//error_log("wrong object type. expected $pType got {$object->get_type()} (id: {$pID})");
-					//throw new Exception("wrong object type. expected $pType got {$object->get_type()} (id: {$pID})");
+				//	API_DEBUG ? $GLOBALS["MONOLOG"]->addWarning("wrong object type. expected $pType got {$object->get_type()} (id: {$pID})") : "";
 					return $object;
 				}
 			}
@@ -161,11 +160,11 @@ class steam_factory {
 			$objectData = $GLOBALS['STEAM']->predefined_command($clientSupport, "query_object_data", array($pObject, $pIventory, $pDepanding), $pBuffer);
 			$objects = $objectData["objects"];
 			foreach ($objects as $id => $object) {
-				(!API_DEBUG) or error_log("prefetched: " . $id);
+				API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("prefetched: " . $id) : "";
 				$steam_object = self::get_object($pSteamConnectorID, $id, $object["object_class"]);
 				$steam_object->set_values($object["attributes"]);
 				$steam_object->set_prefetched();
-				(!API_DEBUG) or error_log(count($steam_object->get_values(), true));
+				API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug(count($steam_object->get_values(), true)) : "";
 				if ($steam_object instanceof steam_user) {
 					self::setUserCache($object["attributes"]["OBJ_NAME"], $steam_object);
 				} else if ($steam_object instanceof steam_group) {
@@ -374,7 +373,13 @@ class steam_factory {
 		$arguments = array_merge(array("name" => $pName), $pArguments);
 		$obj = steam_connector::get_instance($pSteamConnectorID)->predefined_command($steam_factory, "execute", $arguments, 0);
 		if ($pEnvironment != FALSE) {
-			$obj->move($pEnvironment);
+			try {
+				$obj->move($pEnvironment);
+			} catch (Exception $e) {
+				$obj->delete(false, true);
+				throw $e;
+
+			}
 		}
 		return $obj;
 	}
@@ -542,7 +547,7 @@ class steam_factory {
 	 * @param steam_container $pEnvironment room or container where the document should be created
 	 * @return steam_document
 	 */
-	public static function create_document($pSteamConnectorID, $pName, $pContent, $pMimeType, $pEnvironment = FALSE, $pDescription = "") {
+	public static function create_document($pSteamConnectorID, $pName, $pContent = null, $pMimeType, $pEnvironment = FALSE, $pDescription = "") {
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 		if (DEFAULT_PERSISTENCE_TYPE == PERSISTENCE_DATABASE) {
 			$doc_persistence_type = PERSISTENCE_DATABASE;
@@ -562,12 +567,16 @@ class steam_factory {
 			$pMimeType =  MimetypeHelper::get_instance()->getMimeType($pName);
 		}
 
-		if (($doc_persistence_type == PERSISTENCE_FILE_UID || $doc_persistence_type == PERSISTENCE_FILE_CONTENTID) && !\OpenSteam\Persistence\FilePersistence::allowed($pMimeType)) {
+		if (($doc_persistence_type == PERSISTENCE_FILE_UID || $doc_persistence_type == PERSISTENCE_FILE_CONTENTID) && !\OpenSteam\Persistence\FilePersistence::allowedMimetype($pMimeType)) {
 			$doc_persistence_type = PERSISTENCE_DATABASE;
 		}
 
 		$steam_document = steam_factory::create_object($pSteamConnectorID, $pName, CLASS_DOCUMENT, $pEnvironment, array("mimetype" => $pMimeType, "attributes" => array(OBJ_DESC => $pDescription, DOC_PERSISTENCE_TYPE => $doc_persistence_type)));
-		$steam_document->set_initial_content($pContent);
+
+		if (isset($pContent)) {
+			$steam_document->set_content($pContent);
+		}
+
 		$steam_document->lock_attribute(DOC_PERSISTENCE_TYPE);
 
 		return $steam_document;

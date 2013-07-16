@@ -441,7 +441,7 @@ class steam_connection {
 				} else {
 					// if tid < commandtid skipping may help
 					if ($thetid < $commandtid) {
-						error_log("steam_connector.php, send_command: command tid=" . $commandtid . " answer tid=" . $thetid . " skipping result...");
+						API_DEBUG ? $GLOBALS["MONOLOG"]->addWarning("steam_connector.php, send_command: command tid=" . $commandtid . " answer tid=" . $thetid . " skipping result...") : "";
 					} // no chance, serious failure in data transfer
 					else {
 						throw new steam_exception($this->get_login_user_name(), "Failure during data transfer commandbuffer=" . $pCommandBuffer, 300);
@@ -456,7 +456,7 @@ class steam_connection {
 			$string = "object: " . (($request->get_object() instanceof steam_object) ? $request->get_object()->get_id() : "null") . "\t";
 			$string .= "methode: " . ((is_array($args) && isset($args[0])) ? $args[0] : "null") . "\t";
 			// 			$string .= "args: " . (isset($args[1]) ? var_export($args[1], true) : "") . "\t";
-			(!API_DEBUG) or error_log($string);
+			//API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug($string) : "";
 			$args = $request->get_arguments();
 			if (is_array($args) && isset($args[0])) {
 				$method = $args[0];

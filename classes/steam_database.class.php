@@ -27,16 +27,16 @@ class steam_database
 	 * ID of steam_connector. Connection to sTeam-server
 	 */
 	public $steam_connectorID;
-	
+
 	public function __construct($steamFactory, $steamConnectorId, $id) {
         if (!($steamFactory instanceof steam_factory)) {
-            error_log("phpsteam error: only steam_factory is allowed to call");
+        	API_DEBUG ? $GLOBALS["MONOLOG"]->addError("phpsteam error: only steam_factory is allowed to call") : "";
             throw new Exception("phpsteam error: only steam_factory is allowed to call");
         }
 		$this->id 	= $id;
 		$this->steam_connectorID = $steamConnectorId;
 	}
-	
+
 	public function get_type() {
 		return CLASS_DATABASE;
 	}

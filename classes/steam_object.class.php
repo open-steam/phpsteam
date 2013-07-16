@@ -75,7 +75,7 @@ class steam_object implements Serializable {
 	 */
 	public function __construct($steamFactory, $steamConnectorId, $id) {
         if (!($steamFactory instanceof steam_factory)) {
-            error_log("phpsteam error: only steam_factory is allowed to call");
+            API_DEBUG ? $GLOBALS["MONOLOG"]->addError("phpsteam error: only steam_factory is allowed to call") : "";
             throw new Exception("phpsteam error: only steam_factory is allowed to call");
         }
 		$this->id = (int) $id;
@@ -269,7 +269,7 @@ class steam_object implements Serializable {
 	public function get_attribute( $pAttribute, $pBuffer = FALSE)
 	{
 		if ($pBuffer) {
-			(!API_DEBUG) or error_log("query_attribute with buffer");
+			//API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute with buffer") : "";
 			$value = $this->steam_command($this, "query_attribute", array( $pAttribute ), $pBuffer);
 			if (is_string($value)) {
 				$value = strip_tags($value);
@@ -278,7 +278,7 @@ class steam_object implements Serializable {
 		}
 		else {
 			if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])){
-				(!API_DEBUG) or error_log("query_attribute without buffer");
+				//API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute without buffer") : "";
 				$this->attributes[ $pAttribute ] = $this->steam_command($this, "query_attribute", array( $pAttribute ), 0);
 			}
 			$value = isset($this->attributes[$pAttribute]) ? $this->attributes[$pAttribute] : 0;
@@ -458,7 +458,17 @@ class steam_object implements Serializable {
 	public function set_attribute( $pAttribute, $pValue, $pBuffer= 0 )
 	{
 		$pValue = ( is_string( $pValue ) ) ? strip_tags(stripslashes( $pValue )) : $pValue;
-		return $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
+		try {
+			$result = $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
+		} catch (steam_exception $e) {
+			if (strstr($e->get_message(), "Cannot update identifier")) {
+				throw new DoubleFilenameException();
+			} else {
+				throw new $e;
+
+			}
+		}
+		return $result;
 	}
 
 	/**
@@ -854,11 +864,26 @@ class steam_object implements Serializable {
 	 * @param boolean $pBuffer 0 = send command now, 1 = buffer command
 	 * @return boolean TRUE | FALSE
 	 */
-	public function move( $pNewEnvironment, $pBuffer = 0 )
+	public function move($pNewEnvironment, $pBuffer = 0)
 	{
+		API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
+		$name = $this->get_name();
+
+		$steam_object = $pNewEnvironment->get_object_by_name($name);
+		if (API_DOUBLE_FILENAME_NOT_ALLOWED && $steam_object instanceof steam_object) {
+			// object with same name already exists
+			throw new DoubleFilenameException();
+		}
+
+		$inventory = $pNewEnvironment->get_inventory();
+		if (API_MAX_INVENTORY_COUNT > 0 && sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
+			// max limit of inventory count reached
+			throw new TooManyFilesPerContainerException();
+		}
+
 		return $this->steam_command(
 		$this,
-																"move",
+		"move",
 		array( $pNewEnvironment ),
 		$pBuffer
 		);
@@ -1218,6 +1243,7 @@ class steam_object implements Serializable {
 	 * @return int returns 1 if successful
 	 */
 	public function delete() {
+		API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->delete %" . $this->get_id()) : "";
 		if ($this instanceof steam_container) {
 			$steam_documents = array();
 			$iterator = new OpenSteam\Iterators\SteamContainerIterator($this);
@@ -1237,6 +1263,7 @@ class steam_object implements Serializable {
 
 	public function low_delete($pBuffer = 0 )
 	{
+		API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->low_delete %" . $this->get_id()) : "";
 		// TODO: CHECK!!!
 		// TODO: If this was needed it must be moved to a separate function to avoid problems with the buffer !
 		// replace links with source object if source is deleted

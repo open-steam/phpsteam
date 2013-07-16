@@ -18,7 +18,7 @@
  *
  */
 define( "SORT_NONE", "0" );
-// SORT_DESC is PHP global for SORT DESCENDING and produces output in error_log
+// SORT_DESC is PHP global for SORT DESCENDING and produces output in error_log ?? What?!
 // if defined here again
 define( "SORT_DESCENDING", "2" );
 define( "SORT_NAME", "4" );
@@ -192,6 +192,7 @@ class steam_container extends steam_object
 				throw new steam_exception($this->get_steam_connector()->get_login_user_name(), "incompatible version: you must install the latest version of package:whiteboardmodule on the server.", 500);
 			}
 		}
+
 		$inventory = array();
 		foreach( $invdata["attributes"] as $id => $data ) {
 			$type = $invdata["self_defined"][$id]["object_class"];
