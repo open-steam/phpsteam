@@ -1,34 +1,34 @@
 <?php
 
 abstract class VirusScanner{
-    
+
     /**
-     * @return bool - true if clean - else false 
+     * @return bool - true if clean - else false
      */
     public abstract function scanFile($filename);
-    
+
     /**
-     * @return bool - true if clean - else false 
+     * @return bool - true if clean - else false
      */
-    public abstract function scanDir($dirname);   
+    public abstract function scanDir($dirname);
 }
 
 
 
 
 class ClamAvScanner extends VirusScanner{
-    
+
     public function scanDir($dirname) {
-        $command = sprintf("clamscan -r %s", $filename);
+        $command = sprintf(CLAMAV_BIN . " -r %s", $filename);
         return $this->executeCommand($command);
     }
 
     public function scanFile($filename) {
-        $command = sprintf("clamscan %s", $filename);        
+        $command = sprintf(CLAMAV_BIN . " %s", $filename);
         return $this->executeCommand($command);
-        
+
     }
-     
+
     private function executeCommand($command){
         $returnCode = -1;
         $out = "";
@@ -43,7 +43,7 @@ class ClamAvScanner extends VirusScanner{
 }
 
 class SophosScanner extends VirusScanner{
-    
+
     public function scanDir($dirname) {
         throw new Exception('Not implemented yet.');
     }

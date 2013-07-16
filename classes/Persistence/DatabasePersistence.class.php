@@ -2,6 +2,8 @@
 
 namespace OpenSteam\Persistence;
 
+use steam_document;
+
 class DatabasePersistence extends Persistence {
 
     protected static $_contentProvider;
@@ -19,19 +21,24 @@ class DatabasePersistence extends Persistence {
 
     }
 
-    public function delete(\steam_document $document, $buffer = 0) {
+    public function delete(steam_document $document, $buffer = 0) {
         //no additional stuff needed
     }
 
-	public function initialSave(\steam_document $document, &$content) {
-		$this->save($document, $content);
+    public function allowed(\steam_document $document) {
+        return true;
+    }
+
+	public function migrateSave(steam_document $document, $handle) {
+		$this->save($document, $handle, 0, true);
 	}
 
-	public function migrateSave(\steam_document $document, &$content) {
-		$this->save($document, $content, 0, true);
-	}
-
-    public function save(\steam_document $document, &$content, $buffer = 0, $noVersion = false) {
+    public function save(steam_document $document, $handle, $buffer = 0, $noVersion = false) {
+        if (is_resource($handle)) {
+            $content = stream_get_contents($handle);
+        } else {
+            $content = $handle;
+        }
 		if ($noVersion) {
 			$databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
 			$databaseHelper->connect_to_mysql();
@@ -43,22 +50,19 @@ class DatabasePersistence extends Persistence {
 				return strlen($content);
 			}
 		} else {
-            if (is_resource($content)) {
-                $content = stream_get_contents($content);
-            }
 			return $document->steam_command($document, "set_content", array($content), $buffer);
 		}
     }
 
-    public function load(\steam_document $document, $buffer = 0) {
+    public function load(steam_document $document, $buffer = 0) {
         return self::$_contentProvider->getContent($document, $buffer);
     }
 
-	public function printContent(\steam_document $document) {
+	public function printContent(steam_document $document) {
 		self::$_contentProvider->printContent($document);
 	}
 
-    public function getSize(\steam_document $document , $buffer = 0) {
+    public function getSize(steam_document $document , $buffer = 0) {
 		if (($buffer == 0) && isset($document->attributes["DOC_SIZE"])) {
 			return $document->attributes["DOC_SIZE"];
 		}
@@ -73,7 +77,7 @@ class DatabasePersistence extends Persistence {
 		return self::$_contentProvider;
 	}
 
-    public function low_copy(\steam_document $orig, \steam_document $copy) {
+    public function low_copy(steam_document $orig, steam_document $copy) {
         //nothing to do
     }
 }
