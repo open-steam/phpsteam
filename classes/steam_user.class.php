@@ -36,7 +36,7 @@ class steam_user extends steam_container
 {
 
 	private $rucksack_current_folder;
-	
+
 	public function get_type() {
 		return CLASS_USER | CLASS_CONTAINER | CLASS_OBJECT;
 	}
@@ -819,7 +819,9 @@ class steam_user extends steam_container
 		//Get ids
 		if(is_array($user_toconfirm_obj))
 		foreach($user_toconfirm_obj as $utco){
-			$user_toconfirm_ids[] =  $utco->get_id();
+			if ($utco instanceof steam_user) {
+				$user_toconfirm_ids[] =  $utco->get_id();
+			}
 		}
 
 		$buddie_ids = array();
@@ -828,7 +830,7 @@ class steam_user extends steam_container
 			$buddie_ids += array_keys($confirmed_contacts);
 		}
 		$buddie_ids = array_unique(array_merge ($user_favourites_ids, $buddie_ids));
-		
+
 
 		$c = array_diff($buddie_ids, $user_toconfirm_ids);
 		$buddie_ids = array_intersect($c, $buddie_ids);
