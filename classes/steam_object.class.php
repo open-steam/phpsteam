@@ -866,7 +866,7 @@ class steam_object implements Serializable {
 	 */
 	public function move($pNewEnvironment, $pBuffer = 0)
 	{
-		/*if ($pNewEnvironment instanceof steam_container) {
+		if ($pNewEnvironment instanceof steam_container) {
 			API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
 			$name = $this->get_name();
 
@@ -881,7 +881,7 @@ class steam_object implements Serializable {
 				// max limit of inventory count reached
 				throw new TooManyFilesPerContainerException();
 			}
-		}*/
+		}
 
 		return $this->steam_command(
 		$this,
