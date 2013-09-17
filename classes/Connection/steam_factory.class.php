@@ -92,7 +92,11 @@ class steam_factory {
 
 		if ($pType === FALSE) {
 			$obj = new steam_object(self::get_instance(), $pSteamConnectorID, $pID);
-			$pType = $obj->get_object_class();
+			try {
+				$pType = $obj->get_object_class();
+			} catch (Exception $e) {
+				return null;
+			}
 		}
 		switch (TRUE) {
 			case (($pType & CLASS_USER) == CLASS_USER):
