@@ -33,7 +33,19 @@ class steam_document extends steam_object
 		} else {
 			$result = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 		}
-		return $result;
+	}
+
+	public function getPersistenceType() {
+		$id = $this->get_attribute(DOC_PERSISTENCE_TYPE)
+		if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_UID) {
+			return $id;
+		} else if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_CONTENTID) {
+			return $id;
+		} else if ($id === PERSISTENCE_DATABASE) {
+			return $id;
+		} else {
+			return PERSISTENCE_DATABASE;
+		}
 	}
 
 	public function getPersistence() {
