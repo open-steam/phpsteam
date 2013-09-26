@@ -8,14 +8,12 @@ class RangeDownloader extends Downloader
     public static function download(\steam_document $document){
         //check if document stored in filesystem
         //  if not stored in filesystem - create tmp-file
-        $persistence_type = $document->get_attribute(DOC_PERSISTENCE_TYPE);
-        $persistence = PersistenceFactory::getInstance()->create_file_persistence($persistence_type);
+        $persistence = $document->getPersistence();
         $file = PATH_TEMP . $document->get_id();
-        if($persistence_type === PERSISTENCE_STEAM && !file_exists($file)){
-            $content =  $persistence->load($document);
-
-            file_put_contents( $file , $content);
-        } else if($persistence_type !== PERSISTENCE_STEAM){
+        if($persistence instanceof \OpenSteam\Persistence\DatabasePersistence && !file_exists($file)){
+            $content = $persistence->load($document);
+            file_put_contents($file, $content);
+        } else {
             $file = $persistence->get_file_path($document);
         }
 
