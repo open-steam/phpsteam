@@ -33,6 +33,7 @@ class steam_document extends steam_object
 		} else {
 			$result = \OpenSteam\Persistence\DatabasePersistence::getInstance();
 		}
+		return $result;
 	}
 
 	public function getPersistenceType() {
