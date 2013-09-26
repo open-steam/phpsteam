@@ -36,7 +36,7 @@ class steam_document extends steam_object
 	}
 
 	public function getPersistenceType() {
-		$id = $this->get_attribute(DOC_PERSISTENCE_TYPE)
+		$id = $this->get_attribute(DOC_PERSISTENCE_TYPE);
 		if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_UID) {
 			return $id;
 		} else if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_CONTENTID) {
