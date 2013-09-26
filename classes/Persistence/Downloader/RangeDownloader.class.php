@@ -8,9 +8,10 @@ class RangeDownloader extends Downloader
     public static function download(\steam_document $document){
         //check if document stored in filesystem
         //  if not stored in filesystem - create tmp-file
+        $persistence = $document->getPersistence();
         $persistenceType = $document->getPersistenceType();
         $file = PATH_TEMP . $document->get_id();
-        if($persistenceType === PERSISTENCE_DATABASE && !file_exists($file)){
+        if($persistenceType === PERSISTENCE_DATABASE){
             $content = $persistence->load($document);
             file_put_contents($file, $content);
         } else {
