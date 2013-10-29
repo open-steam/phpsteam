@@ -134,7 +134,7 @@ class FileUidPersistence extends FilePersistence {
 		$document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
 
 		$file_path = $this->get_file_path($document);
-		print file_get_contents($file_path);
+		readfile($file_path);
 	}
 
 	public function getSize(\steam_document $document, $buffer = 0) {

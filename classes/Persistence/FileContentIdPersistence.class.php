@@ -122,7 +122,7 @@ class FileContentIdPersistence extends FilePersistence {
 
 		$file_path = $this->get_file_path($document);
 		if (file_exists($file_path)) {
-			print file_get_contents($file_path);
+			readfile($file_path);
 		} else {
 			throw new Exception("content file is missing (id: " . $document->get_id() ."; file: " . $file_path . ")");
 		}
@@ -158,18 +158,22 @@ class FileContentIdPersistence extends FilePersistence {
 			unlink($contentFile);
 		} else {
 			//echo "***********CONTENTFILE MISSING**************\n";
-			throw new Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
+			//throw new Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
 		}
 
 		$current_dir = dirname($contentFile);
-		while ($current_dir . "/" !== self::$persistenceBaseFolder) {
-			$obj_count = count(glob($current_dir . "/*"));
-			if ($obj_count === 0) {
-				rmdir($current_dir);
-				$current_dir = dirname($current_dir);
-			} else {
-				break;
+		if (is_dir($current_dir)) {
+			while ($current_dir . "/" !== self::$persistenceBaseFolder) {
+				$obj_count = count(glob($current_dir . "/*"));
+				if ($obj_count === 0) {
+					rmdir($current_dir);
+					$current_dir = dirname($current_dir);
+				} else {
+					break;
+				}
 			}
+		} else {
+			//echo "***********NOT A DIR**************\n";
 		}
 		return true;
 	}
