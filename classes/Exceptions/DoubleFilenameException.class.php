@@ -1,8 +1,8 @@
 <?php
 class DoubleFilenameException extends Exception {
 
-    public function __construct() {
-        $this->message = "Double filename";
+    public function __construct($name) {
+        $this->message = "Double filename {$name}";
 
         parent::__construct( $this->message );
     }

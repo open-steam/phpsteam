@@ -868,18 +868,22 @@ class steam_object implements Serializable {
 	{
 		if ($pNewEnvironment instanceof steam_container) {
 			API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
-			$name = $this->get_name();
 
-			$steam_object = $pNewEnvironment->get_object_by_name($name);
-			if (API_DOUBLE_FILENAME_NOT_ALLOWED && $steam_object instanceof steam_object) {
-				// object with same name already exists
-				throw new DoubleFilenameException();
+			if (API_DOUBLE_FILENAME_NOT_ALLOWED) {
+				$name = $this->get_name();
+				$steam_object = $pNewEnvironment->get_object_by_name($name);
+				if ($steam_object instanceof steam_object) {
+					// object with same name already exists
+					throw new DoubleFilenameException($name);
+				}
 			}
 
-			$inventory = $pNewEnvironment->get_inventory();
-			if (API_MAX_INVENTORY_COUNT > 0 && sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
-				// max limit of inventory count reached
-				throw new TooManyFilesPerContainerException();
+			if (API_MAX_INVENTORY_COUNT > 0) { // set to -1 to disable
+				$inventory = $pNewEnvironment->get_inventory();
+				if (sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
+					// max limit of inventory count reached
+					throw new TooManyFilesPerContainerException();
+				}
 			}
 		}
 
