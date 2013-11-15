@@ -176,7 +176,7 @@ class steam_document extends steam_object
 	    	throw new ParameterException("pContent", "resource or string");
 	    }
 
-	    self::virusScan($tmpfile);
+	    //self::virusScan($tmpfile);
 
 	    $handle = fopen($tmpfile, 'r');
 

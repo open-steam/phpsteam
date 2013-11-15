@@ -464,7 +464,7 @@ class steam_object implements Serializable {
 			if (strstr($e->get_message(), "Cannot update identifier")) {
 				throw new DoubleFilenameException();
 			} else {
-				throw new $e;
+				throw $e;
 
 			}
 		}
