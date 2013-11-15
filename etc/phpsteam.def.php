@@ -14,7 +14,7 @@ defined("API_MAX_INVENTORY_COUNT") or define("API_MAX_INVENTORY_COUNT", 500);
 defined("API_MAX_CONTENT_SIZE") or define("API_MAX_CONTENT_SIZE", 52428800); //50mb
 defined("API_ATTRIBUTE_SIZE") or define("API_ATTRIBUTE_SIZE", 0); //TODO
 defined("API_MAX_PATH_LENGTH") or define("API_MAX_PATH_LENGTH", 0); //TODO
-defined("API_TEMP_DIR") or define("API_TEMP_DIR", sys_get_temp_dir());
+defined("API_TEMP_DIR") or define("API_TEMP_DIR", sys_get_temp_dir() . "/");
 defined("API_VIRUS_SCAN") or define("API_VIRUS_SCAN", FALSE);
 defined("DEFAULT_VIRUS_SCAN") or define("DEFAULT_VIRUS_SCAN", "ClamAvScanner");
 defined("CLAMAV_BIN") or define("CLAMAV_BIN", "/usr/local/bin/clamscan");
