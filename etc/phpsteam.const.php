@@ -16,3 +16,7 @@ define("PERSISTENCE_FILE",           0x00001000);
 define("PERSISTENCE_FILE_UID",       0x00000002 | PERSISTENCE_FILE);
 define("PERSISTENCE_FILE_HASH",      0x00000003 | PERSISTENCE_FILE);
 define("PERSISTENCE_FILE_CONTENTID", 0x00000004 | PERSISTENCE_FILE);
+
+define("API_LOGGER_CHANNEL", "phpsteam");
+
+include_once dirname(__FILE__) . "/logger.conf.php";

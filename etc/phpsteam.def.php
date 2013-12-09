@@ -20,9 +20,14 @@ defined("API_VIRUS_SCAN") or define("API_VIRUS_SCAN", false);
 defined("DEFAULT_VIRUS_SCAN") or define("DEFAULT_VIRUS_SCAN", "ClamAvScanner");
 defined("CLAMAV_BIN") or define("CLAMAV_BIN", "/usr/local/bin/clamscan");
 
-
 // config default content provider
 defined("DEFAULT_CONTENT_PROVIDER") or define("DEFAULT_CONTENT_PROVIDER", CONTENT_PROVIDER_COAL);
+
+//db connection data
+defined("STEAM_DATABASE") or define("STEAM_DATABASE", "steam");
+defined("STEAM_DATABASE_HOST") or define("STEAM_DATABASE_HOST", "localhost");
+defined("STEAM_DATABASE_USER") or define("STEAM_DATABASE_USER", "steam");
+defined("STEAM_DATABASE_PASS") or define("STEAM_DATABASE_PASS", "steam");
 
 // config persistence
 defined("ENABLE_FILE_PERSISTENCE") or define("ENABLE_FILE_PERSISTENCE", false);

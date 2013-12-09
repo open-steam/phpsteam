@@ -15,6 +15,9 @@
 
 include_once dirname(dirname(dirname(__FILE__))) . "/etc/phpsteam.def.php";
 
+use Monolog\Logger;
+use Monolog\Registry;
+
 /**
  * The steam_connector manages all socket functions.
  *
@@ -73,6 +76,8 @@ class steam_connector implements Serializable
 		$this->LoginName = $pLoginName;
 		self::$instances [$this->get_id()] = $this;
 		steam_connection::init($pServerIp, $pServerPort, $pLoginName, $pLoginPassword);
+        $logger = Registry::getInstance(API_LOGGER_CHANNEL);
+        $logger->debug("steam_connection init finished", array("connection", $pLoginName . "@" . $pServerIp . ":" . $pServerPort));
 	}
 
 	public static function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword) {
@@ -86,7 +91,7 @@ class steam_connector implements Serializable
 			return $instance;
 		}
 	}
-	
+
 	public static function get_instance($id) {
 		if (!is_string($id)) throw new ParameterException( "id", "string" );
 		if (isset(self::$instances[$id])) {
@@ -217,13 +222,13 @@ class steam_connector implements Serializable
 	{
 		return steam_connection::get_instance($this->get_id())->get_root_room();
 	}
-	
+
 	/**
 	 * function get_server_module:
-	 * 
+	 *
 	 * Returns server module
 	 *
-	 * @param string $pServerModule Name of the module 
+	 * @param string $pServerModule Name of the module
 	 * @return steam_object
 	 */
 	/*public function get_server_module( $pServerModule )
@@ -233,7 +238,7 @@ class steam_connector implements Serializable
     	echo "hund";die;
     	return 0;
     }
-    
+
     switch ( $pServerModule ) {
       case "package:searchsupport":
           return new searchsupport( $this->login_arguments[ 8 ][ $pServerModule ] );
@@ -242,7 +247,7 @@ class steam_connector implements Serializable
           return new module_groups( $this->login_arguments[ 8 ][ $pServerModule ] );
           break;
       case "searching":
-      	//compare_versions doesn't exist, login_arguments doesn't exist, 
+      	//compare_versions doesn't exist, login_arguments doesn't exist,
       	// if ( $this->compare_versions( $this->server_version, '2.9.4' ) < 0 ) break;
           return new searching(steam_connection::get_instance($this->get_id())->get_module($pServerModule));
           break;
@@ -261,7 +266,7 @@ class steam_connector implements Serializable
 	 */
 	public function get_module( $pServerModule )
 	{
-		return steam_connection::get_instance($this->get_id())->get_module($pServerModule); 
+		return steam_connection::get_instance($this->get_id())->get_module($pServerModule);
 	}
 
 	public function get_service_manager()
@@ -362,19 +367,19 @@ class steam_connector implements Serializable
 	{
 		return steam_connection::get_instance($this->get_id())->get_sentrequests();
 	}
-	
+
 	public function get_globalrequest_count() {
 		return steam_connection::get_instance($this->get_id())->get_globalrequests();
 	}
-	
+
 	public function get_globalrequest_map() {
 		return steam_connection::get_instance($this->get_id())->get_globalrequestsmap();
 	}
-	
+
 	public function get_globalrequest_time() {
 		return steam_connection::get_instance($this->get_id())->get_globalrequeststime();
 	}
-	
+
 
 	/**
 	 * function upload:
@@ -494,11 +499,11 @@ class steam_connector implements Serializable
 	public function predefined_command( $pObject, $pMethod, $pArgs, $pBuffer ) {
   		return steam_connection::get_instance($this->get_id())->predefined_command($pObject, $pMethod, $pArgs, $pBuffer);
   	}
-  
+
   	public function buffer_flush() {
   		return steam_connection::get_instance($this->get_id())->buffer_flush();
   	}
-  
+
   	public function get_socket_status() {
   		return steam_connection::get_instance($this->get_id())->get_socket_status();
   	}
@@ -506,11 +511,11 @@ class steam_connector implements Serializable
 	public function is_connected() {
 		return steam_connection::get_instance($this->get_id())->is_connected();
 	}
-  
+
   	public function exception( $pCode, $pDetails = "", $allow_backtrace = TRUE ) {
   		return steam_connection::get_instance($this->get_id())->exception( $pCode, $pDetails, $allow_backtrace);
   	}
-  	
+
   	public function buffer_attributes_request( $pObject, $pAttributes, $pSourceObjectID = 0 ){
   		return steam_connection::get_instance($this->get_id())->buffer_attributes_request( $pObject, $pAttributes, $pSourceObjectID);
   	}
@@ -535,4 +540,4 @@ class steam_connector implements Serializable
 		$steam_connection = steam_connection::get_instance($this->get_id());
 		$steam_connection->add_buffer_result_callback($transactionid, $callback);
 	}
-} 
+}

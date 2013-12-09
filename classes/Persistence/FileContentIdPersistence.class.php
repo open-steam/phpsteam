@@ -3,6 +3,8 @@
 namespace OpenSteam\Persistence;
 
 use steam_document, Exception;
+use Monolog\Logger;
+use Monolog\Registry;
 
 class FileContentIdPersistence extends FilePersistence {
 
@@ -157,8 +159,8 @@ class FileContentIdPersistence extends FilePersistence {
 		if(file_exists($contentFile)){
 			unlink($contentFile);
 		} else {
-			//echo "***********CONTENTFILE MISSING**************\n";
-			//throw new Exception("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
+			$logger = Registry::getInstance(API_LOGGER_CHANNEL);
+            $logger->warning("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
 		}
 
 		$current_dir = dirname($contentFile);
