@@ -336,10 +336,12 @@ class DatabaseHelper {
 			trigger_error ("no content id set" , E_USER_WARNING);
 			return "";
 		}
-		$query = "delete from doc_data where doc_id = " . $content_id . ";";
-		$query .= "insert into doc_data values('" . mysql_real_escape_string($content) . "', " . $content_id . ", 1)";
+		$query = "delete from doc_data where doc_id = :content_id;";
+		$query .= "insert into doc_data values(':content', :content_id, 1)";
 		try{
 			$statement = $this->pdo->prepare($query);
+            $statement->bindParam(':content_id', $content_id, PDO::PARAM_INT);
+            $statement->bindParam(':content', $content, PDO::PARAM_STR);
 			$statement->execute();
 			$results = $statement->fetchAll();
 			return $results;
