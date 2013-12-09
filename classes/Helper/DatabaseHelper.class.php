@@ -5,6 +5,9 @@ namespace OpenSteam\Helper;
 use PDO,
 	PDOException;
 
+use Monolog\Logger;
+use Monolog\Registry;
+
 class DatabaseHelper {
 
 	private static $instance;
@@ -163,33 +166,33 @@ class DatabaseHelper {
 		$unreadMails = $mailsCount-$readMailsCount;
 		return $unreadMails;
 	}
-	
+
 	public function countMails($userName=""){
 		$link = mysql_connect(STEAM_DATABASE_HOST, STEAM_DATABASE_USER, STEAM_DATABASE_PASS, true);
 		if (!$link) {
 			error_log('no connection: ' . mysql_error());
 			die("Probleme mit der Datenbank. Wir arbeiten an einer L&ouml;sung.");
 		}
-	
+
 		mysql_select_db(STEAM_DATABASE, $link);
 		$result = mysql_query("SELECT login, ob_id FROM i_userlookup WHERE login='".$userName."'");
-	
+
 		$userObjectId = 0;
 		while($row = @mysql_fetch_array($result)){
 			$userObjectId = $row["ob_id"];
 		}
-	
+
 		if ($userObjectId==0){
 			return 0;
 		}
-	
+
 		//secound query
 		$mailObjectIdsString = "";
 		$result = mysql_query("SELECT ob_id,ob_ident,ob_data FROM ob_data WHERE ob_ident='annots' AND ob_id='".$userObjectId."'");
 		while($row = mysql_fetch_array($result)){
 			$mailObjectIdsString = $row["ob_data"];
 		}
-	
+
 		//find the object numbers
 		//extract object numbers from the string
 		//these are the object ids of the mails
@@ -202,11 +205,13 @@ class DatabaseHelper {
 			$objectNumbers[]=substr($mailObjectIdsStringCut,$firstPercent+1,$firstKomma-$firstPercent-1);
 			$mailObjectIdsStringCut = substr($mailObjectIdsStringCut,$firstKomma+1);
 		}
-	
+
 		return (count($objectNumbers) - 1);
 	}
 
 	function connect_to_mysql() {
+        $logger = Registry::getInstance(API_LOGGER_CHANNEL);
+
 		$db_host = STEAM_DATABASE_HOST;
 		$db_database = STEAM_DATABASE;
 		$db_user = STEAM_DATABASE_USER;
@@ -216,9 +221,10 @@ class DatabaseHelper {
 			try{
 				$this->pdo = new \PDO($dsn, $db_user, $db_password);
 			} catch (\PDOException $e) {
-				echo 'Connection failed: ' . $e->getMessage();
+				$logger->error("failed to connect db", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
 			}
 		} else throw new \Exception("Unable to connect to database.", E_CONFIGURATION);
+        $logger->debug("db connected", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
 	}
 
 	function disconnect_from_mysql() {
