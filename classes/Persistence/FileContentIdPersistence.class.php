@@ -160,7 +160,7 @@ class FileContentIdPersistence extends FilePersistence {
 			unlink($contentFile);
 		} else {
 			$logger = Registry::getInstance(API_LOGGER_CHANNEL);
-            $logger->addWarning("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
+            $logger->warning("content file is missing (id: " . $document->get_id() ."; file: " . $contentFile . ")");
 		}
 
 		$current_dir = dirname($contentFile);
