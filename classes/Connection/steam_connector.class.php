@@ -14,7 +14,6 @@
  */
 
 include_once dirname(dirname(dirname(__FILE__))) . "/etc/phpsteam.def.php";
-include_once dirname(dirname(dirname(__FILE__))) . "/etc/logger.conf.php";
 
 use Monolog\Logger;
 use Monolog\Registry;
@@ -78,7 +77,7 @@ class steam_connector implements Serializable
 		self::$instances [$this->get_id()] = $this;
 		steam_connection::init($pServerIp, $pServerPort, $pLoginName, $pLoginPassword);
         $logger = Registry::getInstance(API_LOGGER_CHANNEL);
-        $logger->addDebug("steam_connection init finished");
+        $logger->debug("steam_connection init finished", array("connection", $pLoginName . "@" . $pServerIp . ":" . $pServerPort));
 	}
 
 	public static function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword) {
