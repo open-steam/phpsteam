@@ -167,9 +167,9 @@ class DatabaseHelper
     public function set_content($cid, &$content)
     {
         $query = "delete from doc_data where doc_id = :content_id;";
-        $query .= "insert into doc_data values(':content', :content_id, 1)";
+        $query .= "insert into doc_data values(:content, :content_id, 1)";
         try {
-            $statement = $this->pdo->prepare($query);
+            $statement = $this->_pdo->prepare($query);
             $statement->bindParam(':content_id', $content_id, PDO::PARAM_INT);
             $statement->bindParam(':content', $content, PDO::PARAM_STR);
             $statement->execute();
@@ -194,7 +194,7 @@ class DatabaseHelper
 
     public function get_oid_by_path($path)
     {
-        $query = "select ob_id from ob_data where ob_attr='OBJ_PATH' and ob_data=':path'";
+        $query = "select ob_id from ob_data where ob_attr='OBJ_PATH' and ob_data=:path";
         try {
             $statement = $this->_pdo->prepare($query);
             $statement->bindParam(':path', $path, PDO::PARAM_STR);
@@ -286,40 +286,38 @@ class DatabaseHelper
 
         $mailOids = $this->get_users_mail_oids($uid);
 
-        //build up a long sql string
-        $mailsCount=0;
-        $first = true;
-        foreach ($objectNumbers as $mailObjectNumber) {
-            $mailsCount++;
-            if ($first) {
-                $first=false;
-                $allMailsQuery = "SELECT k,v FROM i_read_documents WHERE k='".$mailObjectNumber."'";
-            } else {
-                $allMailsQuery.=" OR k='".$mailObjectNumber."'";
+        if (count($mailOids) === 1) {
+            return 0;
+        }
+
+        $query = "SELECT k,v FROM i_read_documents WHERE ";
+
+        foreach ($mailOids as $i => $mailOid) {
+            $query .= "k = :mailOid{$i}";
+            if ($i < count($mailOids) - 1) {
+                $query .= " OR ";
             }
         }
-        $mailsCount--;
+        try {
+            $statement = $this->_pdo->prepare($query);
+            foreach ($mailOids as $i => $mailOid) {
+                $statement->bindParam(":mailOid{$i}", str_replace('%', '', $mailOid), PDO::PARAM_STR);
+            }
+            $statement->execute();
+            $results = $statement->fetchAll();
 
-        //check if mails are read
-        $allMailsData = array();
-        $result = mysql_query($allMailsQuery);
-        while ($row = mysql_fetch_array($result)) {
-            $allMailsData[] = $row;
-        }
-
-        $readMailsCount=0;
-        if (isset($allMailsData)) {
-            foreach ($allMailsData as $mailData) {
-                if (stripos($mailData["v"], $userObjectId) != false) {
-                    $readMailsCount++;
+            $unreadMails=0;
+            foreach ($results as $key => $value) {
+                $value['v'] = str_replace('%', '',  $value['v']);
+                if (strpos($value['v'], (string) $uid) === false) {
+                    $unreadMails++;
                 }
             }
+
+            return $unreadMails;
+        } catch (PDOException $e) {
+            $this->_logger->error('Connection failed: ' . $e->getMessage());
         }
-
-        mysql_close($link);
-        $unreadMails = $mailsCount-$readMailsCount;
-
-        return $unreadMails;
     }
 
     public function countMails($userName)
