@@ -28,10 +28,9 @@ class DatabaseContentProvider extends SteamContentProvider
 
     public function printContent(\steam_document $document)
     {
-        $databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
-        $databaseHelper->connect_to_mysql();
         $module_read_doc = $document->get_steam_connector()->get_module("table:read-documents");
         $document->steam_command($module_read_doc, "download_document", array(8, $document), 0);
+        $databaseHelper = \OpenSteam\Helper\DatabaseHelper::getInstance();
         $databaseHelper->print_content($document->get_content_id());
     }
 }
