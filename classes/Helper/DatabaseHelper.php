@@ -212,59 +212,79 @@ class DatabaseHelper
         download_and_print($this->get_oid_by_path($path));
     }
 
-    public function get_content_size($contentid)
+    public function get_content_size($cid)
     {
-        $size = 0;
-        $query = "select length(rec_data) from doc_data where doc_id=" . $contentid . " order by rec_order";
-        $result = mysql_query($query);
-        $i = 0;
-        while ($row = mysql_fetch_row($result)) {
-            $i++;
-            $size += (int) $row[0];
-        }
+        $query = "select length(rec_data) from doc_data where doc_id=:cid order by rec_order";
+        try {
+            $statement = $this->_pdo->prepare($query);
+            $statement->bindParam(':cid', $cid, PDO::PARAM_INT);
+            $statement->execute();
 
-        return $size;
+            $size = 0;
+            while ($arr = $statement->fetch()) {
+                $size += (int) $arr[0];
+            }
+
+            return $size;
+        } catch (PDOException $e) {
+            $this->_logger->error('Connection failed: ' . $e->getMessage());
+        }
     }
 
-        public function getUnreadMails($userName="")
+    public function get_user_oid($userName)
     {
-        //$link = mysql_connect(STEAM_DATABASE_HOST, STEAM_DATABASE_USER, STEAM_DATABASE_PASS, true);
-        if (!$link) {
-            API_DEBUG ? $GLOBALS["MONOLOG"]->addError('no connection: ' . mysql_error()) : "";
-            die("Probleme mit der Datenbank. Wir arbeiten an einer L&ouml;sung.");
-        }
+        $query = "SELECT login, ob_id FROM i_userlookup WHERE login = :userName";
+        try {
+            $statement = $this->_pdo->prepare($query);
+            $statement->bindParam(":userName", $userName, PDO::PARAM_STR);
+            $statement->execute();
+            $results = $statement->fetchAll();
 
-        mysql_select_db(STEAM_DATABASE, $link);
-        $result = mysql_query("SELECT login, ob_id FROM i_userlookup WHERE login='".$userName."'");
-
-        $userObjectId = 0;
-        while ($row = @mysql_fetch_array($result)) {
-            $userObjectId = $row["ob_id"];
+            return (int) $results[0]['ob_id'];
+        } catch (PDOException $e) {
+            $this->_logger->error('Connection failed: ' . $e->getMessage());
         }
+    }
 
-        if ($userObjectId==0) {
-            return 0;
-        }
+    public function get_users_mail_oids($uid)
+    {
+        $query = "SELECT ob_id,ob_ident,ob_data FROM ob_data WHERE ob_ident='annots' AND ob_id=:uid";
+        try {
+            $statement = $this->_pdo->prepare($query);
+            $statement->bindParam(":uid", $uid, PDO::PARAM_INT);
+            $statement->execute();
+            $results = $statement->fetchAll();
 
-        //secound query
-        $mailObjectIdsString = "";
-        $result = mysql_query("SELECT ob_id,ob_ident,ob_data FROM ob_data WHERE ob_ident='annots' AND ob_id='".$userObjectId."'");
-        while ($row = mysql_fetch_array($result)) {
-            $mailObjectIdsString = $row["ob_data"];
-        }
+            $decoded = $this->steam_decode($results[0]['ob_data']);
 
-        //find the object numbers
-        //extract object numbers from the string
-        //these are the object ids of the mails
-        $mailObjectIdsStringCut = $mailObjectIdsString;
-        $objectNumbers = array();
-        while (true) {
-            $firstPercent = stripos($mailObjectIdsStringCut, "%");
-            $firstKomma = stripos($mailObjectIdsStringCut, ",");
-            if ($firstPercent === false) break;
-            $objectNumbers[] = substr($mailObjectIdsStringCut, $firstPercent + 1, $firstKomma - $firstPercent - 1);
-            $mailObjectIdsStringCut = substr($mailObjectIdsStringCut, $firstKomma + 1);
+            return $decoded['Annotations'];
+        } catch (PDOException $e) {
+            $this->_logger->error('Connection failed: ' . $e->getMessage());
         }
+    }
+
+    public function steam_decode($string)
+    {
+        $string = str_replace("[", "[[", $string);
+        $string = str_replace("]", "]]", $string);
+        $string = str_replace("{", "[", $string);
+        $string = str_replace("}", "]", $string);
+        $string = str_replace("[[", "{", $string);
+        $string = str_replace("]]", "}", $string);
+
+        $string = str_replace(",]", "]", $string);
+        $string = str_replace(",}", "}", $string);
+
+        $string = preg_replace("/(%\d+)/", "\"$1\"", $string);
+
+        return json_decode($string,  true);
+    }
+
+    public function getUnreadMails($userName)
+    {
+        $uid = $this->get_user_oid($userName);
+
+        $mailOids = $this->get_users_mail_oids($uid);
 
         //build up a long sql string
         $mailsCount=0;
@@ -302,46 +322,11 @@ class DatabaseHelper
         return $unreadMails;
     }
 
-    public function countMails($userName = "")
+    public function countMails($userName)
     {
-       // $link = mysql_connect(STEAM_DATABASE_HOST, STEAM_DATABASE_USER, STEAM_DATABASE_PASS, true);
-        if (!$link) {
-            error_log('no connection: ' . mysql_error());
-            die("Probleme mit der Datenbank. Wir arbeiten an einer L&ouml;sung.");
-        }
+       $uid = $this->get_user_oid($userName);
+       $mailOids = $this->get_users_mail_oids($uid);
 
-        mysql_select_db(STEAM_DATABASE, $link);
-        $result = mysql_query("SELECT login, ob_id FROM i_userlookup WHERE login='".$userName."'");
-
-        $userObjectId = 0;
-        while ($row = @mysql_fetch_array($result)) {
-            $userObjectId = $row["ob_id"];
-        }
-
-        if ($userObjectId==0) {
-            return 0;
-        }
-
-        //secound query
-        $mailObjectIdsString = "";
-        $result = mysql_query("SELECT ob_id,ob_ident,ob_data FROM ob_data WHERE ob_ident='annots' AND ob_id='".$userObjectId."'");
-        while ($row = mysql_fetch_array($result)) {
-            $mailObjectIdsString = $row["ob_data"];
-        }
-
-        //find the object numbers
-        //extract object numbers from the string
-        //these are the object ids of the mails
-        $mailObjectIdsStringCut = $mailObjectIdsString;
-        $objectNumbers = array();
-        while (true) {
-            $firstPercent = stripos($mailObjectIdsStringCut,"%");
-            $firstKomma = stripos($mailObjectIdsStringCut,",");
-            if ($firstPercent===FALSE) break;
-            $objectNumbers[]=substr($mailObjectIdsStringCut,$firstPercent+1,$firstKomma-$firstPercent-1);
-            $mailObjectIdsStringCut = substr($mailObjectIdsStringCut,$firstKomma+1);
-        }
-
-        return (count($objectNumbers) - 1);
+       return (count($mailOids) - 1);
     }
 }
