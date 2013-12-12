@@ -308,7 +308,6 @@ class DatabaseHelper
 
             $unreadMails=0;
             foreach ($results as $key => $value) {
-                $value['v'] = str_replace('%', '',  $value['v']);
                 if (strpos($value['v'], (string) $uid) === false) {
                     $unreadMails++;
                 }
