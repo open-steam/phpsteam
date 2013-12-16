@@ -11,4 +11,4 @@ $logger = new Logger(API_LOGGER_CHANNEL);
 
 Registry::addLogger($logger);
 
-$logger->debug("API Logger init finished");
+//$logger->debug("API Logger init finished");
