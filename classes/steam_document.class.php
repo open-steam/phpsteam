@@ -441,7 +441,7 @@ class steam_document extends steam_object
     {
         $mime = $this->get_attribute(DOC_MIME_TYPE);
         if (empty($mime)) {
-            $mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
+            $mime = \MimetypeHelper::get_instance()->getMimeType($this->get_name());
         }
 
         return $mime;
