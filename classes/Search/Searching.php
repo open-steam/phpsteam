@@ -39,7 +39,7 @@ class Searching
 
         $myrequest = new steam_request(
                                         $this->_steamObject->get_steam_connector()->get_id(),
-                                        $this->_steamOject->get_steam_connector()->get_transaction_id(),
+                                        $this->_steamObject->get_steam_connector()->get_transaction_id(),
                                         $this->_steamObject,
                                         array("searchAsync", array(
                                                                     $searches,
