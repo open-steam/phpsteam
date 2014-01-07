@@ -100,7 +100,7 @@ class ThumbnailHelper
             $transparent_new_index = ImageColorTransparent($img_resized, $transparent_new);
             ImageFill($img_resized, 0, 0, $transparent_new_index);
         }
-        if (ImageCopyResized($img_resized, $img, 0, 0, 0, 0, $nWidth, $nHeight, $src_width, $src_height)) {
+        if (imagecopyresampled($img_resized, $img, 0, 0, 0, 0, $nWidth, $nHeight, $src_width, $src_height)) {
             ImageDestroy($img);
             $img = $img_resized;
         }
