@@ -57,21 +57,34 @@ class ThumbnailHelper
 
         if ($mime == 'image/gif' OR $type == 'gif') {
             $img = ImageCreateFromGIF($f);
+            if (!$img) {
+                self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
+                unlink($f);
+                die;
+            }
             $imgFunc = 'ImageGIF';
             $transparent_index = ImageColorTransparent($img);
             if ($transparent_index != (-1))
                 $transparent_color = ImageColorsForIndex($img, $transparent_index);
         } elseif ($mime == 'image/jpeg' OR $mime == 'image/pjpeg' OR $type == 'jpg') {
             $img = ImageCreateFromJPEG($f);
+            if (!$img) {
+                self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
+                unlink($f);
+                die;
+            }
             $imgFunc = 'ImageJPEG';
         } elseif ($mime == 'image/png' OR $type == 'png') {
             $img = ImageCreateFromPNG($f);
+            if (!$img) {
+                self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
+                unlink($f);
+                die;
+            }
             ImageAlphaBlending($img, false);
             ImageSaveAlpha($img, true);
 
             $imgFunc = 'ImagePNG';
-        } else {
-            die("ERROR - no image found");
         }
 
         $img_resized = ImageCreateTrueColor($nWidth, $nHeight);
