@@ -9,32 +9,37 @@ class ImageDownloader extends Downloader
     {
         //init document
         if ($this->identifier_type === "id") {
-            $this->document = steam_factory::get_object($this->steam_connector->get_id(), (int)$this->identifier);
-        }
-        else {
+            $this->document = steam_factory::get_object($this->steam_connector->get_id(), (int) $this->identifier);
+        } else {
             if ($this->identifier_type === "name") {
                 $this->document = $this->steam_connector
                     ->predefined_command(
                     $this->steam_connector
-                        ->get_module("icons"), "get_icon_by_name", array((string)$this->identifier), 0
+                        ->get_module("icons"), "get_icon_by_name", array((string) $this->identifier), 0
                 );
             }
         }
+
         return $this->document;
     }*/
 
     public static function download(\steam_document $document, $width = 0, $height = 0, $cache = true)
     {
+        if (!$document->check_access_read()) {
+            \ThumbnailHelper::renderPlaceholderImage("keine Berechtigung", 'ccc', '555', $width, $height);
+            die;
+        }
+
         //check if thumbnail for object already exists
-		$mime = $document->get_attribute(DOC_MIME_TYPE);
-		if(empty($mime)){
-			$mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
-		}
-		$ext = \MimetypeHelper::get_instance()->getExtension($mime);
+        $mime = $document->get_attribute(DOC_MIME_TYPE);
+        if (empty($mime)) {
+            $mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
+        }
+        $ext = \MimetypeHelper::get_instance()->getExtension($mime);
         $thumbnail_path = THUMBNAIL_PATH . $document->get_id() . "_" . $width . "x" . $height . "." . $ext;
-		$thumbnail_exists = file_exists($thumbnail_path);
-		
-        if(!$cache || !$thumbnail_exists){
+        $thumbnail_exists = file_exists($thumbnail_path);
+
+        if (!$cache || !$thumbnail_exists) {
             $content = $document->get_content();
             $thumbnail_path = \ThumbnailHelper::createThumbnail(
                 $document, $content, $mime, $thumbnail_path, $width, $height);
@@ -50,7 +55,7 @@ class ImageDownloader extends Downloader
     protected static function prepare_header(\steam_document $document, $params = array())
     {
         header('Content-Description: File Transfer;');
-        if($params["cache"]){
+        if ($params["cache"]) {
             //cache 1 week
             header('Cache-Control: max-age=604800;');
         } else {
