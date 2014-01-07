@@ -115,6 +115,11 @@ class ThumbnailHelper
         $fontheight = imagefontheight($fontsize);
         $length = strlen($text);
         $textwidth = $length * $fontwidth;
+        if ($textwidth > $width) {
+            $text = "X";
+            $length = strlen($text);
+            $textwidth = $length * $fontwidth;
+        }
         $xpos = (imagesx($image) - $textwidth) / 2;
         $ypos = (imagesy($image) - $fontheight) / 2;
 
