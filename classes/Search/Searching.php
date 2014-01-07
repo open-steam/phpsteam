@@ -48,7 +48,7 @@ class Searching
                                                                     $class_type)),
                                                             COAL_COMMAND);
 
-        $answer = $this->steam_object->get_steam_connector()->command($myrequest);
+        $answer = $this->_steamObject->get_steam_connector()->command($myrequest);
 
         return $answer->get_arguments();
     }
