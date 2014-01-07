@@ -4,8 +4,11 @@ class ThumbnailHelper
 {
     public static function createThumbnail(steam_document $document, &$content, $mime, $thumbnail_path, $width, $height)
     {
-        if (!$document->check_access_read()) {
-            self::renderPlaceholderImage("keine Berechtigung", 'ccc', '555', $width, $height);
+        if ($mime === 'application/octet-stream') {
+            $mime = MimetypeHelper::get_instance()->getMimeType($document->get_name());
+        }
+        if ($mime !== 'image/gif' && $mime !== 'image/jpeg' && $mine != 'image/png') {
+            self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
             die;
         }
 
