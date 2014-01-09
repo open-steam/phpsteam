@@ -32,7 +32,7 @@ class ThumbnailHelper
         $src_width = $imgInfo[0];
         $src_height = $imgInfo[1];
 
-        if ($src_width === 0 || $src_height === 0) {
+        if (empty($src_width) || empty($src_height)) {
             self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
             die;
         }
