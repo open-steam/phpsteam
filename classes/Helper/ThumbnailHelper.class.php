@@ -7,7 +7,7 @@ class ThumbnailHelper
         if ($mime === 'application/octet-stream') {
             $mime = MimetypeHelper::get_instance()->getMimeType($document->get_name());
         }
-        if ($mime !== 'image/gif' && $mime !== 'image/jpeg' && $mine != 'image/png') {
+        if ($mime !== 'image/gif' && $mime !== 'image/jpeg' && $mime != 'image/png') {
             self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
             die;
         }
@@ -28,9 +28,14 @@ class ThumbnailHelper
         fwrite($fh, $content);
         fclose($fh);
 
-        $imgInfo = getimagesize($f);
+        $imgInfo = @getimagesize($f);
         $src_width = $imgInfo[0];
         $src_height = $imgInfo[1];
+
+        if ($src_width === 0 || $src_height === 0) {
+            self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
+            die;
+        }
 
         //use correct aspect-ratio
         $nWidth = $width;
