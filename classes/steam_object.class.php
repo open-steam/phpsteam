@@ -142,7 +142,7 @@ class steam_object implements Serializable
      *  Note: This method doesnt fill the object cache on PHP side
      *
      */
-    public function get_all_attributes( $pBuffer = FALSE )
+    public function get_all_attributes($pBuffer = FALSE)
     {
         return $this->steam_command($this, "query_attributes", 0, $pBuffer);
     }
@@ -273,7 +273,7 @@ class steam_object implements Serializable
      *
      * @return mixed the attribute you asked for
      */
-    public function get_attribute( $pAttribute, $pBuffer = FALSE)
+    public function get_attribute($pAttribute, $pBuffer = FALSE)
     {
         if ($pBuffer) {
             //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute with buffer") : "";
@@ -340,6 +340,9 @@ class steam_object implements Serializable
      */
     public function get_path($pBuffer = FALSE)
     {
+        if ($this->get_steam_connector()->get_login_status() === 0) {
+            throw new steam_exception($this->get_login_user_name(), "Not logged in. Wrong user or password.", 300);
+        }
         $modules = $this->get_steam_connector()->get_login_data()->get_arguments();
         $result = $this->steam_command($modules[8][ "filepath:tree" ], "object_to_filename", array( $this ), $pBuffer);
 
@@ -357,7 +360,7 @@ class steam_object implements Serializable
      *</code>
      * @return string Name of the object
      */
-    public function get_name( $pBuffer = FALSE )
+    public function get_name($pBuffer = FALSE)
     {
         return $this->get_attribute("OBJ_NAME", $pBuffer);
     }
@@ -373,7 +376,7 @@ class steam_object implements Serializable
      *</code>
      *
      * @param string $pName the name you want to give to the object
-     * @param $pValue
+     *                      @param $pValue
      *
      * @return
      */
@@ -474,9 +477,9 @@ class steam_object implements Serializable
      *
      * @param string $pAttribute attribute key.
      * @param mixed  $pValue     attribute value
-     * @param $pBuffer 0= send now, 1 = buffer command and send later
+     *                           @param $pBuffer 0= send now, 1 = buffer command and send later
      */
-    public function set_attribute( $pAttribute, $pValue, $pBuffer= 0 )
+    public function set_attribute($pAttribute, $pValue, $pBuffer= 0)
     {
         $pValue = ( is_string( $pValue ) ) ? strip_tags(stripslashes( $pValue )) : $pValue;
         try {
@@ -501,7 +504,7 @@ class steam_object implements Serializable
      * @param  string $pAttribute attribute key
      * @return void
      */
-    public function delete_attribute( $pAttribute, $pBuffer = 0 )
+    public function delete_attribute($pAttribute, $pBuffer = 0)
     {
         unset($this->attributes[$pAttribute]);
 
@@ -520,7 +523,7 @@ class steam_object implements Serializable
      *
      * @param mixed $pAttributes New attributes and their values.
      */
-    public function set_attributes( $pAttributes, $pBuffer= 0 )
+    public function set_attributes($pAttributes, $pBuffer= 0)
     {
         $pAttributes = $this->strip_tags_array($pAttributes);
         $this->attributes = array_merge( $this->attributes, $pAttributes );
@@ -539,7 +542,7 @@ class steam_object implements Serializable
      * @param $pValues
      *
      */
-    public function set_additional_values( $pValues )
+    public function set_additional_values($pValues)
     {
         $this->additional = array_merge( $this->additional, $pValues );
     }
@@ -572,7 +575,7 @@ class steam_object implements Serializable
      * @param $pValues
      *
      */
-    public function set_values( $pValues )
+    public function set_values($pValues)
     {
         $this->attributes = array_merge( $this->attributes, $pValues );
     }
@@ -584,7 +587,7 @@ class steam_object implements Serializable
      * @param $pValue
      *
      */
-    public function set_value( $pKey, $pValue )
+    public function set_value($pKey, $pValue)
     {
         $this->attributes [$pKey] = $pValue;
     }
@@ -596,7 +599,7 @@ class steam_object implements Serializable
      * @param $pValue
      *
      */
-    public function delete_value( $pKey )
+    public function delete_value($pKey)
     {
         unset($this->attributes [$pKey]);
     }
@@ -619,7 +622,7 @@ class steam_object implements Serializable
      * @param  boolean       $pBuffer 0 = send now, 1 = buffer command and send later
      * @return steam_request | integer Depending on the buffer argument either a steam_request instance or a unique transaction id is given back
      */
-    public function steam_command( $pObject, $pMethod, $pArgs, $pBuffer = 0 )
+    public function steam_command($pObject, $pMethod, $pArgs, $pBuffer = 0)
     {
         return $this->get_steam_connector()->predefined_command(
         $pObject,
@@ -652,7 +655,7 @@ class steam_object implements Serializable
      *
      * @return steam_object the environment of this object
      */
-    public function get_environment ()
+    public function get_environment()
     {
         return $this->steam_command(
         $this,
@@ -678,7 +681,7 @@ class steam_object implements Serializable
      *
      * @return steam_object the root environment of this object
      */
-    public function get_root_environment ()
+    public function get_root_environment()
     {
         // check for server version 2.7.18
         $version = $this->get_steam_connector()->get_server_version();
@@ -720,11 +723,11 @@ class steam_object implements Serializable
      * objetcs. This function returns the annotations
      * of this object.
      *
-     * @param int $pClass Only return annotations of this class /
-     *   these classes
+     * @param  int   $pClass Only return annotations of this class /
+     *                       these classes
      * @return mixed Array of steam_objects
      */
-    public function get_annotations( $pClass = FALSE, $pBuffer = FALSE )
+    public function get_annotations($pClass = FALSE, $pBuffer = FALSE)
     {
         if ( ! $pClass )
         return $this->steam_command(
@@ -773,7 +776,7 @@ class steam_object implements Serializable
      * @param pMaxDepth (optional) max recursion depth (0 = only return
      *   annotations of this object)
      * @return an array of objects that match the specified filters, sort order and
-     *   pagination.
+     *            pagination.
      */
     public function get_annotations_filtered ( $pFilters = array(), $pSort = array(), $pOffset = 0, $pLength = 0, $pMaxDepth = 0, $pBuffer = FALSE )
     {
@@ -834,12 +837,12 @@ class steam_object implements Serializable
      * $my_object->add_annotation( $new_url );
      * </code>
      *
-     * @param steam_object $pAnnotation Object, which is the annotation
-     * @param steam_object object, which should act as the root (optional)
-     * @param  boolean         $pBuffer send command now = 0, send later = 1
+     * @param  steam_object    $pAnnotation Object, which is the annotation
+     *                                      @param steam_object object, which should act as the root (optional)
+     * @param  boolean         $pBuffer     send command now = 0, send later = 1
      * @return boolean|integer depends on the buffer argument: boolean if buffer = 0, unique transaction id otherwise
      */
-    public function add_annotation( $pAnnotation, $pBuffer = 0 )
+    public function add_annotation($pAnnotation, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -865,7 +868,7 @@ class steam_object implements Serializable
      * @param  mixed   $pAnnotations Array of steam_object
      * @return boolean TRUE|FALSE
      */
-    public function add_annotations( $pAnnotations )
+    public function add_annotations($pAnnotations)
     {
         foreach ($pAnnotations as $annotation) {
             $this->steam_command(
@@ -927,9 +930,9 @@ class steam_object implements Serializable
      * access rights from all objects including all acquired access rights
      *
      * @return a mapping with all objects having access rights on this
-     *   object as keys and their effective rights as value
+     *           object as keys and their effective rights as value
      */
-    public function resolve_access($pBuffer = 0 )
+    public function resolve_access($pBuffer = 0)
     {
         $access = array();
         $acquire = $this;
@@ -957,7 +960,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function get_user_access( $pUser, $pBuffer = 0 )
+    public function get_user_access($pUser, $pBuffer = 0)
     {
         $modules = $this->get_steam_connector()->get_login_data()->get_arguments();
         $steam_security = $modules[ 8 ][ "security" ];
@@ -979,7 +982,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function get_group_access( $pGroup, $pBuffer = 0 )
+    public function get_group_access($pGroup, $pBuffer = 0)
     {
         return $this->get_user_access(
         $pGroup,
@@ -996,7 +999,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function check_access( $pBit, $pUser = "", $pBuffer = 0 )
+    public function check_access($pBit, $pUser = "", $pBuffer = 0)
     {
         if ($this->get_steam_connector()->get_login_status() === 0) {
             throw new steam_exception($this->get_login_user_name(), "Not logged in. Wrong user or password.", 300);
@@ -1023,7 +1026,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function set_sanction( $pPersonOrGroup, $pSanction, $pBuffer=0 )
+    public function set_sanction($pPersonOrGroup, $pSanction, $pBuffer=0)
     {
         return $this->sanction( $pSanction, $pPersonOrGroup, $pBuffer );
     }
@@ -1037,7 +1040,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function sanction( $pSanction, $pPersonOrGroup, $pBuffer = 0 )
+    public function sanction($pSanction, $pPersonOrGroup, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1056,7 +1059,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function sanction_meta( $pSanction, $pPersonOrGroup, $pBuffer = 0 )
+    public function sanction_meta($pSanction, $pPersonOrGroup, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1074,7 +1077,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function query_meta_sanction( $pPersonOrGroup, $pBuffer = 0 )
+    public function query_meta_sanction($pPersonOrGroup, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1091,9 +1094,9 @@ class steam_object implements Serializable
      * @param $pBuffer
      *
      * @return mapping with object ids as keys and access rights bitmask
-     * as values
+     *                 as values
      */
-    public function get_sanction( $pBuffer = 0 )
+    public function get_sanction($pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1111,7 +1114,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function query_sanction( $pPersonOrGroup, $pBuffer = 0 )
+    public function query_sanction($pPersonOrGroup, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1129,7 +1132,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function set_sanction_all( $pPersonOrGroup, $pBuffer = FALSE )
+    public function set_sanction_all($pPersonOrGroup, $pBuffer = FALSE)
     {
         // dont need to respect old rights in here, just set SANCTION_ALL
         // otherwise this may lead into problems with negative rights
@@ -1146,7 +1149,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function check_access_read($pPersonOrGroup = "", $pBuffer = FALSE )
+    public function check_access_read($pPersonOrGroup = "", $pBuffer = FALSE)
     {
         return $this->check_access( SANCTION_READ, $pPersonOrGroup, $pBuffer );
     }
@@ -1159,22 +1162,22 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function check_access_write($pPersonOrGroup = "", $pBuffer = FALSE )
+    public function check_access_write($pPersonOrGroup = "", $pBuffer = FALSE)
     {
         return $this->check_access( SANCTION_WRITE, $pPersonOrGroup, $pBuffer );
     }
 
-    public function check_access_annotate( $pPersonOrGroup = "", $pBuffer = FALSE )
+    public function check_access_annotate($pPersonOrGroup = "", $pBuffer = FALSE)
     {
         return $this->check_access( SANCTION_ANNOTATE, $pPersonOrGroup, $pBuffer );
     }
 
-    public function check_access_insert( $pPersonOrGroup = "", $pBuffer = FALSE )
+    public function check_access_insert($pPersonOrGroup = "", $pBuffer = FALSE)
     {
         return $this->check_access( SANCTION_INSERT, $pPersonOrGroup, $pBuffer );
     }
 
-    public function check_access_move( $pPersonOrGroup = "", $pBuffer = FALSE )
+    public function check_access_move($pPersonOrGroup = "", $pBuffer = FALSE)
     {
         return $this->check_access( SANCTION_MOVE, $pPersonOrGroup, $pBuffer );
     }
@@ -1188,7 +1191,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function set_read_access( $pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0 )
+    public function set_read_access($pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0)
     {
         $sanction = $this->query_sanction( $pPersonOrGroup, 0 );
         if ( $pSetOrUnset && ( ! ($sanction & SANCTION_READ ) ) ) {
@@ -1201,7 +1204,7 @@ class steam_object implements Serializable
         return $this->sanction( $sanction, $pPersonOrGroup, $pBuffer );
     }
 
-    public function set_annotate_access( $pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0 )
+    public function set_annotate_access($pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0)
     {
         $sanction = $this->query_sanction( $pPersonOrGroup, 0 );
         if ( $pSetOrUnset && ( ! ( $sanction & SANCTION_ANNOTATE ) ) ) {
@@ -1215,12 +1218,12 @@ class steam_object implements Serializable
         return $this->sanction( $sanction, $pPersonOrGroup, $pBuffer );
     }
 
-    public function set_rights_annotate( $pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0 )
+    public function set_rights_annotate($pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0)
     {
         return $this->set_annotate_access( $pPersonOrGroup, $pSetOrUnset, $pBuffer );
     }
 
-    public function set_insert_access( $pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0 )
+    public function set_insert_access($pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0)
     {
         $sanction = $this->query_sanction( $pPersonOrGroup, 0 );
         if ( $pSetOrUnset && ( ! ( $sanction & SANCTION_INSERT ) ) ) {
@@ -1233,7 +1236,7 @@ class steam_object implements Serializable
         return $this->sanction( $sanction, $pPersonOrGroup, $pBuffer );
     }
 
-    public function set_rights_insert( $pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0 )
+    public function set_rights_insert($pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0)
     {
         return $this->set_insert_access( $pPersonOrGroup, $pSetOrUnset, $pBuffer );
     }
@@ -1247,7 +1250,7 @@ class steam_object implements Serializable
      *
      * @return
      */
-    public function set_write_access( $pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0 )
+    public function set_write_access($pPersonOrGroup, $pSetOrUnset = 1, $pBuffer = 0)
     {
         $sanction = $this->query_sanction( $pPersonOrGroup, 0 );
         if ( $pSetOrUnset && ( ! ($sanction & SANCTION_WRITE ) ) ) {
@@ -1293,7 +1296,7 @@ class steam_object implements Serializable
         return $this->low_delete();
     }
 
-    public function low_delete($pBuffer = 0 )
+    public function low_delete($pBuffer = 0)
     {
         API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->low_delete %" . $this->get_id()) : "";
         // TODO: CHECK!!!
@@ -1333,7 +1336,7 @@ class steam_object implements Serializable
      * @param $pBuffer 0 = send command now, 1 = buffer command
      * @return Int 1 on success, 0 on failure
      */
-    public function set_acquire( $pObject = FALSE, $pBuffer = 0 )
+    public function set_acquire($pObject = FALSE, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1355,7 +1358,7 @@ class steam_object implements Serializable
      * @param $pBuffer 0 = send command now, 1 = buffer command
      * @return Int 1 on success, 0 on failure
      */
-    public function set_acquire_from_environment ( $pBuffer = 0 )
+    public function set_acquire_from_environment($pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1365,7 +1368,7 @@ class steam_object implements Serializable
         );
     }
 
-    public function set_acquire_attribute( $pAttribute, $pObject = FALSE, $pBuffer = 0 )
+    public function set_acquire_attribute($pAttribute, $pObject = FALSE, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1375,7 +1378,7 @@ class steam_object implements Serializable
         );
     }
 
-    public function get_acquire_attribute( $pAttribute, $pBuffer = 0 )
+    public function get_acquire_attribute($pAttribute, $pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1398,7 +1401,7 @@ class steam_object implements Serializable
      * @param $pBuffer 0 = send command now, 1 = buffer command
      * @return 0 or the object where this object acquires rights from
      */
-    public function get_acquire( $pBuffer = 0 )
+    public function get_acquire($pBuffer = 0)
     {
         return $this->steam_command(
         $this,
@@ -1417,7 +1420,7 @@ class steam_object implements Serializable
      * @return array   associative array describing attribute types
      */
 
-    public function describe_attributes( $pBuffer = 0)
+    public function describe_attributes($pBuffer = 0)
     {
         return $this->steam_command(
         $this,

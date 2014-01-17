@@ -13,7 +13,7 @@ class steam_connection
 {
     // socket data
     protected $socket;
-    protected $socket_status;
+    protected $socket_status = 0; // 1=connected, 0=not connected
     protected $socket_timeout;
 
     // server data
@@ -25,7 +25,7 @@ class steam_connection
     protected $current_steam_user;
     protected $login_user_name = "Anonymous";
     protected $login_passwd;
-    protected $login_status; // 1=logged in, 0=logged out
+    protected $login_status = 0; // 1=logged in, 0=logged out
 
     // request buffer
     protected $request_buffer;
@@ -131,8 +131,8 @@ class steam_connection
     {
         $this->sentrequests = 0;
         $this->transaction_id = 1;
-        $this->socket_status = FALSE;
-        $this->login_status = FALSE;
+        $this->socket_status = 0;
+        $this->login_status = 0;
         $this->request_buffer = array();
         $this->object_buffer = array();
     }
@@ -165,12 +165,12 @@ class steam_connection
      * @param  boolean        $reconnect   TRUE if only reconnect (reduces login overhead)
      * @return socket-handler
      */
-    private function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword, $reconnect = FALSE)
+    private function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword, $reconnect = false)
     {
         $this->steam_server_ip = @gethostbyname($pServerIp);
         if (!$this->steam_server_ip) {
             // Exception: steam-server unknown
-            throw $this->exception(100, $pServerIp, FALSE);
+            throw $this->exception(100, $pServerIp, false);
         }
         $this->steam_server_port = $pServerPort;
         $this->login_user_name = $pLoginName;
@@ -178,12 +178,12 @@ class steam_connection
         $this->socket = @fsockopen($this->steam_server_ip, $this->steam_server_port, $errno, $errstr);
 
         if (!$this->socket) {
-            $this->socket_status = FALSE;
+            $this->socket_status = 0;
             // Exception: Could not connect...
-            throw $this->exception(110, $this->steam_server_ip . ":" . $this->steam_server_port, FALSE);
+            throw $this->exception(110, $this->steam_server_ip . ":" . $this->steam_server_port, false);
         }
 
-        $this->socket_status = TRUE;
+        $this->socket_status = 1;
 
         $this->steam_server_ip = $pServerIp;
         $this->steam_server_port = $pServerPort;
@@ -284,7 +284,7 @@ class steam_connection
      * @param  boolean    $relogin   TRUE if only relogin (reduces login overhead)
      * @return steam_user | FALSE
      */
-    public function login($pLogin, $pPassword, $relogin = FALSE)
+    public function login($pLogin, $pPassword, $relogin = false)
     {
         $request = new steam_request($this->get_id(), $this->get_transaction_id(), steam_factory::get_object($this->get_id()), array($pLogin, $pPassword, $this->get_version(), CLIENT_STATUS_CONNECTED), ($relogin ? COAL_RELOGIN : COAL_LOGIN));
 
@@ -292,9 +292,9 @@ class steam_connection
             $result = $this->command($request);
         } catch (steam_exception $e) {
             // not of my business
-            $this->login_status = false;
+            $this->login_status = 0;
 
-            return FALSE;
+            return false;
         }
         $this->login_status = !($request->is_error());
         /*
@@ -328,9 +328,9 @@ class steam_connection
 
             return $this->current_steam_user;
         } else {
-            $this->login_status = false;
+            $this->login_status = 0;
 
-            return FALSE;
+            return false;
         }
     }
 
