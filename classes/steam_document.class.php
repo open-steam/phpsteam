@@ -25,6 +25,9 @@ class steam_document extends steam_object
 
     public static function getPersistenceById($id)
     {
+        if (!ENABLE_FILE_PERSISTENCE && $id !== 0) {
+            throw new Exception("file persistence disabled but expected!");
+        }
         if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_UID) {
             $result = \OpenSteam\Persistence\FileUidPersistence::getInstance();
         } elseif (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_CONTENTID) {
@@ -131,7 +134,7 @@ class steam_document extends steam_object
      *
      * @return
      */
-    public function get_readers( $pBuffer = 0 )
+    public function get_readers($pBuffer = 0)
     {
         $module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
 
@@ -151,7 +154,7 @@ class steam_document extends steam_object
      *
      * @return
      */
-    public function is_reader( $pUser = "", $pBuffer = 0  )
+    public function is_reader($pUser = "", $pBuffer = 0)
     {
         $pUser = ( empty( $pUser ) ) ? $this->get_steam_connector()->get_current_steam_user() : $pUser;
         $module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
@@ -249,7 +252,7 @@ class steam_document extends steam_object
      *
      * @return Integer the content id
      */
-    public function get_content_id( $pBuffer = 0 )
+    public function get_content_id($pBuffer = 0)
     {
         $result = $this->steam_command(
         $this,
@@ -396,7 +399,7 @@ class steam_document extends steam_object
 
     public function get_previous_versions($pBuffer = 0)
     {
-        $callback = function($versions) {
+        $callback = function ($versions) {
             $result = array();
             if (is_array($versions) && !empty($versions)) {
                 krsort($versions);
@@ -407,7 +410,7 @@ class steam_document extends steam_object
             return $result;
         };
 
-        //prefent caching
+        //prevent caching
         unset($this->attributes["DOC_VERSIONS"]);
 
         if ($pBuffer) {
