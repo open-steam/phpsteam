@@ -55,7 +55,7 @@ class FileContentIdPersistence extends FilePersistence
 
         $fileName = $document->get_content_id();
         $contentFile = $target_dir . $fileName;
-        if (file_exists($contentFile)) {
+        if ($version && file_exists($contentFile)) {
             throw new Exception("content file already exists (id: " . $document->get_id() ."; file: " . $contentFile . ")");
         }
         file_put_contents($contentFile, $handler);
