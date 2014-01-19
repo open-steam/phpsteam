@@ -32,6 +32,9 @@ class FileContentIdPersistence extends FilePersistence
     private static function createTargetFolderFromID($id)
     {
         $dir = str_pad((string) $id, 10, "0", STR_PAD_LEFT);
+        if (file_exists($target_dir . $dir)) {
+            throw new Exception("target dir " . $target_dir . $dir . " already exists.");
+        }
         $dir_array = str_split($dir, 2);
 
         $target_dir = self::$persistenceBaseFolder;
