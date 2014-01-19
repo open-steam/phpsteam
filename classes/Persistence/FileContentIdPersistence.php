@@ -71,7 +71,10 @@ class FileContentIdPersistence extends FilePersistence
             if (file_exists($versionContentFile)) {
                 throw new Exception("content file already exists (id: " . $last_version->get_id() ."; file: " . $versionContentFile . ")");
             }
-            rename($target_dir . $lastContentId, $versionContentFile);
+            $success = rename($target_dir . $lastContentId, $versionContentFile);
+            if (!$success) {
+                throw new Exception("could not rename version content " . $target_dir . $lastContentId - " to " . $versionContentFile);
+            }
         }
 
         return filesize($contentFile);
