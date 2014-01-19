@@ -67,7 +67,7 @@ class FileContentIdPersistence extends FilePersistence
             $version_target_dir = self::createTargetFolderFromID($versionId);
             $versionFileName = $last_version->get_content_id();
             if ($versionFileName !== $lastContentId) {
-                throw new Exception("wrong Content id in version!!", 1);
+                throw new Exception("wrong Content id in version [id: {$id}, versionId: {$versionId}, versionFileName: {$versionFileName}, lastContentId: {$lastContentId}]!!", 1);
             }
             $versionContentFile = $version_target_dir . $versionFileName;
             if (file_exists($versionContentFile)) {
