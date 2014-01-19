@@ -12,7 +12,7 @@ class FileContentIdPersistence extends FilePersistence
 
     public static function init()
     {
-        if (!FILE_PERSISTENCE_BASE_PATH || empty(FILE_PERSISTENCE_BASE_PATH)) {
+        if (!FILE_PERSISTENCE_BASE_PATH || FILE_PERSISTENCE_BASE_PATH === "") {
             throw new Exception("file persistence folder is not defined.");
         }
         self::$persistenceBaseFolder = FILE_PERSISTENCE_BASE_PATH . "contentid/";
