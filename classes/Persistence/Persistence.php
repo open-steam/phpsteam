@@ -30,7 +30,7 @@ abstract class Persistence
 
     }
 
-    abstract public function save(steam_document $document, $handle, $buffer = 0);
+    abstract public function save(steam_document $document, $handle, $buffer = 0, $noVersion = false);
 
     abstract public function migrateSave(steam_document $document, $handle);
 

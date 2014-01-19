@@ -175,7 +175,7 @@ class steam_document extends steam_object
      * @param  Boolean $pBuffer  send now or buffer request?
      * @return int     content size
      */
-    public function set_content($pContent, $pBuffer = 0)
+    public function set_content($pContent, $pBuffer = 0, $noVersion = false)
     {
         $tmpfile = tempnam(API_TEMP_DIR, "API");
         if (is_resource($pContent)) {
@@ -197,7 +197,7 @@ class steam_document extends steam_object
 
         $handle = fopen($tmpfile, 'r');
 
-        $result = $this->getPersistence()->save($this, $handle, $pBuffer);
+        $result = $this->getPersistence()->save($this, $handle, $pBuffer, $noVersion);
         unset($this->attributes[OBJ_VERSIONOF]);
         unset($this->attributes[DOC_VERSION]);
         unset($this->attributes[DOC_VERSIONS]);
