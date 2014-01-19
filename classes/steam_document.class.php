@@ -430,9 +430,9 @@ class steam_document extends steam_object
     {
         $versions = $this->get_previous_versions();
         $keys = array_keys($versions);
-        $last = end($keys);
+        $first = $keys[0];
 
-        return $versions[$last];
+        return $versions[$first];
     }
 
     public function is_previous_version_of($pBuffer = 0)
