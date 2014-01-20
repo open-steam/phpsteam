@@ -7,7 +7,7 @@ class ThumbnailHelper
         if ($mime === 'application/octet-stream') {
             $mime = MimetypeHelper::get_instance()->getMimeType($document->get_name());
         }
-        if ($mime !== 'image/gif' && $mime !== 'image/jpeg' && $mime != 'image/png') {
+        if ($mime !== 'image/gif' && $mime !== 'image/jpeg' && $mime !== 'image/jpg' && $mime != 'image/png') {
             self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
             die;
         }
@@ -71,7 +71,7 @@ class ThumbnailHelper
             $transparent_index = ImageColorTransparent($img);
             if ($transparent_index != (-1))
                 $transparent_color = ImageColorsForIndex($img, $transparent_index);
-        } elseif ($mime == 'image/jpeg' OR $mime == 'image/pjpeg' OR $type == 'jpg') {
+        } elseif ($mime == 'image/jpeg' OR $mime == 'image/jpg' OR $mime == 'image/pjpeg' OR $type == 'jpg') {
             $img = ImageCreateFromJPEG($f);
             if (!$img) {
                 self::renderPlaceholderImage("defektes Bild", 'ccc', '555', $width, $height);
