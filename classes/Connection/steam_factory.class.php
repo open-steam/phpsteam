@@ -74,12 +74,15 @@ class steam_factory {
 	 * @return steam_object new instance of a subclass of steam_object, depending on the type definition parameter
 	 */
 	public static function get_object($pSteamConnectorID, $pID = 0, $pType = FALSE) {
-        if ((int) $var != $var) {
+        if (!preg_match("/^\d+$/", $pID) {
+            return 0;
+        }
+        /*if ((int) $var != $var) {
             return 0;
         }
 		if (intval($pID) <= 0) {
 			return 0;
-		}
+		}*/
         $pID = (int) $pID;
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
 
