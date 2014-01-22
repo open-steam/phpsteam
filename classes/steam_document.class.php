@@ -198,6 +198,10 @@ class steam_document extends steam_object
         $handle = fopen($tmpfile, 'r');
 
         $result = $this->getPersistence()->save($this, $handle, $pBuffer, $noVersion);
+        //if ($noVersion) {
+        //    $this->set_attribute("DOC_LAST_MODIFIED", time());
+        //    $this->set_attribute("DOC_USER_MODIFIED", ...);
+        //}
         unset($this->attributes[OBJ_VERSIONOF]);
         unset($this->attributes[DOC_VERSION]);
         unset($this->attributes[DOC_VERSIONS]);
