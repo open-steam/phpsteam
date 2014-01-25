@@ -43,7 +43,7 @@ class DatabaseHelper
                 $this->_logger->error("failed to connect db", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
             }
         } else throw new Exception("Unable to connect to database.", E_CONFIGURATION);
-        $this->_logger->debug("db connected", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
+        //$this->_logger->debug("db connected", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
     }
 
     private function disconnect()
