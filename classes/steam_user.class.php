@@ -834,9 +834,13 @@ class steam_user extends steam_container
 
         $buddie_ids = array();
         if (is_array($confirmed_contacts)) {
-            $buddie_ids += array_keys($confirmed_contacts);
+            foreach ($confirmed_contacts as $confirmed_contact => $value) {
+                if ($confirmed_contact instanceof steam_user || $confirmed_contact instanceof steam_group) {
+                    $buddie_ids[] = $confirmed_contact->get_id();
+                }
+            }
         }
-        $buddie_ids = array_unique(array_merge ($user_favourites_ids, $buddie_ids));
+        $buddie_ids = array_unique(array_merge($user_favourites_ids, $buddie_ids));
 
 
         $c = array_diff($buddie_ids, $user_toconfirm_ids);
@@ -844,8 +848,10 @@ class steam_user extends steam_container
 
 
         foreach ($buddie_ids as $buddy_id) {
-            if ( steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP) instanceof STEAM_USER || steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP) instanceof STEAM_GROUP ) {
-                $buddies[] = steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP);
+            if ($buddy_id > 0) {
+                if ( steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP) instanceof STEAM_USER || steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP) instanceof STEAM_GROUP ) {
+                    $buddies[] = steam_factory::get_object( $GLOBALS[ "STEAM" ]->get_id(), $buddy_id, CLASS_USER | CLASS_GROUP);
+                }
             }
         }
 
