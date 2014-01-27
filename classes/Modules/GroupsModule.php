@@ -1,12 +1,17 @@
 <?php
 namespace OpenSteam\Modules;
+
+use steam_object,
+    steam_connector,
+    ParameterException;
+
 class GroupsModule extends steam_object
 {
     private $_steamObject;
 
     private static $instances = array();
 
-    public static function get_instance($pSteamConnectorID)
+    public static function getInstance($pSteamConnectorID)
     {
         if (!is_string($pSteamConnectorID)) throw new ParameterException( "pSteamConnectorID", "string" );
         if (isset(self::$instances[$pSteamConnectorID])) {
