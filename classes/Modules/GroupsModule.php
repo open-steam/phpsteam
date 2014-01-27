@@ -4,10 +4,24 @@ class GroupsModule extends steam_object
 {
     private $_steamObject;
 
-    public function __construct($steam_object)
+    private static $instances = array();
+
+    public static function get_instance($pSteamConnectorID)
     {
-        parent::__construct($steam_object->get_steam_connector(), $steam_object->get_id(), CLASS_MODULE);
-        $this->_steamObject = $steam_object;
+        if (!is_string($pSteamConnectorID)) throw new ParameterException( "pSteamConnectorID", "string" );
+        if (isset(self::$instances[$pSteamConnectorID])) {
+            return self::$instances[$pSteamConnectorID];
+        } else {
+            self::$instances[$pSteamConnectorID] = new self($pSteamConnectorID);
+            return self::$instances[$pSteamConnectorID];
+        }
+    }
+
+    private function __construct($pSteamConnectorID)
+    {
+        $groupsModule = steam_connector::get_instance($pSteamConnectorID)->get_module("groups");
+        parent::__construct(steam_connector::get_instance($pSteamConnectorID), $groupsModule->get_id(), CLASS_MODULE);
+        $this->_steamObject = $groupsModule;
     }
 
     public function getTopGroups($pBuffer = false)
