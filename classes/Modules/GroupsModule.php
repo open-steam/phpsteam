@@ -22,7 +22,7 @@ class GroupsModule extends steam_object
         }
     }
 
-    private function __construct($pSteamConnectorID)
+    public function __construct($pSteamConnectorID)
     {
         $groupsModule = steam_connector::get_instance($pSteamConnectorID)->get_module("groups");
         parent::__construct(steam_connector::get_instance($pSteamConnectorID), $groupsModule->get_id(), CLASS_MODULE);
