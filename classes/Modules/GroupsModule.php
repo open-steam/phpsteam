@@ -32,8 +32,8 @@ class GroupsModule extends steam_object
 
     public function getTopGroups($pBuffer = false)
     {
-        return $this->steam_object->get_steam_connector()->predefined_command(
-            $this->steam_object,
+        return $this->_steam_object->get_steam_connector()->predefined_command(
+            $this->_steam_object,
             "get_top_groups",
             array( ),
             $pBuffer
