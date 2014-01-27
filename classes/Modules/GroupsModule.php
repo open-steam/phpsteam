@@ -3,6 +3,7 @@ namespace OpenSteam\Modules;
 
 use steam_object,
     steam_connector,
+    steam_factory,
     ParameterException;
 
 class GroupsModule extends steam_object
@@ -25,7 +26,7 @@ class GroupsModule extends steam_object
     public function __construct($pSteamConnectorID)
     {
         $groupsModule = steam_connector::get_instance($pSteamConnectorID)->get_module("groups");
-        parent::__construct(steam_connector::get_instance($pSteamConnectorID), $groupsModule->get_id(), CLASS_MODULE);
+        parent::__construct(steam_factory::get_instance(), steam_connector::get_instance($pSteamConnectorID), $groupsModule->get_id(), CLASS_MODULE);
         $this->_steamObject = $groupsModule;
     }
 
