@@ -319,9 +319,14 @@ class steam_request
 				//echo $newdata . "<br />";
 				break;
 			case CMD_TYPE_STRING:
-				$length = (string) hexdec(bin2hex(substr($command, 1, 4)));
-				$newdata = substr($command, 5, $length);
-				$command = substr($command, 5 + $length);
+				$length = (int) hexdec(bin2hex(substr($command, 1, 4)));
+                if ($length === 0) {
+                    $newdata = "";
+                    $command = substr($command, 5 + $length);
+                } else {
+                    $newdata = substr($command, 5, $length);
+                    $command = substr($command, 5 + $length);
+                }
 				break;
 			case CMD_TYPE_OBJECT:
 				$newdata = steam_factory::get_object( $this->steam_connectorID, hexdec(bin2hex(substr($command, 1, 4))), hexdec(bin2hex(substr($command, 5, 4))) );
