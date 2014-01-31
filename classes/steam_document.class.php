@@ -455,7 +455,7 @@ class steam_document extends steam_object
     }
 
     public function send_custom_header($downloaderType = "A") {
-        if (defined(PLATFORM_ID)) {
+        if (defined("PLATFORM_ID")) {
             $key = "X-" . PLATFORM_ID;
         } else {
             $key = "X-PHPSTEAM";
