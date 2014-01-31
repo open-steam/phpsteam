@@ -472,7 +472,7 @@ class steam_document extends steam_object
             } else {
                 $value .= " CP: C";
             }
-        } else if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_CONTENTID) {
+        } else if (ENABLE_FILE_PERSISTENCE && $this->getPersistenceType() === PERSISTENCE_FILE_CONTENTID) {
             $value .= " FP: CID";
         }
         $value .= " D: " . $downloaderType;
