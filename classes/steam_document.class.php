@@ -446,11 +446,38 @@ class steam_document extends steam_object
 
     public function get_mimetype($pBuffer = 0)
     {
-        $mime = $this->get_attribute(DOC_MIME_TYPE);
-        if (empty($mime) || $mime === "unknown/unknown" || $mimetype === "application/x-download" || $mimetype === "application/download" || $mimetype === "application/octet-stream") {
+        $mime = trim($this->get_attribute(DOC_MIME_TYPE));
+        if (empty($mime) || $mime === "unknown/unknown" || $mime === "application/x-download" || $mime === "application/download" || $mime === "application/octet-stream" || $mime === "application/x-unknown-content-type") {
             $mime = \MimetypeHelper::get_instance()->getMimeType($this->get_name());
         }
 
         return $mime;
     }
+
+    public function send_custom_header($downloaderType = "A") {
+        if (defined(PLATFORM_ID)) {
+            $key = "X-" . PLATFORM_ID;
+        } else {
+            $key = "X-PHPSTEAM";
+        }
+
+        $value = "PT: " . $this->getPersistenceType();
+        if ($this->getPersistenceType() === PERSISTENCE_DATABASE) {
+            if (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_COAL) {
+                $value .= " CP: C";
+            } elseif (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_STEAMWEB) {
+                $value .= " CP: W";
+            } elseif (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_DATABASE) {
+                $value .= " CP: D";
+            } else {
+                $value .= " CP: C";
+            }
+        } else if (ENABLE_FILE_PERSISTENCE && $id === PERSISTENCE_FILE_CONTENTID) {
+            $value .= " FP: CID";
+        }
+        $value .= " D: " . $downloaderType;
+
+        header($key . ": " . $value);
+    }
+
 }

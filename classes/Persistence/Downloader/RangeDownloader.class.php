@@ -18,7 +18,7 @@ class RangeDownloader extends Downloader
             $file = $persistence->get_file_path($document);
         }
 
-        header("Content-type: " . $document->attributes['mimetype']);
+        header("Content-Type: " . $document->get_mimetype());
 
         $fp = @fopen($file, 'rb');
 
@@ -95,6 +95,7 @@ class RangeDownloader extends Downloader
         // Notify the client the byte range we'll be outputting
         header("Content-Range: bytes $start-$end/$size");
         header("Content-Length: $length");
+        $document->send_custom_header("R");
 
         // Start buffered download
         $buffer = 1024 * 8;

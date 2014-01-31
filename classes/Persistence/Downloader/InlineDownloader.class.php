@@ -11,5 +11,6 @@ class InlineDownloader extends Downloader
         header("Content-Type: {$document->get_mimetype()}");
         header("Content-Length:" . $document->get_content_size());
         header("Content-Disposition: inline; filename=\"" . $document->get_name() . "\"");
+        $document->send_custom_header("IN");
     }
 }
