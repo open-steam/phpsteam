@@ -31,10 +31,8 @@ class ImageDownloader extends Downloader
         }
 
         //check if thumbnail for object already exists
-        $mime = $document->get_attribute(DOC_MIME_TYPE);
-        if (empty($mime)) {
-            $mime = \MimetypeHelper::get_instance()->getMimeType($document->get_name());
-        }
+        $mime = $document->get_mimetype();
+
         $ext = \MimetypeHelper::get_instance()->getExtension($mime);
         $thumbnail_path = THUMBNAIL_PATH . $document->get_id() . "_" . $width . "x" . $height . "." . $ext;
         $thumbnail_exists = file_exists($thumbnail_path);
@@ -67,5 +65,6 @@ class ImageDownloader extends Downloader
         header("Last-Modified: {$document->get_attribute(DOC_LAST_MODIFIED)};");
         header("Content-Type: {$params["mimetype"]};");
         header("Content-Length: {$params["filesize"]};");
+        $document->send_custom_header("IM");
     }
 }

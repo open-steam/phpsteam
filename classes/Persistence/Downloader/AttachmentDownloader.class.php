@@ -11,6 +11,7 @@ class AttachmentDownloader extends Downloader {
 		header("Content-Type: {$document->get_mimetype()}");
 		header("Content-Length: {$document->get_content_size()}");
 		header("Content-Disposition: attachment; filename=\"" . $document->get_name() . "\"");
+        $document->send_custom_header("A");
 	}
 
 }
