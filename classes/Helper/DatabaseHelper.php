@@ -41,6 +41,7 @@ class DatabaseHelper
                 $this->_pdo = new PDO($dsn, $db_user, $db_password);
             } catch (PDOException $e) {
                 $this->_logger->error("failed to connect db", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
+                throw new Exception("Unable to connect to database (connection: " . $db_user . "@" . $db_host . ":/" . $db_database, E_CONFIGURATION);
             }
         } else throw new Exception("Unable to connect to database.", E_CONFIGURATION);
         //$this->_logger->debug("db connected", array("connection", $db_user . "@" . $db_host . ":/" . $db_database));
