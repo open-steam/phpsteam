@@ -65,6 +65,10 @@ class ImageDownloader extends Downloader
         header("Last-Modified: {$document->get_attribute(DOC_LAST_MODIFIED)};");
         header("Content-Type: {$params["mimetype"]};");
         header("Content-Length: {$params["filesize"]};");
-        $document->send_custom_header("IM");
+        if ($params["cache"]) {
+            $document->send_custom_header("IMCF");
+        } else {
+            $document->send_custom_header("IMDC");
+        }
     }
 }
