@@ -178,7 +178,7 @@ class steam_document extends steam_object
     public function set_content($pContent, $pBuffer = 0, $noVersion = false)
     {
         if (!$this->check_access_write()) {
-            throw new steam_exception($this->get_login_user_name(), 'Access denied for user', 120, false);
+            throw new steam_exception($this->get_steam_connector()->get_login_name(), 'Access denied for user', 120, false);
         }
         $tmpfile = tempnam(API_TEMP_DIR, "API");
         if (is_resource($pContent)) {
@@ -290,7 +290,7 @@ class steam_document extends steam_object
     public function get_content($pBuffer = 0)
     {
         if (!$this->check_access_read()) {
-            throw new steam_exception($this->get_login_user_name(), 'Access denied for user', 120, false);
+            throw new steam_exception($this->get_steam_connector()->get_login_name(), 'Access denied for user', 120, false);
         }
         return $this->getPersistence()->load($this, $pBuffer);
     }
@@ -298,7 +298,7 @@ class steam_document extends steam_object
     public function print_content()
     {
         if (!$this->check_access_read()) {
-            throw new steam_exception($this->get_login_user_name(), 'Access denied for user', 120, false);
+            throw new steam_exception($this->get_steam_connector()->get_login_name(), 'Access denied for user', 120, false);
         }
         return $this->getPersistence()->printContent($this);
     }
