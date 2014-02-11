@@ -147,6 +147,16 @@ class steam_connector implements Serializable
     }
 
     /**
+     * function get_login_name:
+     *
+     * @return
+     */
+    public function get_login_name()
+    {
+        retrun $this->LoginName;
+    }
+
+    /**
      * function get_current_steam_user:
      *
      * Returns the user who is logged in
