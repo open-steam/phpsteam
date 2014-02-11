@@ -153,7 +153,7 @@ class steam_connector implements Serializable
      */
     public function get_login_name()
     {
-        retrun $this->LoginName;
+        return $this->LoginName;
     }
 
     /**
