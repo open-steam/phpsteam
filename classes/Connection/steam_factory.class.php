@@ -314,6 +314,11 @@ class steam_factory {
 	 */
 	public static function load_attributes($pSteamConnectorID, $pObjects, $pAttributes) {
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
+        foreach ($pObjects as $key => $object) {
+            if (!$object instanceof steam_object) {
+                unset($pObjects[$key]);
+            }
+        }
 		$tids = array();
 		foreach ($pObjects as $object) {
 			$tids[$object->get_id()] = steam_connector::get_instance($pSteamConnectorID)->predefined_command($object, "query_attributes", array($pAttributes), 1);

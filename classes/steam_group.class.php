@@ -17,13 +17,13 @@
  */
 class steam_group extends steam_object
 {
-	
+
 	private $subGroupsLookupCache;
-	
+
 	public function get_type() {
 		return CLASS_GROUP | CLASS_OBJECT;
 	}
-	
+
 	/**
 	 * function get_members:
 	 * This function returns the members of the group
@@ -382,7 +382,7 @@ class steam_group extends steam_object
 		$pBuffer
 		);
 	}
-	
+
 	public function get_groups($pBuffer = 0)
 	{
 		return $this->steam_command(
@@ -577,11 +577,11 @@ class steam_group extends steam_object
 			$pBuffer
 		);
 	}
-	
+
 	public function drop_subGroupsLookupCache() {
 		$this->subGroupsLookupCache = null;
 	}
-	
+
 	public function move_group( $pParent, $pBuffer = FALSE )
 	{
 		$myConnector = steam_connector::get_instance($this->steam_connectorID);
