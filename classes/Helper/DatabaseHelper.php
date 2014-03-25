@@ -302,7 +302,8 @@ class DatabaseHelper
         try {
             $statement = $this->_pdo->prepare($query);
             foreach ($mailOids as $i => $mailOid) {
-                $statement->bindParam(":mailOid{$i}", str_replace('%', '', $mailOid), PDO::PARAM_STR);
+                $mailOid = str_replace('%', '', $mailOid);
+                $statement->bindParam(":mailOid{$i}", $mailOid, PDO::PARAM_STR);
             }
             $statement->execute();
             $results = $statement->fetchAll();

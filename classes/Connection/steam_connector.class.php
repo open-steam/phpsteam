@@ -418,7 +418,7 @@ class steam_connector implements Serializable
     {
         $request = new steam_request(
         $this,
-        $this->get_transaction_id(),
+        $this->get_transactionid(),
         $this->get_current_steam_user(),
         array( $pPath, strlen( $pContent ) ),
         COAL_FILE_UPLOAD
@@ -556,9 +556,9 @@ class steam_connector implements Serializable
       {
           return steam_connection::get_instance($this->get_id())->buffer_attributes_request( $pObject, $pAttributes, $pSourceObjectID);
       }
-      public function get_transaction_id()
+      public function get_transactionid()
       {
-          return steam_connection::get_instance($this->get_id())->get_transaction_id();
+          return steam_connection::get_instance($this->get_id())->get_transactionid();
       }
       public function command($pRequest)
       {
@@ -572,7 +572,7 @@ class steam_connector implements Serializable
     public function add_to_buffer($value)
     {
         $steam_connection = steam_connection::get_instance($this->get_id());
-        $trans_action = $steam_connection->get_transaction_id();
+        $trans_action = $steam_connection->get_transactionid();
         $steam_connection->add_known_result($trans_action, $value);
 
         return $trans_action;
