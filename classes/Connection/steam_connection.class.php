@@ -34,7 +34,7 @@ class steam_connection
     protected $object_buffer;
 
     // internal transaction counter
-    protected $transaction_id;
+    protected $transactionid;
 
     // internal request counter
     protected $sentrequests;
@@ -130,7 +130,7 @@ class steam_connection
     protected function init_variables()
     {
         $this->sentrequests = 0;
-        $this->transaction_id = 1;
+        $this->transactionid = 1;
         $this->socket_status = 0;
         $this->login_status = 0;
         $this->request_buffer = array();
@@ -286,7 +286,7 @@ class steam_connection
      */
     public function login($pLogin, $pPassword, $relogin = false)
     {
-        $request = new steam_request($this->get_id(), $this->get_transaction_id(), steam_factory::get_object($this->get_id()), array($pLogin, $pPassword, $this->get_version(), CLIENT_STATUS_CONNECTED), ($relogin ? COAL_RELOGIN : COAL_LOGIN));
+        $request = new steam_request($this->get_id(), $this->get_transactionid(), steam_factory::get_object($this->get_id()), array($pLogin, $pPassword, $this->get_version(), CLIENT_STATUS_CONNECTED), ($relogin ? COAL_RELOGIN : COAL_LOGIN));
 
         try {
             $result = $this->command($request);
@@ -643,14 +643,14 @@ class steam_connection
     }
 
     /**
-     * function get_transaction_id:
+     * function get_transactionid:
      *
      * increments the counter of transactions and
      * returns the new number as an unique transaction id
      *
      * @return integer unique transaction id
      */
-    public function get_transaction_id()
+    public function get_transactionid()
     {
         $this->transactionid += 1;
 
@@ -731,9 +731,9 @@ class steam_connection
             throw new steam_exception($this->get_login_user_name(), "Not logged in. Wrong user or password.", 300);
         }
         if ($raw) {
-            $request = new steam_request($this->get_id(), $this->get_transaction_id(), $pObject, array($pMethod, $pArgs));
+            $request = new steam_request($this->get_id(), $this->get_transactionid(), $pObject, array($pMethod, $pArgs));
         } else {
-            $request = new steam_request($this->get_id(), $this->get_transaction_id(), $pObject, array($pMethod, $pArgs));
+            $request = new steam_request($this->get_id(), $this->get_transactionid(), $pObject, array($pMethod, $pArgs));
         }
 
         if ($pBuffer == 0) {
