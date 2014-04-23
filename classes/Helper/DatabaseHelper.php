@@ -303,14 +303,14 @@ class DatabaseHelper
             $statement = $this->_pdo->prepare($query);
             foreach ($mailOids as $i => $mailOid) {
                 $mailOid = str_replace('%', '', $mailOid);
-                $statement->bindParam(":mailOid{$i}", $mailOid, PDO::PARAM_STR);
+                $statement->bindValue(":mailOid{$i}", $mailOid, PDO::PARAM_STR);
             }
             $statement->execute();
             $results = $statement->fetchAll();
 
             $unreadMails=0;
             foreach ($results as $key => $value) {
-                if (strpos($value['v'], (string) $uid) === false) {
+                if (!strpos($value['v'], (string) $uid)) {
                     $unreadMails++;
                 }
             }
