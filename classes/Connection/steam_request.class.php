@@ -246,11 +246,11 @@ class steam_request
                     $server_backtrace = $this->arguments[4];
                 }
 
-                if ($this->arguments[0] === E_NOTEXIST | E_OBJECT) { // 576
+                if ($this->arguments[0] === COAL_E_NOTEXIST | COAL_E_OBJECT) { // 576
                     throw new NotFoundException();
                 }
 
-                if ($this->arguments[0] === E_DELETED) { // 524288
+                if ($this->arguments[0] === COAL_E_DELETED) { // 524288
                     throw new DeletedException();
                 }
 

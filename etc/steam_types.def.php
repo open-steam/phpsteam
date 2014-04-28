@@ -33,7 +33,28 @@
   define("COAL_CRYPT",          "\x0c");
   define("COAL_COMMAND_RAW",    "\x0d");
 
-
+  // exception types
+  define("COAL_E_ERROR",          1<<0 ); // an error has occured
+  define("COAL_E_LOCAL",          1<<1 ); // local exception, user defined
+  define("COAL_E_MEMORY",         1<<2 ); // some memory messed up, uninitialized mapping,etc
+  define("COAL_E_EVENT",          1<<3 ); // some exception on an event
+  define("COAL_E_ACCESS",         1<<4 );
+  define("COAL_E_PASSWORD",       1<<5 );
+  define("COAL_E_NOTEXIST",       1<<6 );
+  define("COAL_E_FUNCTION",       1<<7 );
+  define("COAL_E_FORMAT",         1<<8 );
+  define("COAL_E_OBJECT",         1<<9 );
+  define("COAL_E_TYPE",           1<<10);
+  define("COAL_E_MOVE",           1<<11);
+  define("COAL_E_LOOP",           1<<12);
+  define("COAL_E_LOCK",           1<<13);
+  define("COAL_E_QUOTA",          1<<14);
+  define("COAL_E_TIMEOUT",        1<<15);
+  define("COAL_E_CONNECT",        1<<16);
+  define("COAL_E_UPLOAD",         1<<17);
+  define("COAL_E_DOWNLOAD",       1<<18);
+  define("COAL_E_DELETED",        1<<19);
+  define("COAL_E_ERROR_PROTOCOL", 1<<20);
 
   //define CLASS ids
   define("CLASS_OBJECT",       0x00000001);
