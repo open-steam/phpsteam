@@ -26,7 +26,7 @@ class steam_exception extends Exception {
 	 * @param $pMessage
 	 * @param $pCode
 	 */
-	public function __construct( $pUser = "Anonymous", $pMessage = FALSE, $pCode = FALSE, $pallow_backtrace = TRUE )
+	public function __construct($pUser = "Anonymous", $pMessage = FALSE, $pCode = FALSE, $pallow_backtrace = TRUE)
 	{
 		if ( ! $pMessage )
 		{

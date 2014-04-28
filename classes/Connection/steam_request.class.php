@@ -245,14 +245,15 @@ class steam_request
 				if (isset($this->arguments[4]) && is_string($this->arguments[4])) {
                     $server_backtrace = $this->arguments[4];
                 }
-                /*$log = "";
-				$trace = debug_backtrace();
-				foreach ($trace as $i=>$t) {
-				   $log .= $i .'=>'.$t['file'].' '.$t['line']."\n";
-				}
-				echo $log;
-				echo $this->object->get_path();
-                die;*/
+
+                if ($this->arguments[0] === COAL_E_NOTEXIST | COAL_E_OBJECT) { // 576
+                    throw new NotFoundException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
+                }
+
+                if ($this->arguments[0] === COAL_E_DELETED) { // 524288
+                    throw new DeletedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
+                }
+
 				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer.\nCOAL_ERROR : args[0]=" . $this->arguments[0] . "\nargs[1]=" . $this->arguments[1] . (isset($server_backtrace) ? "\nserver backtrace=" . $server_backtrace : ""), 120);
 			} else {
 				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
