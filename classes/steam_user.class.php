@@ -145,8 +145,6 @@ class steam_user extends steam_container
         if(!is_array($favourites_old)) $favourites_old = array();
         if(!is_array($to_confirm)) $to_confirm = array();
 
-        $contact = steam_factory::get_object( $steam_connector->get_id(), $contact_id, CLASS_USER );
-
         //check if attribute 'user_contacts_toconfirm' contains the contact
         //if contact is in the "user_contacts_toconfirm"-list
         //	remove the contacts from the list and add the contact to
@@ -155,7 +153,7 @@ class steam_user extends steam_container
         $s = count($to_confirm);
         for ($i =0;$i< $s; $i++) {
             $tc = $to_confirm[$i];
-            if ($tc->get_id() == $contact->get_id()) {
+            if ($tc->get_id() == $contact_id) {
                 $found = TRUE;
                 unset($to_confirm[$i]);
             }
@@ -163,6 +161,12 @@ class steam_user extends steam_container
         if ($found) {
             $to_confirm = array_values($to_confirm);
             $this->set_attribute("USER_CONTACTS_TOCONFIRM", $to_confirm);
+        }
+
+        $contact = steam_factory::get_object( $steam_connector->get_id(), $contact_id, CLASS_USER );
+
+        if (!$contact instanceof steam_user) {
+            return false;
         }
 
 
@@ -178,6 +182,7 @@ class steam_user extends steam_container
         $favourites_new = $favourites_old;
         $favourites_new[] = $contact;
         $this->set_attribute("USER_FAVOURITES", $favourites_new);
+        return true;
     }
 
 
