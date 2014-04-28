@@ -1,5 +1,5 @@
 <?php
-class NotFoundException extends Exception {
+class NotFoundException extends steam_exception {
 
     public function __construct() {
         $this->message = "steam object not found";

@@ -1,5 +1,5 @@
 <?php
-class DeletedException extends Exception {
+class DeletedException extends steam_exception {
 
     public function __construct() {
         $this->message = "steam object deleted";
