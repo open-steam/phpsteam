@@ -1,14 +1,7 @@
 <?php
 class DeletedException extends steam_exception {
 
-    public function __construct() {
-        $this->message = "steam object deleted";
-
-        parent::__construct( $this->message );
+    public function __construct($login) {
+        parent::__construct($login, "steam object deleted", COAL_E_DELETED);
     }
-
-    public function get_message() {
-        return $this->message;
-    }
-
 }
