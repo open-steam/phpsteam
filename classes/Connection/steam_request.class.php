@@ -247,11 +247,11 @@ class steam_request
                 }
 
                 if ($this->arguments[0] === COAL_E_NOTEXIST | COAL_E_OBJECT) { // 576
-                    throw new NotFoundException($this->steam_connectorID)->get_login_user_name());
+                    throw new NotFoundException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
                 }
 
                 if ($this->arguments[0] === COAL_E_DELETED) { // 524288
-                    throw new DeletedException($this->steam_connectorID)->get_login_user_name());
+                    throw new DeletedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
                 }
 
 				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer.\nCOAL_ERROR : args[0]=" . $this->arguments[0] . "\nargs[1]=" . $this->arguments[1] . (isset($server_backtrace) ? "\nserver backtrace=" . $server_backtrace : ""), 120);
