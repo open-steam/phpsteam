@@ -51,13 +51,16 @@ class steam_user extends steam_container
         $s = count($unconfirmed);
         for ($i =0;$i< $s; $i++) {
             $tc = $unconfirmed[$i];
+            if (!$tc instanceof steam_object) { // remove deleted user
+                $found = TRUE;
+                unset($unconfirmed[$i]);
+            }
             if ($tc->get_id() == $contact_id) {
                 $found = TRUE;
                 unset($unconfirmed[$i]);
             }
         }
         if ($found) {
-            $unconfirmed_old = array_values($unconfirmed);
             $this->set_attribute("USER_CONTACTS_TOCONFIRM", $unconfirmed);
         }
     }
