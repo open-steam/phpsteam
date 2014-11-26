@@ -7,6 +7,6 @@
     },
     "require": {
         "php": ">=5.3",
-        "monolog/monolog" : "dev-master"
+        "monolog/monolog" : "*"
     }
 }
