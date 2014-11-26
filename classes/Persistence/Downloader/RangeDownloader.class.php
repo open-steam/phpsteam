@@ -38,18 +38,17 @@ class RangeDownloader extends Downloader
                  * (mediatype = mimetype)
                  * as well as a boundry header to indicate the various chunks of data.
                  */
-        header("Accept-Ranges: 0-$length");
-        // header('Accept-Ranges: bytes');
+        //header("Accept-Ranges: 0-$length");
+        header('Accept-Ranges: bytes');
         // multipart/byteranges
         // http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
         if (isset($_SERVER['HTTP_RANGE'])) {
-
             $c_start = $start;
             $c_end   = $end;
             // Extract the range string
-            list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+            list($range_type, $range_data) = explode('=', $_SERVER['HTTP_RANGE'], 2);
             // Make sure the client hasn't sent us a multibyte range
-            if (strpos($range, ',') !== false) {
+            if ($range_type != 'bytes') {
 
                 // (?) Shoud this be issued here, or should the first
                 // range be used? Or should the header be ignored and
@@ -59,11 +58,14 @@ class RangeDownloader extends Downloader
                 // (?) Echo some info to the client?
                 exit;
             }
-            // If the range starts with an '-' we start from the beginning
-            // If not, we forward the file pointer
-            // And make sure to get the end byte if spesified
-            if ($range[0] == '-') {
-
+           // Use only first range set as  multiple ranges are currently not
+        // supported.
+        $ranges = explode(',', $range_data, 2);
+        $range = $ranges[0];
+        // If the range starts with an '-' we start from the beginning.
+        // If not, we forward the file pointer and make sure to get the end byte
+        // if spesified.
+        if ($range{0} == '-') {
                 // The n-number of the last bytes is requested
                 $c_start = $size - substr($range, 1);
             }
@@ -80,7 +82,6 @@ class RangeDownloader extends Downloader
             $c_end = ($c_end > $end) ? $end : $c_end;
             // Validate the requested range and return an error if it's not correct.
             if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
-
                 header('HTTP/1.1 416 Requested Range Not Satisfiable');
                 header("Content-Range: bytes $start-$end/$size");
                 // (?) Echo some info to the client?
@@ -98,8 +99,15 @@ class RangeDownloader extends Downloader
         $document->send_custom_header("R");
 
         // Start buffered download
-        $buffer = 1024 * 8;
+        $buffer = 1024;
+        $rate = DOWNLOAD_RANGE_SPEEDLIMIT; // spead limit in kB
+        if ($rate > 0) {
+                $buffer *= $rate;
+        }
+        set_time_limit(0); // Reset time limit for big files
+
         while(!feof($fp) && ($p = ftell($fp)) <= $end) {
+           $timeStart = microtime(true);
 
             if ($p + $buffer > $end) {
 
@@ -107,9 +115,15 @@ class RangeDownloader extends Downloader
                 // read past the length
                 $buffer = $end - $p + 1;
             }
-            set_time_limit(0); // Reset time limit for big files
+
             echo fread($fp, $buffer);
             flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
+
+           $wait = (microtime(true) - $timeStart) * 1000000;
+           // if speedlimit is defined, make sure to only send specified bytes per second
+            if($rate > 0) {
+                usleep(1000000 - $wait);
+            }
         }
 
         fclose($fp);
