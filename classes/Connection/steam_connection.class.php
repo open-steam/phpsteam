@@ -175,7 +175,12 @@ class steam_connection
         $this->steam_server_port = $pServerPort;
         $this->login_user_name = $pLoginName;
 
-        $this->socket = @fsockopen($this->steam_server_ip, $this->steam_server_port, $errno, $errstr);
+        $hostprefix = '';
+        if ($this->steam_server_port === 1999 || $this->steam_server_port === 31999) {
+            $hostprefix = 'ssl://';
+        }
+
+        $this->socket = @fsockopen($hostprefix . $this->steam_server_ip, $this->steam_server_port, $errno, $errstr);
 
         if (!$this->socket) {
             $this->socket_status = 0;
