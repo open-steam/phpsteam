@@ -246,11 +246,15 @@ class steam_request
                     $server_backtrace = $this->arguments[4];
                 }
 
-                if ($this->arguments[0] === COAL_E_NOTEXIST | COAL_E_OBJECT) { // 576
+                if ($this->arguments[0] & COAL_E_ACCESS) { // 1<<4 is set
+                    throw new AccessDeniedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
+                }
+
+                if ($this->arguments[0] & COAL_E_NOTEXIST) { // 1<<6 is set
                     throw new NotFoundException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
                 }
 
-                if ($this->arguments[0] === COAL_E_DELETED) { // 524288
+                if ($this->arguments[0] & COAL_E_DELETED) { // 1<<19 is set
                     throw new DeletedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
                 }
 
