@@ -3,7 +3,7 @@
  * Definition of all types of objects's attributes
  *
  * PHP versions 5
- * 
+ *
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
@@ -11,7 +11,7 @@
 
 // BEGIN deprecated
   /**
-   * 
+   *
    */
  /* define("EXIT_TO",                 401);
   define("LINK_TARGET",             900);*/
