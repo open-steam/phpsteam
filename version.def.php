@@ -6,8 +6,8 @@
  *
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @author Dominik Niehus <nicke@upb.de>
+ * @author Dominik Niehus <dominik.niehus@coactum.de>
  */
 
-	define( "PHPSTEAM_VERSION", "4.1.68" );
+	define( "PHPSTEAM_VERSION", "4.1.69" );
 ?>
