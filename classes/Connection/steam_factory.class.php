@@ -196,10 +196,12 @@ class steam_factory {
 	 */
 	public static function path_to_object($pSteamConnectorID, $pPath, $pBuffer = 0) {
 		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
-		$steam_object = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"), "path_to_object", array($pPath), $pBuffer);
-		if (!$steam_object instanceof steam_object) {
-			$steam_object = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"), "path_to_object", array($pPath), $pBuffer);
-		}
+
+        try {
+		    $steam_object = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"), "path_to_object", array($pPath), $pBuffer);
+        } catch (NotFoundException $e) {
+            $steam_object = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"), "path_to_object", array($pPath), $pBuffer);
+        }
 		return $steam_object;
 	}
 
