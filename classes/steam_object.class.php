@@ -255,7 +255,7 @@ class steam_object implements Serializable
     public function get_attribute_cached($key)
     {
         if (!array_key_exists($key, $this->attributes))
-            return FALSE;
+            return false;
         return $this->attributes[$key];
     }
 
@@ -273,7 +273,7 @@ class steam_object implements Serializable
      *
      * @return mixed the attribute you asked for
      */
-    public function get_attribute($pAttribute, $pBuffer = FALSE)
+    public function get_attribute($pAttribute, $pBuffer = false)
     {
         if ($pBuffer) {
             //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute with buffer") : "";
@@ -295,6 +295,39 @@ class steam_object implements Serializable
 
             return $value;
         }
+    }
+
+    public function purify($string) {
+        //require_once './libraries/php/htmlpurifier-4.3.0/library/HTMLPurifier.auto.php';
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('Cache.DefinitionImpl', null);
+        //$config->set('Core.CollectErrors', true);
+        $config->set('CSS.AllowTricky', true);
+        $config->set('CSS.AllowedProperties', array("text-align", "float", "margin-left", "display", "margin-right", "list-style-type", "padding-left"));
+        $config->set('HTML.AllowedAttributes', '*.style,*.id,*.title,*.class,a.href,a.target,img.src,img.alt,*.name,ol.start');
+        $config->set('Attr.EnableID', true);
+        //$def = $config->getHTMLDefinition(true);
+        //$def->addAttribute('a', 'id', 'ID');
+
+        $purifier = new HTMLPurifier($config);
+        return $purifier->purify($string);
+    }
+
+    public function get_attribute_html($pAttribute, $pBuffer = false)
+    {
+        if ($pBuffer) {
+            //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute with buffer") : "";
+            $value = $this->steam_command($this, "query_attribute", array( $pAttribute ), $pBuffer);
+        } else {
+            if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])) {
+                //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute without buffer") : "";
+                $this->attributes[ $pAttribute ] = $this->steam_command($this, "query_attribute", array( $pAttribute ), 0);
+            }
+            $value = isset($this->attributes[$pAttribute]) ? $this->attributes[$pAttribute] : 0;
+        }
+        $value = str_replace('data:text/html;charset=utf8;base64,', '', $value);
+        $value = base64_decode($value);
+        return $this->purify($value);
     }
 
     /**
@@ -338,7 +371,7 @@ class steam_object implements Serializable
      *
      * @return string path of the object
      */
-    public function get_path($pBuffer = FALSE)
+    public function get_path($pBuffer = false)
     {
         if ($this->get_steam_connector()->get_login_status() === 0) {
             throw new steam_exception($this->get_login_user_name(), "Not logged in. Wrong user or password.", 300);
@@ -496,6 +529,21 @@ class steam_object implements Serializable
         return $result;
     }
 
+    public function set_attribute_html($pAttribute, $pValue, $pBuffer= 0) {
+        try {
+            $pValue = $purifier->purify($pValue);
+            $pValue = 'data:text/html;charset=utf8;base64,' . base64_encode($pValue);
+            $result = $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
+        } catch (steam_exception $e) {
+            if (strstr($e->get_message(), "Cannot update identifier")) {
+                throw new DoubleFilenameException();
+            } else {
+                throw $e;
+            }
+        }
+        return $result;
+    }
+
     /**
      * function delete_attribute:
      *
@@ -510,7 +558,7 @@ class steam_object implements Serializable
 
         return $this->steam_command(
         $this,
-                                                                "set_attribute",
+        "set_attribute",
         array( $pAttribute ),
         $pBuffer
         );
@@ -530,7 +578,7 @@ class steam_object implements Serializable
 
         return $this->steam_command(
         $this,
-                                                                "set_attributes",
+        "set_attributes",
         array($pAttributes),
         $pBuffer
         );
