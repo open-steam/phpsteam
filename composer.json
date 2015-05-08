@@ -8,6 +8,6 @@
     "require": {
         "php": ">=5.3",
         "monolog/monolog" : "*",
-        "ezyang/htmlpurifier": "dev-master"
+        "ezyang/htmlpurifier": "~4.6"
     }
 }
