@@ -303,7 +303,7 @@ class steam_object implements Serializable
         $config->set('Cache.DefinitionImpl', null);
         //$config->set('Core.CollectErrors', true);
         $config->set('CSS.AllowTricky', true);
-        $config->set('CSS.AllowedProperties', array("text-align", "float", "margin-left", "display", "margin-right", "list-style-type", "padding-left"));
+        $config->set('CSS.AllowedProperties', array("color", "text-align", "float", "margin-left", "display", "margin-right", "list-style-type", "padding-left"));
         $config->set('HTML.AllowedAttributes', '*.style,*.id,*.title,*.class,a.href,a.target,img.src,img.alt,*.name,ol.start');
         $config->set('Attr.EnableID', true);
         //$def = $config->getHTMLDefinition(true);
@@ -531,7 +531,7 @@ class steam_object implements Serializable
 
     public function set_attribute_html($pAttribute, $pValue, $pBuffer= 0) {
         try {
-            $pValue = $purifier->purify($pValue);
+            $pValue = $this->purify($pValue);
             $pValue = 'data:text/html;charset=utf8;base64,' . base64_encode($pValue);
             $result = $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
         } catch (steam_exception $e) {
