@@ -163,11 +163,11 @@ class steam_object implements Serializable
      * @param  mixed $pAttributes List of attributes' names
      * @return mixed Array of attributes'names and their values
      */
-    public function get_attributes( $pAttributes = array(), $pBuffer = FALSE, $pFollowLinks = FALSE )
+    public function get_attributes( $pAttributes = array(), $pBuffer = false, $pFollowLinks = false, $decode = false )
     {
         if (!$pBuffer) {
             if ( count( $pAttributes ) == 0 ) {
-                return $this->strip_tags_array($this->attributes);
+                return $this->decode_array($decode, $this->strip_tags_array($this->attributes));
             }
             $known_attributes = array();
             $unknown_attributes = array();
@@ -195,8 +195,8 @@ class steam_object implements Serializable
                     );
                     $this->attributes = array_merge( $this->attributes, $result );
 
-                    return $this->strip_tags_array(array_merge( $known_attributes, $result ));
-            } else return $this->strip_tags_array($known_attributes);
+                    return $this->decode_array($decode, $this->strip_tags_array(array_merge( $known_attributes, $result )));
+            } else return $this->decode_array($decode, $this->strip_tags_array($known_attributes));
         } else {  // Use the buffer
             // we need a mapping instead of an array here,
             // so convert it
@@ -205,11 +205,11 @@ class steam_object implements Serializable
                 $pAttr[ $key ] = "";
             }
 
-            return $this->strip_tags_array($this->get_steam_connector()->buffer_attributes_request(
+            return $this->decode_array($decode, $this->strip_tags_array($this->get_steam_connector()->buffer_attributes_request(
             $this,
             $pAttr,
             0
-            ));
+            )));
         }
     }
 
@@ -223,6 +223,24 @@ class steam_object implements Serializable
             $value = $array[$key];
             if (is_string($value)) {
                 $array[$key] = strip_tags($value);
+            }
+        }
+
+        return $array;
+    }
+
+    private function decode_array($decode, $array)
+    {
+        if (!is_array($decode) || !is_array($array)) {
+            return $array;
+        }
+        $keys = array_keys($array);
+        foreach ($keys as $key) {
+            $value = $array[$key];
+            if (is_string($value)) {
+                if (isset($decode[$key])) {
+                    $array[$key] = $this->decode($decode[$key], $value);
+                }
             }
         }
 
@@ -273,7 +291,7 @@ class steam_object implements Serializable
      *
      * @return mixed the attribute you asked for
      */
-    public function get_attribute($pAttribute, $pBuffer = false)
+    public function get_attribute($pAttribute, $pBuffer = false, $decode = false)
     {
         if ($pBuffer) {
             //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute with buffer") : "";
@@ -281,7 +299,7 @@ class steam_object implements Serializable
             if (is_string($value)) {
                 $value = strip_tags($value);
             }
-
+            $value = $this->decode($decode, $value);
             return $value;
         } else {
             if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])) {
@@ -292,9 +310,21 @@ class steam_object implements Serializable
             if (is_string($value)) {
                 $value = strip_tags($value);
             }
-
+            $value = $this->decode($decode, $value);
             return $value;
         }
+    }
+
+    public function decode($decode, $data) {
+        if ($decode === 'html' && is_string($data)) {
+            $pattern = 'data:text/html;charset=utf8;base64,';
+            if (substr($data, 0, strlen($pattern)) === $pattern) {
+                $data = str_replace($pattern, '', $data);
+                $data = base64_decode($data);
+                $data = $this->purify($data);
+            }
+        }
+        return $data;
     }
 
     public function purify($string) {
@@ -311,23 +341,6 @@ class steam_object implements Serializable
 
         $purifier = new HTMLPurifier($config);
         return $purifier->purify($string);
-    }
-
-    public function get_attribute_html($pAttribute, $pBuffer = false)
-    {
-        if ($pBuffer) {
-            //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute with buffer") : "";
-            $value = $this->steam_command($this, "query_attribute", array( $pAttribute ), $pBuffer);
-        } else {
-            if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])) {
-                //API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("query_attribute without buffer") : "";
-                $this->attributes[ $pAttribute ] = $this->steam_command($this, "query_attribute", array( $pAttribute ), 0);
-            }
-            $value = isset($this->attributes[$pAttribute]) ? $this->attributes[$pAttribute] : 0;
-        }
-        $value = str_replace('data:text/html;charset=utf8;base64,', '', $value);
-        $value = base64_decode($value);
-        return $this->purify($value);
     }
 
     /**
@@ -512,8 +525,9 @@ class steam_object implements Serializable
      * @param mixed  $pValue     attribute value
      *                           @param $pBuffer 0= send now, 1 = buffer command and send later
      */
-    public function set_attribute($pAttribute, $pValue, $pBuffer= 0)
+    public function set_attribute($pAttribute, $pValue, $pBuffer = 0, $encode = false)
     {
+        $pValue = $this->encode($encode, $pValue);
         $pValue = ( is_string( $pValue ) ) ? strip_tags(stripslashes( $pValue )) : $pValue;
         try {
             $result = $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
@@ -529,19 +543,13 @@ class steam_object implements Serializable
         return $result;
     }
 
-    public function set_attribute_html($pAttribute, $pValue, $pBuffer= 0) {
-        try {
-            $pValue = $this->purify($pValue);
-            $pValue = 'data:text/html;charset=utf8;base64,' . base64_encode($pValue);
-            $result = $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
-        } catch (steam_exception $e) {
-            if (strstr($e->get_message(), "Cannot update identifier")) {
-                throw new DoubleFilenameException();
-            } else {
-                throw $e;
-            }
+    public function encode($encode, $data) {
+        if ($encode === 'html') {
+            $data = $this->purify($data);
+            $data = 'data:text/html;charset=utf8;base64,' . base64_encode($data);
         }
-        return $result;
+
+        return $data;
     }
 
     /**
@@ -571,11 +579,17 @@ class steam_object implements Serializable
      *
      * @param mixed $pAttributes New attributes and their values.
      */
-    public function set_attributes($pAttributes, $pBuffer= 0)
+    public function set_attributes($pAttributes, $pBuffer= 0, $encode = false)
     {
+        if (is_array($encode)) {
+            foreach ($encode as $key => $value) {
+                if (isset($pAttributes[$key])) {
+                    $pAttributes[$key] = $this->encode($value, $pAttributes[$key]);
+                }
+            }
+        }
         $pAttributes = $this->strip_tags_array($pAttributes);
         $this->attributes = array_merge( $this->attributes, $pAttributes );
-
         return $this->steam_command(
         $this,
         "set_attributes",
