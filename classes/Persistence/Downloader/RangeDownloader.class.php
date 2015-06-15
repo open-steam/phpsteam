@@ -17,8 +17,10 @@ class RangeDownloader extends Downloader
         } else {
             $file = $persistence->get_file_path($document);
         }
+        
+        $document->send_custom_header("R");
 
-        if (function_exists(http_send_content_disposition)) { // use pecl http extension
+        if (function_exists("http_send_content_disposition")) { // use pecl http extension
             http_send_content_disposition($document->get_name(), true);
             http_send_content_type($document->get_mimetype());
             //http_throttle(0.1, 1024);
@@ -107,7 +109,6 @@ class RangeDownloader extends Downloader
         // Notify the client the byte range we'll be outputting
         header("Content-Range: bytes $start-$end/$size");
         header("Content-Length: $length");
-        $document->send_custom_header("R");
 
         // Start buffered download
         $buffer = 1024;
