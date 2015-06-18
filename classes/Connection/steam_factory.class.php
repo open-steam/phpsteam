@@ -559,6 +559,23 @@ class steam_factory {
 	}
 
 	/**
+	 *function create_textdoc:
+	 *
+	 * @param $pSteamConnector
+	 * @param $pName
+	 * @param $pContent
+	 * @param $pEnviroment
+	 * @param $pDescription
+	 *
+	 * @return
+	 */
+	public static function create_htmldoc($pSteamConnectorID, $pName, $pContent = "", $pEnvironment = FALSE, $pDescription = "") {
+		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
+		$pContent = \OpenSteam\Helper\HtmlHelper::purify($pContent);
+		return steam_factory::create_document($pSteamConnectorID, $pName, $pContent, "text/html", $pEnvironment, $pDescription);
+	}
+
+	/**
 	 * function create_document:
 	 *
 	 * Creates a new document
