@@ -167,7 +167,7 @@ class steam_object implements Serializable
     {
         if (!$pBuffer) {
             if ( count( $pAttributes ) == 0 ) {
-                return $this->decode_array($decode, $this->strip_tags_array($this->attributes));
+                return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array($this->attributes));
             }
             $known_attributes = array();
             $unknown_attributes = array();
@@ -195,8 +195,8 @@ class steam_object implements Serializable
                     );
                     $this->attributes = array_merge( $this->attributes, $result );
 
-                    return $this->decode_array($decode, $this->strip_tags_array(array_merge( $known_attributes, $result )));
-            } else return $this->decode_array($decode, $this->strip_tags_array($known_attributes));
+                    return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array(array_merge( $known_attributes, $result )));
+            } else return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array($known_attributes));
         } else {  // Use the buffer
             // we need a mapping instead of an array here,
             // so convert it
@@ -205,46 +205,12 @@ class steam_object implements Serializable
                 $pAttr[ $key ] = "";
             }
 
-            return $this->decode_array($decode, $this->strip_tags_array($this->get_steam_connector()->buffer_attributes_request(
+            return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array($this->get_steam_connector()->buffer_attributes_request(
             $this,
             $pAttr,
             0
             )));
         }
-    }
-
-    private function strip_tags_array($array)
-    {
-        if (!is_array($array)) {
-            return $array;
-        }
-        $keys = array_keys($array);
-        foreach ($keys as $key) {
-            $value = $array[$key];
-            if (is_string($value)) {
-                $array[$key] = strip_tags($value);
-            }
-        }
-
-        return $array;
-    }
-
-    private function decode_array($decode, $array)
-    {
-        if (!is_array($decode) || !is_array($array)) {
-            return $array;
-        }
-        $keys = array_keys($array);
-        foreach ($keys as $key) {
-            $value = $array[$key];
-            if (is_string($value)) {
-                if (isset($decode[$key])) {
-                    $array[$key] = $this->decode($decode[$key], $value);
-                }
-            }
-        }
-
-        return $array;
     }
 
     /**
@@ -299,7 +265,7 @@ class steam_object implements Serializable
             if (is_string($value)) {
                 $value = strip_tags($value);
             }
-            $value = $this->decode($decode, $value);
+            $value = \OpenSteam\Helper\HtmlHelper::decode($decode, $value);
             return $value;
         } else {
             if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])) {
@@ -310,37 +276,9 @@ class steam_object implements Serializable
             if (is_string($value)) {
                 $value = strip_tags($value);
             }
-            $value = $this->decode($decode, $value);
+            $value = \OpenSteam\Helper\HtmlHelper::decode($decode, $value);
             return $value;
         }
-    }
-
-    public function decode($decode, $data) {
-        if ($decode === 'html' && is_string($data)) {
-            $pattern = 'data:text/html;charset=utf8;base64,';
-            if (substr($data, 0, strlen($pattern)) === $pattern) {
-                $data = str_replace($pattern, '', $data);
-                $data = base64_decode($data);
-                $data = $this->purify($data);
-            }
-        }
-        return $data;
-    }
-
-    public function purify($string) {
-        //require_once './libraries/php/htmlpurifier-4.3.0/library/HTMLPurifier.auto.php';
-        $config = HTMLPurifier_Config::createDefault();
-        $config->set('Cache.DefinitionImpl', null);
-        //$config->set('Core.CollectErrors', true);
-        $config->set('CSS.AllowTricky', true);
-        $config->set('CSS.AllowedProperties', array("color", "text-align", "float", "margin-left", "display", "margin-right", "list-style-type", "padding-left"));
-        $config->set('HTML.AllowedAttributes', '*.style,*.id,*.title,*.class,a.href,a.target,img.src,img.alt,*.name,ol.start');
-        $config->set('Attr.EnableID', true);
-        //$def = $config->getHTMLDefinition(true);
-        //$def->addAttribute('a', 'id', 'ID');
-
-        $purifier = new HTMLPurifier($config);
-        return $purifier->purify($string);
     }
 
     /**
@@ -527,7 +465,7 @@ class steam_object implements Serializable
      */
     public function set_attribute($pAttribute, $pValue, $pBuffer = 0, $encode = false)
     {
-        $pValue = $this->encode($encode, $pValue);
+        $pValue = \OpenSteam\Helper\HtmlHelper::encode($encode, $pValue);
         $pValue = ( is_string( $pValue ) ) ? strip_tags(stripslashes( $pValue )) : $pValue;
         try {
             $result = $this->set_attributes(array($pAttribute => $pValue ), $pBuffer);
@@ -541,15 +479,6 @@ class steam_object implements Serializable
         }
 
         return $result;
-    }
-
-    public function encode($encode, $data) {
-        if ($encode === 'html') {
-            $data = $this->purify($data);
-            $data = 'data:text/html;charset=utf8;base64,' . base64_encode($data);
-        }
-
-        return $data;
     }
 
     /**
@@ -584,11 +513,11 @@ class steam_object implements Serializable
         if (is_array($encode)) {
             foreach ($encode as $key => $value) {
                 if (isset($pAttributes[$key])) {
-                    $pAttributes[$key] = $this->encode($value, $pAttributes[$key]);
+                    $pAttributes[$key] = \OpenSteam\Helper\HtmlHelper::encode($value, $pAttributes[$key]);
                 }
             }
         }
-        $pAttributes = $this->strip_tags_array($pAttributes);
+        $pAttributes = \OpenSteam\Helper\HtmlHelper::strip_tags_array($pAttributes);
         $this->attributes = array_merge( $this->attributes, $pAttributes );
         return $this->steam_command(
         $this,
@@ -754,7 +683,7 @@ class steam_object implements Serializable
 
         return $this->steam_command(
         $this,
-            "get_root_environment",
+        "get_root_environment",
         array(),
         0
         );
@@ -770,7 +699,7 @@ class steam_object implements Serializable
     {
         return $this->steam_command(
         $this,
-                                                                "get_creator",
+        "get_creator",
         array(),
         $pBuffer
         );
@@ -794,14 +723,14 @@ class steam_object implements Serializable
         if ( ! $pClass )
         return $this->steam_command(
         $this,
-                "get_annotations",
+        "get_annotations",
         array(),
         $pBuffer
         );
         else
         return $this->steam_command(
         $this,
-                "get_annotations_by_class",
+        "get_annotations_by_class",
         array( (int) $pClass ),
         $pBuffer
         );

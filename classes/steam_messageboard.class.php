@@ -33,13 +33,13 @@ class steam_messageboard extends steam_object
 	 *
 	 * @return
 	 */
-	protected function create_entry( $pEntryName, $pDescription )
+	protected function create_entry($pEntryName, $pDescription, $html = true)
 	{
-		$new_annotation = steam_factory::create_textdoc(
-		$this->steam_connectorID,
-		$pEntryName,
-		$pDescription
-		);
+		if ($html) {
+			$new_annotation = steam_factory::create_htmldoc($this->steam_connectorID, $pEntryName, $pDescription);
+		} else {
+			$new_annotation = steam_factory::create_textdoc($this->steam_connectorID, $pEntryName, $pDescription);
+		}
 
 		$this->add_annotation( $new_annotation );
 		// set acquiring
@@ -57,12 +57,9 @@ class steam_messageboard extends steam_object
 	 *
 	 * @return steam_document the thread object
 	 */
-	public function add_thread( $pThreadName, $pThreadDescription)
+	public function add_thread($pThreadName, $pThreadDescription, $html = true)
 	{
-		return $this->create_entry(
-		$pThreadName,
-		$pThreadDescription
-		);
+		return $this->create_entry($pThreadName, $pThreadDescription, $html);
 	}
 
 	/**
@@ -73,12 +70,9 @@ class steam_messageboard extends steam_object
 	 *
 	 * @return
 	 */
-	public function add_article( $pSubject, $pContent )
+	public function add_article($pSubject, $pContent, $html = true)
 	{
-		return $this->create_entry(
-		$pSubject,
-		$pContent
-		);
+		return $this->create_entry($pSubject, $pContent, $html);
 	}
 
 	/**
