@@ -18,8 +18,7 @@
  *
  * @package     PHPsTeam
  */
-class steam_request
-{
+class steam_request {
 	//***************************************************************************
 	//class variables
 	//***************************************************************************
@@ -46,17 +45,19 @@ class steam_request
 	//construtor: steam_request()
 	//***************************************************************************
 	/**
-	* function steam_request:
-	*
-	* @param $pSteamConnector
-	* @param $transactionid
-	* @param $object
-	* @param $arguments
-	* @param coalcommand
-	*/
-	function steam_request( $pSteamConnectorID, $transactionid = 0, $object = 0, $arguments = 0, $coalcommand = COAL_COMMAND)
-	{
-		if (!is_string($pSteamConnectorID)) throw new ParameterException("pSteamConnectorID", "string");
+	 * function steam_request:
+	 *
+	 * @param $pSteamConnector
+	 * @param $transactionid
+	 * @param $object
+	 * @param $arguments
+	 * @param coalcommand
+	 */
+	function steam_request($pSteamConnectorID, $transactionid = 0, $object = 0, $arguments = 0, $coalcommand = COAL_COMMAND) {
+		if (!is_string($pSteamConnectorID)) {
+			throw new ParameterException("pSteamConnectorID", "string");
+		}
+
 		//set class variables
 		$this->steam_connectorID = $pSteamConnectorID;
 		$this->set_transactionid($transactionid);
@@ -69,28 +70,23 @@ class steam_request
 			$this->set_arguments($arguments);
 		}
 
-
-
 	} //function steam_request($transactionid, $coalcommand, $object, $arguments)
-
 
 	//***************************************************************************
 	//method: encode()
 	//***************************************************************************
 	/**
-	* function encode:
-	*
-	* @return
-	*/
-	function encode()
-	{
+	 * function encode:
+	 *
+	 * @return
+	 */
+	function encode() {
 		//build COAL command
 		$command = "\xff" . $this->length_encoded . $this->transactionid_encoded . $this->coalcommand . $this->object_encoded . $this->arguments_encoded;
 
 		return $command;
 
 	} //function encode()
-
 
 	//***************************************************************************
 	//method: encode_data()
@@ -118,41 +114,35 @@ class steam_request
 	 *
 	 * @return
 	 */
-	function encode_data($data, $object_keys = FALSE)
-	{
+	function encode_data($data, $object_keys = FALSE) {
 		if (is_object($data) && !($data instanceof steam_object)) {
 			$newdata = CMD_TYPE_MAPPING . pack("C*", 0 >> 8, 0); // empty mapping
-		} else if(is_array($data)) { //encode array/mapping
+		} else if (is_array($data)) {
+			//encode array/mapping
 			//check if its an  array or mapping
 			$array = true;
 			$j = 0;
-			foreach($data as $key => $value)
-			{
-				if(gettype($key) != "integer" || !($key === $j))
-				{
+			foreach ($data as $key => $value) {
+				if (gettype($key) != "integer" || !($key === $j)) {
 					$array = false;
 					break;
 				}
 				$j++;
 			}
 
-
 			//build array
-			if($array)
-			{
+			if ($array) {
 				$count = sizeof($data);
-				$newdata = CMD_TYPE_ARRAY . pack("C*", $count >> 8 , $count);
+				$newdata = CMD_TYPE_ARRAY . pack("C*", $count >> 8, $count);
 
-				foreach($data as $tmpdata)
-				{
+				foreach ($data as $tmpdata) {
 					$newdata .= $this->encode_data($tmpdata);
 				} //foreach($data as $tmpdata)
 
 			}
 
 			//build mapping
-			else
-			{
+			else {
 				$object_keys = FALSE;
 				if (isset($data["_OBJECT_KEYS"]) && $data["_OBJECT_KEYS"] === "TRUE") {
 					$object_keys = TRUE;
@@ -161,8 +151,7 @@ class steam_request
 				$count = sizeof($data);
 				$newdata = CMD_TYPE_MAPPING . pack("C*", $count >> 8, $count);
 
-				foreach($data as $key => $tmpdata)
-				{
+				foreach ($data as $key => $tmpdata) {
 					$newdata .= $this->encode_data($key, $object_keys);
 					$newdata .= $this->encode_data($tmpdata);
 				}
@@ -171,20 +160,22 @@ class steam_request
 		}
 
 		//encode basic types
-		else
-		{
+		else {
 			$type = gettype($data);
-			switch ($type)
-			{
+			switch ($type) {
 				case "boolean":
-					$data = ($data)?1:0;
+					$data = ($data) ? 1 : 0;
 				case "integer":
-					if ($object_keys) $newdata = $this->encode_object($data, CLASS_OBJECT);
-					else $newdata = CMD_TYPE_INT . pack("C*", $data >> 24, $data >> 16, $data >> 8, $data);
+					if ($object_keys) {
+						$newdata = $this->encode_object($data, CLASS_OBJECT);
+					} else {
+						$newdata = CMD_TYPE_INT . pack("C*", $data >> 24, $data >> 16, $data >> 8, $data);
+					}
+
 					break;
 				case "float":
 				case "double":
-					$newdata = CMD_TYPE_FLOAT . strrev(pack("f*" ,$data));
+					$newdata = CMD_TYPE_FLOAT . strrev(pack("f*", $data));
 					break;
 				case "string":
 					$len = strlen($data);
@@ -196,13 +187,13 @@ class steam_request
 				case "null":
 				case "NULL":
 					/*
-					 Use Integer 0 to represent NULL.
-					 TODO: Implement Support of NULL within the Protocol itself.
+					Use Integer 0 to represent NULL.
+					TODO: Implement Support of NULL within the Protocol itself.
 					 */
 					return $this->encode_data(0);
 					break;
 				default:
-					throw new steam_exception( steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error: Type '$type' is not supported by the COAL protocoll!<br>\n", 120 );
+					throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error: Type '$type' is not supported by the COAL protocoll!<br>\n", 120);
 			} //switch
 		}
 
@@ -210,21 +201,18 @@ class steam_request
 
 	} //function encode_data($data)
 
-
 	//***************************************************************************
 	//method: decode()
 	//***************************************************************************
 	/**
-	* function decode:
-	*
-	* @param $command
-	*
-	* @return
-	*/
-	function decode($command, $flushing = FALSE)
-	{
+	 * function decode:
+	 *
+	 * @param $command
+	 *
+	 * @return
+	 */
+	function decode($command, $flushing = FALSE) {
 		$this->command_encoded = $command;
-
 
 		//strip answer of header
 		$this->length = hexdec(bin2hex(substr($command, 1, 4)));
@@ -233,34 +221,37 @@ class steam_request
 
 		// AR: NEW STEAM_OBJECT
 
-		$this->object = steam_factory::get_object($this->steam_connectorID, hexdec(bin2hex(substr($command, 10, 4))), hexdec(bin2hex(substr($command, 14, 4))) );
+		$this->object = steam_factory::get_object($this->steam_connectorID, hexdec(bin2hex(substr($command, 10, 4))), hexdec(bin2hex(substr($command, 14, 4))));
 
 		//get data
 		$command = substr($command, 18);
 		$this->arguments = $this->decode_data($command);
 
 		// detect if result is an error
-		if ( $this->coalcommand == COAL_ERROR ) {
-			if ( is_array($this->arguments) ) {
+		if ($this->coalcommand == COAL_ERROR) {
+			if (is_array($this->arguments)) {
 				if (isset($this->arguments[4]) && is_string($this->arguments[4])) {
-                    $server_backtrace = $this->arguments[4];
-                }
+					$server_backtrace = $this->arguments[4];
+				}
 
-                if ($this->arguments[0] & COAL_E_ACCESS) { // 1<<4 is set
-                    throw new AccessDeniedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
-                }
+				if ($this->arguments[0] & COAL_E_ACCESS) {
+					// 1<<4 is set
+					throw new AccessDeniedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
+				}
 
-                if ($this->arguments[0] & COAL_E_NOTEXIST) { // 1<<6 is set
-                    throw new NotFoundException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
-                }
+				if ($this->arguments[0] & COAL_E_NOTEXIST) {
+					// 1<<6 is set
+					throw new NotFoundException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
+				}
 
-                if ($this->arguments[0] & COAL_E_DELETED) { // 1<<19 is set
-                    throw new DeletedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
-                }
+				if ($this->arguments[0] & COAL_E_DELETED) {
+					// 1<<19 is set
+					throw new DeletedException(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name());
+				}
 
 				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer.\nCOAL_ERROR : args[0]=" . $this->arguments[0] . "\nargs[1]=" . $this->arguments[1] . (isset($server_backtrace) ? "\nserver backtrace=" . $server_backtrace : ""), 120);
 			} else {
-				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(),  "Error during data transfer", 120 );
+				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "Error during data transfer", 120);
 			}
 		}
 		return $this->arguments;
@@ -269,13 +260,13 @@ class steam_request
 	function mybin2dec($str) {
 		$result = 0;
 		$pos = true;
-		if (($str[0] & chr(pow(2,7))) == chr(pow(2,7))) {
+		if (($str[0] & chr(pow(2, 7))) == chr(pow(2, 7))) {
 			$pos = false;
 		}
 
-		for($i=3; $i > -1; $i--) {
+		for ($i = 3; $i > -1; $i--) {
 			$byte = $str[$i];
-			for($j=0; $j < 8; $j++) {
+			for ($j = 0; $j < 8; $j++) {
 				if ($i == 0 && $j == 7) {
 					if ($pos) {
 						return $result;
@@ -284,14 +275,13 @@ class steam_request
 					}
 				} else {
 					if ($pos) {
-						(($byte & chr(pow(2,$j))) == chr(pow(2,$j)) ) ? $result += (pow(2,$j) << (8 * (3 - $i))): "";
+						(($byte & chr(pow(2, $j))) == chr(pow(2, $j))) ? $result += (pow(2, $j) << (8 * (3 - $i))) : "";
 					} else {
-						(($byte & chr(pow(2,$j))) == chr(pow(2,$j)) ) ? "": $result += (pow(2,$j) << (8 * (3 - $i)));
+						(($byte & chr(pow(2, $j))) == chr(pow(2, $j))) ? "" : $result += (pow(2, $j) << (8 * (3 - $i)));
 					}
 				}
 			}
 		}
-
 
 		return $result;
 	}
@@ -300,76 +290,84 @@ class steam_request
 	//method: decode_data()
 	//***************************************************************************
 	/**
-	* function decode_data
-	*
-	* @param $command
-	*
-	* @return
-	*/
-	function decode_data(&$command)
-	{
+	 * function decode_data
+	 *
+	 * @param $command
+	 *
+	 * @return
+	 */
+	function decode_data(&$command) {
 		//echo "decode_data<br>";
 		$typ = $command[0];
 
-		switch ($typ)
-		{
+		switch ($typ) {
 			case CMD_TYPE_INT:
 				$newdata = $this->mybin2dec(substr($command, 1, 4));
 				$command = substr($command, 5);
 				break;
+			/*
+			FLOAT-BUG?
+			Setzte ich z.B. für OBJ_POSITION_X den Wert 7.2 wird alles korrekt gesetzt, aber beim neuladen des Attribut Dialog bekomm ich dann den Wert 7.1999998092651. Also die Konvertierung in float erfolgt in PHP vor dem updaten des Attributes. Wenn ich das Objekt mit dem Webinterface der ClientSupportAPI betrachte, steht dort als Wert "OBJ_POSITION_Y": 7.200000.
+			 */
 			case CMD_TYPE_FLOAT:
-				$tmp = unpack("f*", strrev(substr($command, 1 , 4)));
+				$tmp = unpack("f*", strrev(substr($command, 1, 4)));
 				$newdata = $tmp[1];
 				$command = substr($command, 5);
 				//echo $newdata . "<br />";
 				break;
 			case CMD_TYPE_STRING:
 				$length = (int) hexdec(bin2hex(substr($command, 1, 4)));
-                if ($length === 0) {
-                    $newdata = "";
-                    $command = substr($command, 5 + $length);
-                } else {
-                    $newdata = substr($command, 5, $length);
-                    $command = substr($command, 5 + $length);
-                }
+				if ($length === 0) {
+					$newdata = "";
+					$command = substr($command, 5 + $length);
+				} else {
+					$newdata = substr($command, 5, $length);
+					$command = substr($command, 5 + $length);
+				}
 				break;
 			case CMD_TYPE_OBJECT:
-				$newdata = steam_factory::get_object( $this->steam_connectorID, hexdec(bin2hex(substr($command, 1, 4))), hexdec(bin2hex(substr($command, 5, 4))) );
+				$newdata = steam_factory::get_object($this->steam_connectorID, hexdec(bin2hex(substr($command, 1, 4))), hexdec(bin2hex(substr($command, 5, 4))));
 				$command = substr($command, 9);
 				break;
 			case CMD_TYPE_ARRAY:
 				$count = hexdec(bin2hex(substr($command, 1, 2)));
 				$command = substr($command, 3);
 
-				if($count <= 0)
-				$newdata = array();
-				else
-				for($i = 0; $i < $count; $i++)
-				{
-					$value = $this->decode_data($command);
-					$newdata[$i] = $value;
-				}; //for($i = 0; $i < $count; $i++)
+				if ($count <= 0) {
+					$newdata = array();
+				} else {
+					for ($i = 0; $i < $count; $i++) {
+						$value = $this->decode_data($command);
+						$newdata[$i] = $value;
+					}
+				}
+				; //for($i = 0; $i < $count; $i++)
 
 				break;
 			case CMD_TYPE_MAPPING:
 				$count = hexdec(bin2hex(substr($command, 1, 2)));
 				$command = substr($command, 3);
 
-				if($count <= 0)
-				$newdata = array();
-				else
-				for($i = 0; $i < $count; $i++)
-				{
-					$key = $this->decode_data($command);
-					$value = $this->decode_data($command);
+				if ($count <= 0) {
+					$newdata = array();
+				} else {
+					for ($i = 0; $i < $count; $i++) {
+						$key = $this->decode_data($command);
+						$value = $this->decode_data($command);
 
-					if(is_object($key))
-					$newdata[$key->get_id()] = $value; //TODO: $newdata[(string)$key] = $value;
-					else if(is_array($key))
-					$newdata[] = $value;
-					else
-					$newdata[$key] = $value;
-				}; //for($i = 0; $i < $count; $i++)
+						if (is_object($key)) {
+							$newdata[$key->get_id()] = $value;
+						}
+						//TODO: $newdata[(string)$key] = $value;
+						else if (is_array($key)) {
+							$newdata[] = $value;
+						} else {
+							$newdata[$key] = $value;
+						}
+
+					}
+				}
+				; //for($i = 0; $i < $count; $i++)
 
 				break;
 			case CMD_TYPE_PROGRAM:
@@ -381,12 +379,12 @@ class steam_request
 				break;
 			case CMD_TYPE_FUNCTION:
 				$length = hexdec(bin2hex(substr($command, 1, 4)));
-				$fname = substr($command, 13, $length-8);
-				$newdata = new steam_function( $fname );
+				$fname = substr($command, 13, $length - 8);
+				$newdata = new steam_function($fname);
 				$command = substr($command, 5 + $length);
 				break;
 			default:
-				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "COAL support in PHP not yet implemented for object type=" . $typ . " command=" . $command, 120 );
+				throw new steam_exception(steam_connector::get_instance($this->steam_connectorID)->get_login_user_name(), "COAL support in PHP not yet implemented for object type=" . $typ . " command=" . $command, 120);
 				$newdata = "COAL support in PHP not yet implemented for object type=" . $typ . " command=" . $command;
 				break;
 		} //switch ($typ)
@@ -394,7 +392,6 @@ class steam_request
 		return $newdata;
 
 	} //function decode_data($command)
-
 
 	//***************************************************************************
 	//methods to set variable and encode (same time)
@@ -406,10 +403,9 @@ class steam_request
 	 * @param $transactionid
 	 *
 	 */
-	function set_transactionid($transactionid)
-	{
+	function set_transactionid($transactionid) {
 		$this->transactionid = $transactionid;
-		$this->transactionid_encoded = pack("C*", $transactionid >> 24, $transactionid >> 16, $transactionid >> 8 , $transactionid);
+		$this->transactionid_encoded = pack("C*", $transactionid >> 24, $transactionid >> 16, $transactionid >> 8, $transactionid);
 	} //function set_transactionid($transactionid)
 
 	/**
@@ -417,8 +413,7 @@ class steam_request
 	 *
 	 * @param $coalcommand
 	 */
-	function set_coalcommand($coalcommand)
-	{
+	function set_coalcommand($coalcommand) {
 		$this->coalcommand = $coalcommand;
 	} //function set_coalcommand($coalcommand)
 
@@ -427,20 +422,16 @@ class steam_request
 	 *
 	 * @param $object
 	 */
-	function set_object($object)
-	{
-		if( !is_object($object) )
-		{
-			$this->object = steam_factory::get_object( $this->steam_connectorID );
+	function set_object($object) {
+		if (!is_object($object)) {
+			$this->object = steam_factory::get_object($this->steam_connectorID);
 			$this->object_encoded = "\x00\x00\x00\x00\x00\x00\x00\x00";
-		}
-		else
-		{
+		} else {
 			$this->object = $object;
 			$id = $object->get_id();
 			$type = $object->get_type();
-			$this->object_encoded =  pack("C*", $id >> 24, $id >> 16, $id >> 8, $id ) .
-			pack("C*", $type >> 24, $type >> 16, $type >> 8, $type );
+			$this->object_encoded = pack("C*", $id >> 24, $id >> 16, $id >> 8, $id) .
+			pack("C*", $type >> 24, $type >> 16, $type >> 8, $type);
 		}
 	} //function set_object($object)
 
@@ -449,8 +440,7 @@ class steam_request
 	 *
 	 * @param $arguments
 	 */
-	function set_arguments($arguments, $raw = false)
-	{
+	function set_arguments($arguments, $raw = false) {
 		$this->arguments = $arguments;
 		if ($raw) {
 			$this->arguments_encoded = $arguments;
@@ -462,31 +452,29 @@ class steam_request
 		$this->length_encoded = pack("C*", $this->length >> 24, $this->length >> 16, $this->length >> 8, $this->length);
 	} //function set_arguments($arguments)
 
-
 	//***************************************************************************
 	//methods to get variable status
 	//***************************************************************************
 	/**
-	* function is_error:
-	*
-	* @return
-	*/
-	function is_error() { return ($this->coalcommand == COAL_ERROR); }
+	 * function is_error:
+	 *
+	 * @return
+	 */
+	function is_error() {return ($this->coalcommand == COAL_ERROR);}
 
 	/**
 	 * function access_granted:
 	 *
 	 * @return
 	 */
-	function access_granted() { return ($this->arguments[1] == "Access denied !");}
+	function access_granted() {return ($this->arguments[1] == "Access denied !");}
 
 	/**
 	 * function get_transactionid:
 	 *
 	 * @return
 	 */
-	function get_transactionid()
-	{
+	function get_transactionid() {
 		return $this->transactionid;
 	} //function get_transactionid()
 
@@ -495,8 +483,7 @@ class steam_request
 	 *
 	 * @return
 	 */
-	function get_coalcommand()
-	{
+	function get_coalcommand() {
 		return $this->coalcommand;
 	} //function get_coalcommand()
 
@@ -505,8 +492,7 @@ class steam_request
 	 *
 	 * @return
 	 */
-	function get_object()
-	{
+	function get_object() {
 		return $this->object;
 	} //function get_object()
 
@@ -515,8 +501,7 @@ class steam_request
 	 *
 	 * @return
 	 */
-	function get_arguments()
-	{
+	function get_arguments() {
 		return $this->arguments;
 	} //function get_arguments()
 
