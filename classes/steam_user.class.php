@@ -47,20 +47,19 @@ class steam_user extends steam_container
         //Remove from USER_CONTACTS_TOCONFIRM
         $unconfirmed = $this->get_attribute("USER_CONTACTS_TOCONFIRM");
         if(!is_array($unconfirmed)) $unconfirmed = array();
-        $found = FALSE;
+        $save = FALSE;
         $s = count($unconfirmed);
         for ($i =0;$i< $s; $i++) {
             $tc = $unconfirmed[$i];
             if (!$tc instanceof steam_object) { // remove deleted user
-                $found = TRUE;
+                $save = TRUE;
                 unset($unconfirmed[$i]);
-            }
-            if ($tc->get_id() == $contact_id) {
-                $found = TRUE;
+            } else if ($tc->get_id() == $contact_id) {
+                $save = TRUE;
                 unset($unconfirmed[$i]);
             }
         }
-        if ($found) {
+        if ($save) {
             $this->set_attribute("USER_CONTACTS_TOCONFIRM", $unconfirmed);
         }
     }
@@ -152,16 +151,19 @@ class steam_user extends steam_container
         //if contact is in the "user_contacts_toconfirm"-list
         //	remove the contacts from the list and add the contact to
         //	USER_CONTACTS_CONFIRMED
-        $found = FALSE;//array_search($contact, $to_confirm);
+        $save = FALSE;//array_search($contact, $to_confirm);
         $s = count($to_confirm);
-        for ($i =0;$i< $s; $i++) {
+        for ($i =0; $i < $s; $i++) {
             $tc = $to_confirm[$i];
-            if ($tc->get_id() == $contact_id) {
-                $found = TRUE;
+            if (!$tc instanceof steam_object) {
+                $save = TRUE;
+                unset($to_confirm[$i]);
+            } else if ($tc->get_id() == $contact_id) {
+                $save = TRUE;
                 unset($to_confirm[$i]);
             }
         }
-        if ($found) {
+        if ($save) {
             $to_confirm = array_values($to_confirm);
             $this->set_attribute("USER_CONTACTS_TOCONFIRM", $to_confirm);
         }
