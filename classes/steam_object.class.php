@@ -346,6 +346,7 @@ class steam_object implements Serializable
      */
     public function get_name($pBuffer = FALSE)
     {
+
         return $this->get_attribute("OBJ_NAME", $pBuffer);
     }
 
@@ -892,7 +893,18 @@ class steam_object implements Serializable
                 $steam_object = $pNewEnvironment->get_object_by_name($name);
                 if ($steam_object instanceof steam_object) {
                     // object with same name already exists
-                    throw new DoubleFilenameException($name);
+                    if(API_DOUBLE_FILENAME_RENAME){
+                        $counter = 1;
+                        $tmpName = $name . " (" . $counter . ")";
+                        while($pNewEnvironment->get_object_by_name($tmpName) instanceof steam_object){
+                            $counter++;
+                            $tmpName = $name . " (" . $counter . ")";
+                        }
+                        $this->set_name($tmpName);
+                        //TODO: inform user about renaming
+                    } else{
+                      throw new DoubleFilenameException($name);
+                    }
                 }
             }
 
@@ -905,12 +917,7 @@ class steam_object implements Serializable
             }
         }
 
-        return $this->steam_command(
-        $this,
-        "move",
-        array( $pNewEnvironment ),
-        $pBuffer
-        );
+        return $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
     }
 
     /**
