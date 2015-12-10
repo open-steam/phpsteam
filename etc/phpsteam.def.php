@@ -11,6 +11,7 @@ defined("LOW_API_CACHE") or define("LOW_API_CACHE", true);
 defined("API_DEBUG") or define("API_DEBUG", false);
 
 defined("API_DOUBLE_FILENAME_NOT_ALLOWED") or define("API_DOUBLE_FILENAME_NOT_ALLOWED", true);
+defined("API_DOUBLE_FILENAME_RENAME") or define("API_DOUBLE_FILENAME_RENAME", false);
 defined("API_MAX_INVENTORY_COUNT") or define("API_MAX_INVENTORY_COUNT", 500);
 defined("API_MAX_CONTENT_SIZE") or define("API_MAX_CONTENT_SIZE", 52428800); //50mb
 defined("API_ATTRIBUTE_SIZE") or define("API_ATTRIBUTE_SIZE", 0); //TODO
