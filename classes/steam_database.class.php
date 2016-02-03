@@ -15,8 +15,10 @@
  *
  * @package     PHPsTeam
  */
-class steam_database
-{
+
+use OpenSteam\Helper\LoggerHelper;
+
+class steam_database {
 	/**
 	 * Unique id for this object inside the virtual space, which is
 	 * assigned by a sTeam-server.
@@ -29,11 +31,11 @@ class steam_database
 	public $steam_connectorID;
 
 	public function __construct($steamFactory, $steamConnectorId, $id) {
-        if (!($steamFactory instanceof steam_factory)) {
-        	API_DEBUG ? $GLOBALS["MONOLOG"]->addError("phpsteam error: only steam_factory is allowed to call") : "";
-            throw new Exception("phpsteam error: only steam_factory is allowed to call");
-        }
-		$this->id 	= $id;
+		if (!($steamFactory instanceof steam_factory)) {
+			LoggerHelper::getInstance()->getLogger()->addError("phpsteam error: only steam_factory is allowed to call");
+			throw new Exception("phpsteam error: only steam_factory is allowed to call");
+		}
+		$this->id = $id;
 		$this->steam_connectorID = $steamConnectorId;
 	}
 
