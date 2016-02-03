@@ -187,9 +187,9 @@ class steam_request {
 				case "null":
 				case "NULL":
 					/*
-					Use Integer 0 to represent NULL.
-					TODO: Implement Support of NULL within the Protocol itself.
-					 */
+						Use Integer 0 to represent NULL.
+						TODO: Implement Support of NULL within the Protocol itself.
+					*/
 					return $this->encode_data(0);
 					break;
 				default:
@@ -306,14 +306,13 @@ class steam_request {
 				$command = substr($command, 5);
 				break;
 			/*
-			FLOAT-BUG?
-			Setzte ich z.B. für OBJ_POSITION_X den Wert 7.2 wird alles korrekt gesetzt, aber beim neuladen des Attribut Dialog bekomm ich dann den Wert 7.1999998092651. Also die Konvertierung in float erfolgt in PHP vor dem updaten des Attributes. Wenn ich das Objekt mit dem Webinterface der ClientSupportAPI betrachte, steht dort als Wert "OBJ_POSITION_Y": 7.200000.
-			 */
+				FLOAT-BUG?
+				Setzte ich z.B. für OBJ_POSITION_X den Wert 7.2 wird alles korrekt gesetzt, aber beim neuladen des Attribut Dialog bekomm ich dann den Wert 7.1999998092651. Also die Konvertierung in float erfolgt in PHP vor dem updaten des Attributes. Wenn ich das Objekt mit dem Webinterface der ClientSupportAPI betrachte, steht dort als Wert "OBJ_POSITION_Y": 7.200000.
+			*/
 			case CMD_TYPE_FLOAT:
 				$tmp = unpack("f*", strrev(substr($command, 1, 4)));
-				$newdata = $tmp[1];
+				$newdata = round($tmp[1], 5);
 				$command = substr($command, 5);
-				//echo $newdata . "<br />";
 				break;
 			case CMD_TYPE_STRING:
 				$length = (int) hexdec(bin2hex(substr($command, 1, 4)));
