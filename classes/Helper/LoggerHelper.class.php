@@ -44,7 +44,7 @@ class LoggerHelper {
 
 class LoggerWrapper {
 
-	public function __call(string $name, array $arguments) {
+	public function __call($name, array $arguments) {
 		$logger = LoggerHelper::getInstance()->getLoggerObject();
 
 		if (isset($logger) && API_DEBUG) {
