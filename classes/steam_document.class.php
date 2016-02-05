@@ -435,7 +435,7 @@ class steam_document extends steam_object {
 
 	public function get_mimetype($pBuffer = 0) {
 		$mime = trim($this->get_attribute(DOC_MIME_TYPE));
-		if (!isset($mime) || empty($mime) || $mime === "unknown/unknown" || $mime === "application/x-download" || $mime === "application/download" || $mime === "application/octet-stream" || $mime === "application/x-unknown-content-type" || $mime === "application/" || $mime === "text/html" || $mime === "application/save-as" || $mime === "x-application/octet-stream" || $mime === "application/x-msdownload" || $mime === "application/foobar") {
+		if (!isset($mime) || empty($mime) || $mime === "unknown/unknown" || $mime === "application/x-download" || $mime === "application/download" || $mime === "application/octet-stream" || $mime === "application/x-unknown-content-type" || $mime === "application/" || $mime === "text/html" || $mime === "application/save-as" || $mime === "x-application/octet-stream" || $mime === "application/x-msdownload" || $mime === "application/foobar" || $mime === "text/x-pdf" || $mime === "image/pdf") {
 			$mime = \MimetypeHelper::get_instance()->getMimeType($this->get_name());
 		}
 
