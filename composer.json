@@ -1,6 +1,6 @@
 {
     "name": "open-steam/phpsteam",
-    "version": "4.1.82",
+    "version": "4.1.83",
     "autoload": {
         "classmap": [
             "classes/"

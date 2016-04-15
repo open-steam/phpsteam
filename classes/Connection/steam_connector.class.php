@@ -382,6 +382,10 @@ class steam_connector implements Serializable {
 		return steam_connection::get_instance($this->get_id())->get_globalrequeststime();
 	}
 
+	public function resetRequestCounter() {
+		return steam_connection::get_instance($this->get_id())->resetRequestCounter();
+	}
+
 	/**
 	 * function upload:
 	 *

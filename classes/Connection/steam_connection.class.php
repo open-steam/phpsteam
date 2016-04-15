@@ -789,6 +789,13 @@ class steam_connection {
 		return self::$globalRequestsTime;
 	}
 
+	public function resetRequestCounter() {
+		$this->sentrequests = 0;
+		self::$globalRequests = 0;
+		self::$globalRequestsMap = array();
+		self::$globalRequestsTime = array();
+	}
+
 	public function get_login_user_name() {
 		return $this->login_user_name;
 	}
