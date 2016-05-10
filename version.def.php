@@ -9,5 +9,5 @@
  * @author Dominik Niehus <dominik.niehus@coactum.de>
  */
 
-define("PHPSTEAM_VERSION", "4.1.83");
+define("PHPSTEAM_VERSION", "4.1.84");
 ?>

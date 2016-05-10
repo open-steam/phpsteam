@@ -848,42 +848,54 @@ class steam_object implements Serializable {
 	 * @param  boolean      $pBuffer         0 = send command now, 1 = buffer command
 	 * @return boolean      TRUE | FALSE
 	 */
-	public function move($pNewEnvironment, $pBuffer = 0) {
-		if ($pNewEnvironment instanceof steam_container) {
-			LoggerHelper::getInstance()->getLogger()->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id());
+	public function move($pNewEnvironment, $pBuffer = 0)
+ 	{
 
-			if (API_DOUBLE_FILENAME_NOT_ALLOWED) {
-				$name = $this->get_name();
-				$steam_object = $pNewEnvironment->get_object_by_name($name);
-				if ($steam_object instanceof steam_object) {
-					// object with same name already exists
-					if (API_DOUBLE_FILENAME_RENAME) {
-						$counter = 1;
-						$tmpName = $name . " (" . $counter . ")";
-						while ($pNewEnvironment->get_object_by_name($tmpName) instanceof steam_object) {
-							$counter++;
-							$tmpName = $name . " (" . $counter . ")";
-						}
-						$this->set_name($tmpName);
-						//TODO: inform user about renaming
-					} else {
-						throw new DoubleFilenameException($name);
-					}
-				}
-			}
+ 			$rename = false;
 
-			if (API_MAX_INVENTORY_COUNT > 0) {
-				// set to -1 to disable
-				$inventory = $pNewEnvironment->get_inventory();
-				if (sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
-					// max limit of inventory count reached
-					throw new TooManyFilesPerContainerException();
-				}
-			}
-		}
+ 			if ($pNewEnvironment instanceof steam_container) {
+ 					API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
 
-		return $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
-	}
+ 					if (API_DOUBLE_FILENAME_NOT_ALLOWED) {
+ 							$name = $this->get_name();
+ 							$steam_object = $pNewEnvironment->get_object_by_name($name);
+ 							if ($steam_object instanceof steam_object) {
+ 									// object with same name already exists
+ 									if(API_DOUBLE_FILENAME_RENAME){
+ 											$rename = true;
+ 											$counter = 1;
+ 											$newName = $name . " (" . $counter . ")";
+ 											while($pNewEnvironment->get_object_by_name($newName) instanceof steam_object){
+ 													$counter++;
+ 													$newName = $name . " (" . $counter . ")";
+ 											}
+ 											//add timestamp to avoid double filename exception in current folder
+ 											$tmpName = $newName . time();
+ 											$this->set_name($tmpName);
+ 									} else{
+ 										throw new DoubleFilenameException($name);
+ 									}
+ 							}
+ 					}
+
+ 					if (API_MAX_INVENTORY_COUNT > 0) { // set to -1 to disable
+ 							$inventory = $pNewEnvironment->get_inventory();
+ 							if (sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
+ 									// max limit of inventory count reached
+ 									throw new TooManyFilesPerContainerException();
+ 							}
+ 					}
+ 			}
+
+ 			if($rename){
+ 					$result = $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
+ 					//remove timestamp
+ 					$this->set_name($newName);
+ 					return $result;
+ 			}else{
+ 					return $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
+ 			}
+ 	}
 
 	/**
 	 * function resolve_access:
