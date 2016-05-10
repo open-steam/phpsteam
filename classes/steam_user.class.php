@@ -813,7 +813,7 @@ class steam_user extends steam_container {
 		//Get ids
 		if (is_array($user_toconfirm_obj)) {
 			foreach ($user_toconfirm_obj as $utco) {
-				if ($utco instanceof steam_user || $ufo instanceof steam_group) {
+				if ($utco instanceof steam_user || $utco instanceof steam_group) {
 					$user_toconfirm_ids[] = $utco->get_id();
 				}
 			}
