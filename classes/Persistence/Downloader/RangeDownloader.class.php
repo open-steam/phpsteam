@@ -5,6 +5,10 @@ namespace OpenSteam\Persistence\Downloader;
 class RangeDownloader extends Downloader {
 
 	public static function download(\steam_document $document) {
+		if (!$document->check_access_read()) {
+			header('HTTP/1.0 403 Forbidden');
+			die;
+		}
 		//check if document stored in filesystem
 		//  if not stored in filesystem - create tmp-file
 		$persistence = $document->getPersistence();
