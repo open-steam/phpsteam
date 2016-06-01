@@ -159,11 +159,7 @@ class steam_connection {
 	 * @return socket-handler
 	 */
 	private function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword, $reconnect = false) {
-		$this->steam_server_ip = @gethostbyname($pServerIp);
-		if (!$this->steam_server_ip) {
-			// Exception: steam-server unknown
-			throw $this->exception(100, $pServerIp, false);
-		}
+		$this->steam_server_ip = $pServerIp;
 		$this->steam_server_port = $pServerPort;
 		$this->login_user_name = $pLoginName;
 
