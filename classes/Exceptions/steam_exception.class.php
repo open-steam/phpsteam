@@ -26,22 +26,21 @@ class steam_exception extends Exception {
 	 * @param $pMessage
 	 * @param $pCode
 	 */
-	public function __construct($pUser = "Anonymous", $pMessage = FALSE, $pCode = FALSE, $pallow_backtrace = TRUE)
-	{
-		if ( ! $pMessage )
-		{
+	public function __construct($pUser = "Anonymous", $pMessage = FALSE, $pCode = FALSE, $pallow_backtrace = TRUE) {
+		if (!$pMessage) {
 			$this->message = "non-specified error";
 		}
-		if ( ! $pCode )
-		{
+		if (!$pCode) {
 			$this->code = 0;
 		}
 		$this->user = $pUser;
 		$this->allow_backtrace = $pallow_backtrace;
-		if ($pallow_backtrace)
+		if ($pallow_backtrace) {
 			$this->backtrace = debug_backtrace();
-		else $this->backtrace = $this->security_issue;
-		parent::__construct( $pMessage, $pCode );
+		} else {
+			$this->backtrace = $this->security_issue;
+		}
+		parent::__construct($pMessage, $pCode);
 	}
 
 	/**
@@ -49,15 +48,13 @@ class steam_exception extends Exception {
 	 *
 	 * @return
 	 */
-	public function get_backtrace()
-	{
+	public function get_backtrace() {
 		$log = "";
 		$trace = $this->backtrace;
-		foreach ($trace as $i=>$t) {
-		   $log .= $i .'=>'.$t['file'].' '.$t['line']."\n";
+		foreach ($trace as $i => $t) {
+			$log .= $i . '=>' . $t['file'] . ' ' . $t['line'] . "\n";
 		}
 		return $log;
-		//return print_r($this->backtrace, true);
 	}
 
 	/**
@@ -65,8 +62,7 @@ class steam_exception extends Exception {
 	 *
 	 * @return
 	 */
-	public function get_message()
-	{
+	public function get_message() {
 		return $this->message;
 	}
 
@@ -75,8 +71,7 @@ class steam_exception extends Exception {
 	 *
 	 * @return
 	 */
-	public function get_code()
-	{
+	public function get_code() {
 		return $this->code;
 	}
 
@@ -85,22 +80,19 @@ class steam_exception extends Exception {
 	 *
 	 * @return
 	 */
-	public function get_user()
-	{
+	public function get_user() {
 		return $this->user;
 	}
-
 
 	/**
 	 * override super method  to get control of log output if exception is not
 	 * catched
 	 */
 	function __toString() {
-		if ($this->allow_backtrace)
+		if ($this->allow_backtrace) {
 			return $this->get_message() . "\n" . $this->get_backtrace();
-		else
+		} else {
 			return $this->security_issue;
+		}
 	}
-
 }
-?>
