@@ -112,6 +112,12 @@ class steam_connector implements Serializable {
 		}
 	}
 
+	public static function remove_instance($id) {
+		if (isset(self::$instances[$id])) {
+			unset(self::$instances[$id]);
+		}
+	}
+
 	public function serialize() {
 		return serialize(array($this->ServerIp, $this->ServerPort, $this->LoginName));
 	}
