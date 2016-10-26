@@ -231,12 +231,12 @@ class steam_factory {
 	 * @param Boolean $pBuffer Send now or buffer request?
 	 * @return steam_user the user object
 	 */
-	public static function get_user($pSteamConnectorID, $pUserName, $pBuffer = 0) {
+	public static function get_user($pSteamConnectorID, $pUserName, $pBuffer = 0, $noCache = false) {
 		if (!is_string($pSteamConnectorID)) {
 			throw new ParameterException("pSteamConnectorID", "string");
 		}
 
-		return steam_factory::username_to_object($pSteamConnectorID, $pUserName, $pBuffer);
+		return steam_factory::username_to_object($pSteamConnectorID, $pUserName, $pBuffer, $noCache);
 	}
 
 	/**
@@ -249,13 +249,13 @@ class steam_factory {
 	 * @param Boolean $pBuffer Send now or buffer request?
 	 * @return steam_user the user object
 	 */
-	public static function username_to_object($pSteamConnectorID, $pUserName, $pBuffer = 0) {
+	public static function username_to_object($pSteamConnectorID, $pUserName, $pBuffer = 0, $noCache = false) {
 		$globalUserName = $pUserName . ":" . $pSteamConnectorID;
 		if (!is_string($pSteamConnectorID)) {
 			throw new ParameterException("pSteamConnectorID", "string");
 		}
 
-		if (!isset(self::$userLookupCache[$globalUserName])) {
+		if ($noCache || !isset(self::$userLookupCache[$globalUserName])) {
 			$result = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("users"), "lookup", array($pUserName), $pBuffer);
 			if ($result instanceof steam_user) {
 				self::$userLookupCache[$globalUserName] = $result;

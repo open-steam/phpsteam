@@ -33,6 +33,7 @@ class steam_request {
 	// Sorry for that, but it is hardly needed to ensure correct
 	// implementation. Please contact dbuese@upb.de if you need help.
 	private $arguments;
+	private $callback;
 
 	var $length_encoded;
 	var $transactionid_encoded;
@@ -53,7 +54,7 @@ class steam_request {
 	 * @param $arguments
 	 * @param coalcommand
 	 */
-	function steam_request($pSteamConnectorID, $transactionid = 0, $object = 0, $arguments = 0, $coalcommand = COAL_COMMAND) {
+	function steam_request($pSteamConnectorID, $transactionid = 0, $object = 0, $arguments = 0, $coalcommand = COAL_COMMAND, Closure $callback = null) {
 		if (!is_string($pSteamConnectorID)) {
 			throw new ParameterException("pSteamConnectorID", "string");
 		}
@@ -70,6 +71,7 @@ class steam_request {
 			$this->set_arguments($arguments);
 		}
 
+		$this->callback = $callback;
 	} //function steam_request($transactionid, $coalcommand, $object, $arguments)
 
 	//***************************************************************************
@@ -501,7 +503,15 @@ class steam_request {
 	 * @return
 	 */
 	function get_arguments() {
-		return $this->arguments;
+		if ($this->callback instanceof Closure) {
+			$result = $this->callback->__invoke($this->arguments);
+			return $result;
+		} else {
+			$closure = function ($result) {
+				return $result;
+			};
+			return $closure($this->arguments);
+		}
 	} //function get_arguments()
 
 }; //class steam_request

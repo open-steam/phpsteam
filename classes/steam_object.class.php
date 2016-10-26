@@ -588,12 +588,13 @@ class steam_object implements Serializable {
 	 * @param  boolean       $pBuffer 0 = send now, 1 = buffer command and send later
 	 * @return steam_request | integer Depending on the buffer argument either a steam_request instance or a unique transaction id is given back
 	 */
-	public function steam_command($pObject, $pMethod, $pArgs, $pBuffer = 0) {
+	public function steam_command($pObject, $pMethod, $pArgs, $pBuffer = 0, $callback = null) {
 		return $this->get_steam_connector()->predefined_command(
 			$pObject,
 			$pMethod,
 			$pArgs,
-			$pBuffer
+			$pBuffer,
+			$callback
 		);
 	}
 
@@ -666,13 +667,15 @@ class steam_object implements Serializable {
 	 * Returns the user which creates this object
 	 * @returns steam_user the creator of this object
 	 */
-	public function get_creator($pBuffer = FALSE) {
-		return $this->steam_command(
-			$this,
-			"get_creator",
-			array(),
-			$pBuffer
-		);
+	public function get_creator($pBuffer = false) {
+		$creator = $this->steam_command($this, "get_creator", array(), $pBuffer, function ($result) {
+			if (!$result instanceof steam_object) {
+				return steam_factory::get_user($this->steam_connectorID, "root");
+			} else {
+				return $result;
+			}
+		});
+		return $creator;
 	}
 
 	/**
@@ -848,54 +851,54 @@ class steam_object implements Serializable {
 	 * @param  boolean      $pBuffer         0 = send command now, 1 = buffer command
 	 * @return boolean      TRUE | FALSE
 	 */
-	public function move($pNewEnvironment, $pBuffer = 0)
- 	{
+	public function move($pNewEnvironment, $pBuffer = 0) {
 
- 			$rename = false;
+		$rename = false;
 
- 			if ($pNewEnvironment instanceof steam_container) {
- 					API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
+		if ($pNewEnvironment instanceof steam_container) {
+			API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
 
- 					if (API_DOUBLE_FILENAME_NOT_ALLOWED) {
- 							$name = $this->get_name();
- 							$steam_object = $pNewEnvironment->get_object_by_name($name);
- 							if ($steam_object instanceof steam_object) {
- 									// object with same name already exists
- 									if(API_DOUBLE_FILENAME_RENAME){
- 											$rename = true;
- 											$counter = 1;
- 											$newName = $name . " (" . $counter . ")";
- 											while($pNewEnvironment->get_object_by_name($newName) instanceof steam_object){
- 													$counter++;
- 													$newName = $name . " (" . $counter . ")";
- 											}
- 											//add timestamp to avoid double filename exception in current folder
- 											$tmpName = $newName . time();
- 											$this->set_name($tmpName);
- 									} else{
- 										throw new DoubleFilenameException($name);
- 									}
- 							}
- 					}
+			if (API_DOUBLE_FILENAME_NOT_ALLOWED) {
+				$name = $this->get_name();
+				$steam_object = $pNewEnvironment->get_object_by_name($name);
+				if ($steam_object instanceof steam_object) {
+					// object with same name already exists
+					if (API_DOUBLE_FILENAME_RENAME) {
+						$rename = true;
+						$counter = 1;
+						$newName = $name . " (" . $counter . ")";
+						while ($pNewEnvironment->get_object_by_name($newName) instanceof steam_object) {
+							$counter++;
+							$newName = $name . " (" . $counter . ")";
+						}
+						//add timestamp to avoid double filename exception in current folder
+						$tmpName = $newName . time();
+						$this->set_name($tmpName);
+					} else {
+						throw new DoubleFilenameException($name);
+					}
+				}
+			}
 
- 					if (API_MAX_INVENTORY_COUNT > 0) { // set to -1 to disable
- 							$inventory = $pNewEnvironment->get_inventory();
- 							if (sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
- 									// max limit of inventory count reached
- 									throw new TooManyFilesPerContainerException();
- 							}
- 					}
- 			}
+			if (API_MAX_INVENTORY_COUNT > 0) {
+				// set to -1 to disable
+				$inventory = $pNewEnvironment->get_inventory();
+				if (sizeof($inventory) >= API_MAX_INVENTORY_COUNT) {
+					// max limit of inventory count reached
+					throw new TooManyFilesPerContainerException();
+				}
+			}
+		}
 
- 			if($rename){
- 					$result = $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
- 					//remove timestamp
- 					$this->set_name($newName);
- 					return $result;
- 			}else{
- 					return $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
- 			}
- 	}
+		if ($rename) {
+			$result = $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
+			//remove timestamp
+			$this->set_name($newName);
+			return $result;
+		} else {
+			return $this->steam_command($this, "move", array($pNewEnvironment), $pBuffer);
+		}
+	}
 
 	/**
 	 * function resolve_access:
