@@ -735,19 +735,15 @@ class steam_connection {
 	 * @param  boolean       $pBuffer 0 = send now, 1 = buffer command and send later
 	 * @return steam_request | integer Depending on the buffer argument either a steam_request instance or a unique transaction id is given back
 	 */
-	public function predefined_command($pObject, $pMethod, $pArgs, $pBuffer, $raw = false) {
+	public function predefined_command($pObject, $pMethod, $pArgs, $pBuffer, $callback = null) {
 		if ($this->get_login_status() === 0) {
 			throw new steam_exception($this->get_login_user_name(), "Not logged in. Wrong user or password.", 300);
 		}
-		if ($raw) {
-			$request = new steam_request($this->get_id(), $this->get_transactionid(), $pObject, array($pMethod, $pArgs));
-		} else {
-			$request = new steam_request($this->get_id(), $this->get_transactionid(), $pObject, array($pMethod, $pArgs));
-		}
+
+		$request = new steam_request($this->get_id(), $this->get_transactionid(), $pObject, array($pMethod, $pArgs), COAL_COMMAND, $callback);
 
 		if ($pBuffer == 0) {
 			$request = $this->command($request);
-
 			return $request->get_arguments();
 		} else {
 			$this->buffer_command($request);

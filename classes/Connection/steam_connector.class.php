@@ -483,8 +483,8 @@ class steam_connector implements Serializable {
 		return '=?' . $encoding . '?q?' . $result . '?=';
 	}
 
-	public function predefined_command($pObject, $pMethod, $pArgs, $pBuffer) {
-		return steam_connection::get_instance($this->get_id())->predefined_command($pObject, $pMethod, $pArgs, $pBuffer);
+	public function predefined_command($pObject, $pMethod, $pArgs, $pBuffer, $callback = null) {
+		return steam_connection::get_instance($this->get_id())->predefined_command($pObject, $pMethod, $pArgs, $pBuffer, $callback);
 	}
 
 	public function buffer_flush() {
