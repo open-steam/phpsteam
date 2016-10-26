@@ -240,40 +240,6 @@ class steam_connector implements Serializable {
 	}
 
 	/**
-	 * function get_server_module:
-	 *
-	 * Returns server module
-	 *
-	 * @param  string       $pServerModule Name of the module
-	 * @return steam_object
-	 */
-	/*public function get_server_module( $pServerModule )
-		    {
-		        //True
-		    if (!isset( $this->login_arguments[ 8 ][ $pServerModule ] )) {
-		        echo "hund";die;
-
-		        return 0;
-		    }
-
-		    switch ($pServerModule) {
-		      case "package:searchsupport":
-		          return new searchsupport( $this->login_arguments[ 8 ][ $pServerModule ] );
-		          break;
-		      case "groups":
-		          return new module_groups( $this->login_arguments[ 8 ][ $pServerModule ] );
-		          break;
-		      case "searching":
-		          //compare_versions doesn't exist, login_arguments doesn't exist,
-		          // if ( $this->compare_versions( $this->server_version, '2.9.4' ) < 0 ) break;
-		          return new searching(steam_connection::get_instance($this->get_id())->get_module($pServerModule));
-		          break;
-		    }
-
-		        return $this->login_arguments[ 8 ][ $pServerModule ];
-	*/
-
-	/**
 	 * function get_module:
 	 *
 	 * Returns server module
