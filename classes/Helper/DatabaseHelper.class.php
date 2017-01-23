@@ -190,6 +190,64 @@ class DatabaseHelper {
 		}
 	}
 
+	public function get_attribute($id, $attribute) {
+		$query = "select ob_data from ob_data where ob_id=:id and ob_attr=:attr";
+		try {
+			$statement = $this->_pdo->prepare($query);
+			$statement->bindParam(':id', $id, PDO::PARAM_INT);
+			$statement->bindParam(':attr', $attribute, PDO::PARAM_STR);
+			$statement->execute();
+			$results = $statement->fetchAll();
+
+			if (isset($results[0][0])) {
+				$result = $results[0][0];
+				return $this->pikeDecode($result);
+			} else {
+				return 0;
+			}
+		} catch (PDOException $e) {
+			LoggerHelper::getInstance()->getLogger()->error('Connection failed: ' . $e->getMessage());
+		}
+	}
+
+	public function get_attributes($id, $attributes) {
+		$attributesQuery = implode(',', array_fill(0, count($attributes), '?'));
+
+		$query = "select ob_attr, ob_data from ob_data where ob_id=? and (ob_attr in (" . $attributesQuery . "))";
+
+		array_unshift($attributes, $id);
+
+		try {
+			$statement = $this->_pdo->prepare($query);
+			$statement->execute($attributes);
+			$results = $statement->fetchAll();
+
+			$resultData = array();
+
+			foreach ($results as $result) {
+				$resultData[$result['ob_attr']] = $this->pikeDecode($result['ob_data']);
+			}
+
+			foreach ($attributes as $attribute) {
+				if (!isset($resultData[$attribute])) {
+					$resultData[$attribute] = 0;
+				}
+			}
+
+			return $resultData;
+
+		} catch (PDOException $e) {
+			LoggerHelper::getInstance()->getLogger()->error('Connection failed: ' . $e->getMessage());
+		}
+	}
+
+	public function pikeDecode($encoded) {
+		if (strStartsWith($encoded, "\"") && strEndsWith($encoded, "\"")) {
+			return substr($encoded, 1, -1);
+		}
+		return $encoded;
+	}
+
 	public function download_and_print_path($path) {
 		download_and_print($this->get_oid_by_path($path));
 	}
