@@ -30,6 +30,7 @@ require_once dirname(dirname(__FILE__)) . "/etc/steam_types.def.php";
  * @package     PHPsTeam
  */
 
+use OpenSteam\Helper\DatabaseHelper;
 use OpenSteam\Helper\LoggerHelper;
 
 class steam_object implements Serializable {
@@ -76,7 +77,7 @@ class steam_object implements Serializable {
 	 * @param integer         $pID             unique object ID inside the virtual space (optional)
 	 */
 	public function __construct($steamFactory, $steamConnectorId, $id) {
-		if (!($steamFactory instanceof steam_factory)) {
+		if (!(($steamFactory instanceof steam_factory) || ($steamFactory instanceof DatabaseHelper))) {
 			LoggerHelper::getInstance()->getLogger()->addError("phpsteam error: only steam_factory is allowed to call");
 			throw new Exception("phpsteam error: only steam_factory is allowed to call");
 		}

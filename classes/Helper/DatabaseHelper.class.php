@@ -241,7 +241,31 @@ class DatabaseHelper {
 		}
 	}
 
+	public function find_object($id) {
+		$query = "select ob_class from ob_class where ob_id=?";
+		$statement = $this->_pdo->prepare($query);
+		$statement->execute(array($id));
+		$results = $statement->fetchAll();
+
+		if (isset($results[0])) {
+			$className = $results[0]['ob_class'];
+
+			if ($className === '/classes/Object') {
+				return new \steam_object($this, $GLOBALS['STEAM']->get_id(), $id);
+			} else if ($className === '/classes/Document') {
+				return new \steam_document($this, $GLOBALS['STEAM']->get_id(), $id);
+			} else if ($className === '/classes/User') {
+				return new \steam_user($this, $GLOBALS['STEAM']->get_id(), $id);
+			}
+		} else {
+			return 0;
+		}
+	}
+
 	public function pikeDecode($encoded) {
+		if (strStartsWith($encoded, "%")) {
+			return $this->find_object(substr($encoded, 1));
+		}
 		if (strStartsWith($encoded, "\"") && strEndsWith($encoded, "\"")) {
 			return substr($encoded, 1, -1);
 		}
