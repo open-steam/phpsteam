@@ -1,9 +1,9 @@
 <?php
 
-include_once dirname(dirname(__FILE__)) . "/version.def.php";
-include_once dirname(__FILE__) . "/phpsteam.const.php";
-include_once dirname(__FILE__) . "/steam_attributes.def.php";
-include_once dirname(__FILE__) . "/steam_types.def.php";
+require_once dirname(dirname(__FILE__)) . "/version.def.php";
+require_once dirname(__FILE__) . "/phpsteam.const.php";
+require_once dirname(__FILE__) . "/steam_attributes.def.php";
+require_once dirname(__FILE__) . "/steam_types.def.php";
 
 defined("STEAM_SOCKET_TIMEOUT_DEFAULT") or define("STEAM_SOCKET_TIMEOUT_DEFAULT", 60);
 
@@ -20,6 +20,7 @@ defined("API_TEMP_DIR") or define("API_TEMP_DIR", sys_get_temp_dir() . "/");
 defined("API_VIRUS_SCAN") or define("API_VIRUS_SCAN", false);
 defined("DEFAULT_VIRUS_SCAN") or define("DEFAULT_VIRUS_SCAN", "ClamAvScanner");
 defined("CLAMAV_BIN") or define("CLAMAV_BIN", "/usr/local/bin/clamscan");
+defined("API_GET_CONTENT_READ_DOCUMENTS") or define("API_GET_CONTENT_READ_DOCUMENTS", false);
 
 // config default content provider
 defined("DEFAULT_CONTENT_PROVIDER") or define("DEFAULT_CONTENT_PROVIDER", CONTENT_PROVIDER_COAL);
