@@ -13,7 +13,7 @@
  * @author  Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
  */
 
-include_once dirname(dirname(dirname(__FILE__))) . "/etc/phpsteam.def.php";
+require_once dirname(dirname(dirname(__FILE__))) . "/etc/phpsteam.def.php";
 
 /**
  * The steam_connector manages all socket functions.
