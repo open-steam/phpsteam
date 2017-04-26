@@ -97,6 +97,26 @@ class ThumbnailHelper {
 			unlink($f);
 			die;
 		}
+                
+                if (defined('PHOTOALBUM_ROTATE_IMAGES') && PHOTOALBUM_ROTATE_IMAGES) {
+                        $exif = exif_read_data($f);
+                        if (!empty($exif['Orientation'])) {
+
+                                switch ($exif['Orientation']) {
+                                        case 3:
+                                                $img = imagerotate($img, 180, 0);
+                                        break;
+                                        
+                                        case 6:
+                                                $img = imagerotate($img, -90, 0);
+                                        break;
+
+                                        case 8:
+                                                $img = imagerotate($img, 90, 0);
+                                        break;
+                                }
+                        }
+                }
 
 		$img_resized = ImageCreateTrueColor($nWidth, $nHeight);
 		if ($exifImageType === IMAGETYPE_PNG) {
