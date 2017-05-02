@@ -468,4 +468,9 @@ class steam_document extends steam_object {
 		header($key . ": " . $value);
 	}
 
+	public function markAsRead() {
+		$module_read_doc = $this->get_steam_connector()->get_module("table:read-documents");
+		$this->steam_command($module_read_doc, "download_document", array(8, $this), 0);
+	}
+
 }
