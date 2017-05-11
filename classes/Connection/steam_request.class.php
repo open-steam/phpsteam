@@ -54,7 +54,7 @@ class steam_request {
 	 * @param $arguments
 	 * @param coalcommand
 	 */
-	function steam_request($pSteamConnectorID, $transactionid = 0, $object = 0, $arguments = 0, $coalcommand = COAL_COMMAND, Closure $callback = null) {
+	function __construct($pSteamConnectorID, $transactionid = 0, $object = 0, $arguments = 0, $coalcommand = COAL_COMMAND, Closure $callback = null) {
 		if (!is_string($pSteamConnectorID)) {
 			throw new ParameterException("pSteamConnectorID", "string");
 		}

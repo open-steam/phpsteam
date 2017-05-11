@@ -159,7 +159,7 @@ class steam_connection {
 	 * @return socket-handler
 	 */
 	private function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword, $reconnect = false) {
-		$this->steam_server_ip = $pServerIp;
+		$this->steam_server_ip = "127.0.0.1";
 		$this->steam_server_port = $pServerPort;
 		$this->login_user_name = $pLoginName;
 
@@ -167,8 +167,11 @@ class steam_connection {
 		if ($this->steam_server_port === 1999 || $this->steam_server_port === 31999) {
 			$hostprefix = 'ssl://';
 		}
-
-		$this->socket = @fsockopen($hostprefix . $this->steam_server_ip, $this->steam_server_port, $errno, $errstr);
+		echo $hostprefix . $this->steam_server_ip."\n";
+		$this->socket = fsockopen($hostprefix . $this->steam_server_ip, $this->steam_server_port, $errno, $errstr);
+		echo $errno. "\n";
+		echo $errstr. "\n";
+		die;
 
 		if (!$this->socket) {
 			$this->socket_status = 0;
