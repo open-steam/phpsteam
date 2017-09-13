@@ -515,5 +515,3 @@ class steam_request {
 	} //function get_arguments()
 
 }; //class steam_request
-
-?>

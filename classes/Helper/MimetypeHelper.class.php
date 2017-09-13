@@ -2,7 +2,8 @@
 
 class MimetypeHelper
 {
-    protected $source = "http://svn.apache.org/repos/asf/httpd/httpd/branches/1.3.x/conf/mime.types";
+    //protected $source = "http://svn.apache.org/repos/asf/httpd/httpd/branches/1.3.x/conf/mime.types";
+    protected $source = "http://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x/docs/conf/mime.types";
     public $target;
     public $mimetype_table;
 
@@ -73,6 +74,7 @@ class MimetypeHelper
         $s["pike"] = "source/pike";
         $s["bb"] = "text/bb";
         $s["wiki"] = "text/wiki";
+        $s["md"] = "text/markdown";
 
         return $s;
     }

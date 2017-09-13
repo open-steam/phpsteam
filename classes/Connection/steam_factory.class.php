@@ -774,5 +774,3 @@ class steam_factory {
 		self::$groupLookupCache[$groupName] = $steam_group;
 	}
 }
-
-?>
