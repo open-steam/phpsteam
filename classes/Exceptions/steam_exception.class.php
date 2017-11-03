@@ -36,7 +36,7 @@ class steam_exception extends Exception {
 		$this->user = $pUser;
 		$this->allow_backtrace = $pallow_backtrace;
 		if ($pallow_backtrace) {
-			$this->backtrace = debug_backtrace();
+			$this->backtrace = $this->debug_string_backtrace();
 		} else {
 			$this->backtrace = $this->security_issue;
 		}
@@ -49,13 +49,24 @@ class steam_exception extends Exception {
 	 * @return
 	 */
 	public function get_backtrace() {
-		$log = "";
-		$trace = $this->backtrace;
-		foreach ($trace as $i => $t) {
-			$log .= $i . '=>' . $t['file'] . ' ' . $t['line'] . "\n";
-		}
-		return $log;
+		return $this->backtrace;
 	}
+
+	private function debug_string_backtrace() {
+        ob_start();
+        debug_print_backtrace();
+        $trace = ob_get_contents();
+        ob_end_clean();
+
+        // Remove first item from backtrace as it's this function which
+        // is redundant.
+        $trace = preg_replace ('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $trace, 1);
+
+        // Renumber backtrace items.
+        $trace = preg_replace ('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
+
+        return $trace;
+    }
 
 	/**
 	 * function get_message:
