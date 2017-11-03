@@ -1396,7 +1396,7 @@ class steam_object implements Serializable {
 	 * @return
 	 */
 	public function copy($recursive = true) {
-		if (($this->get_type() & CLASS_CONTAINER) || ($this->get_type() & CLASS_ROOM)) {
+		if ($recursive && (($this->get_type() & CLASS_CONTAINER) || ($this->get_type() & CLASS_ROOM))) {
 			$inventory = $this->get_inventory();
 			$copyinventory = array();
 			foreach ($inventory as $object) {
