@@ -64,7 +64,7 @@ class steam_exception extends Exception {
 
         // Renumber backtrace items.
         //$trace = preg_replace ('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
-        $trace = preg_replace_callback('/^#(\d+)/e', function($matches){
+        $trace = preg_replace_callback('/^#(\d+)/m', function($matches){
         	foreach($matches as $match){
 	            return '#' . ($match - 1);
 	        }
