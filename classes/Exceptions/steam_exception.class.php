@@ -66,7 +66,7 @@ class steam_exception extends Exception {
         //$trace = preg_replace ('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
         $trace = preg_replace_callback('/^#(\d+)/m', function($matches){
         	foreach($matches as $match){
-	            return '#' . ($match - 1);
+	            return '#' . ((int)$match - 1);
 	        }
         }, $trace);
 
