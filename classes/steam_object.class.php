@@ -83,6 +83,8 @@ class steam_object implements Serializable {
 		}
 		$this->id = (int) $id;
 		$this->steam_connectorID = $steamConnectorId;
+
+		$this->type = $this->get_type();
 	}
 
 	public function get_type() {
