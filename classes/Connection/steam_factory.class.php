@@ -638,7 +638,7 @@ class steam_factory {
 	 * @param steam_container $pEnvironment room or container where the document should be created
 	 * @return steam_document
 	 */
-	public static function create_document($pSteamConnectorID, $pName, $pContent = null, $pMimeType, $pEnvironment = FALSE, $pDescription = "") {
+	public static function create_document($pSteamConnectorID, $pName, $pContent = null, $pMimeType = '', $pEnvironment = FALSE, $pDescription = "") {
 		if (!is_string($pSteamConnectorID)) {
 			throw new ParameterException("pSteamConnectorID", "string");
 		}
