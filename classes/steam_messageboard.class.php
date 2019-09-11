@@ -102,5 +102,3 @@ class steam_messageboard extends steam_object
 	}
 
 }
-
-?>

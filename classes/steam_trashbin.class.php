@@ -44,5 +44,3 @@ class steam_trashbin extends steam_container
 		);
 	}
 }
-
-?>

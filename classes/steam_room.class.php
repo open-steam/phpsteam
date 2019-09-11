@@ -37,5 +37,3 @@ class steam_room extends steam_container
 
 
 }
-
-?>

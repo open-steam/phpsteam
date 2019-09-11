@@ -24,4 +24,3 @@ class steam_date extends steam_object
 	}
 	
 }
-?>

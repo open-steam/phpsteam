@@ -84,5 +84,3 @@ class steam_link extends steam_object
 	}
 
 }
-
-?>

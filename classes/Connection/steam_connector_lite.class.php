@@ -157,5 +157,3 @@ class steam_connector_lite extends steam_connector
 		throw new steam_exception( $this->get_login_user_name(), "Error: set_config_value is not available using steam_connector_lite", 980 );
   }
 }
-
-?>

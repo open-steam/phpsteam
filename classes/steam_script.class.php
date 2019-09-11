@@ -21,5 +21,3 @@ class steam_script extends steam_object
 		return CLASS_SCRIPT | CLASS_OBJECT;
 	}
 }
-
-?>

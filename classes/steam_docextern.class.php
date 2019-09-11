@@ -43,5 +43,3 @@ class steam_docextern extends steam_object
 	}
 
 }
-
-?>

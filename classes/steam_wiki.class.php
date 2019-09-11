@@ -20,5 +20,3 @@ class steam_wiki extends steam_document
 		return CLASS_WIKI | CLASS_DOCUMENT | CLASS_OBJECT;
 	}
 }
-
-?>

@@ -7,6 +7,8 @@ use steam_document;
 class DatabasePersistence extends Persistence {
 	protected static $_contentProvider;
 
+	private $cache = [];
+
 	public static function init() {
 		if (DEFAULT_CONTENT_PROVIDER === CONTENT_PROVIDER_COAL) {
 			self::$_contentProvider = new \OpenSteam\Persistence\ContentProvider\CoalContentProvider();
@@ -61,12 +63,15 @@ class DatabasePersistence extends Persistence {
 	}
 
 	public function getSize(steam_document $document, $buffer = 0) {
-		if (($buffer === 0) && isset($document->attributes["get_content_size"])) {
-			return $document->attributes["get_content_size"];
+		if (($buffer === 0) && isset($this->cache[$document->get_id()]) && isset($this->cache[$document->get_id()]["get_content_size"])) {
+			return $this->cache[$document->get_id()]["get_content_size"];
 		}
 		$result = $document->steam_command($document, "get_content_size", array(), $buffer);
 		if ($buffer === 0) {
-			$document->attributes["get_content_size"] = $result;
+		    if (!isset($this->cache[$document->get_id()])) {
+                $this->cache[$document->get_id()] = [];
+            }
+            $this->cache[$document->get_id()]["get_content_size"] = $result;
 		}
 
 		return $result;

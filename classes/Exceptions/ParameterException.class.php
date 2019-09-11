@@ -60,5 +60,3 @@ class ParameterException extends Exception
 		return var_dump( $this->backtrace );
 	}
 }
-
-?>
