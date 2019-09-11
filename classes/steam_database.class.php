@@ -43,5 +43,3 @@ class steam_database {
 		return CLASS_DATABASE;
 	}
 }
-
-?>

@@ -35,5 +35,3 @@ class steam_function
 	}
 
 }
-
-?>

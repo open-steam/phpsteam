@@ -386,4 +386,3 @@ class steam_calendar extends steam_room
 		return $this->add_entry_impl( $pData, $pSetLinkForGroupmembers, $pGroups, FALSE, $pBuffer);
 	}
 }
-?>

@@ -535,5 +535,3 @@ class steam_container extends steam_object
 		);
 	}
 }
-
-?>

@@ -596,5 +596,3 @@ class steam_group extends steam_object
 		);
 	}
 }
-
-?>

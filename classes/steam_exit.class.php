@@ -39,4 +39,3 @@ class steam_exit extends steam_link
 		);
 	}
 }
-?>
