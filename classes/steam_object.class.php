@@ -38,20 +38,25 @@ class steam_object implements Serializable {
 	 * Unique id for this object inside the virtual space, which is
 	 * assigned by a sTeam-server.
 	 */
-	protected $id;
+    public $id;
 
 	/**
 	 * Binary string which defines the type of object.
 	 * @see steam_types.def.php for more details about the types.
 	 */
-	protected $type = CLASS_OBJECT;
+    public $type = CLASS_OBJECT;
+
+    /**
+     * ID of steam_connector. Connection to sTeam-server
+     */
+    public $steam_connectorID;
 
 	/**
 	 * Array of attributes, whereas the key equals the attribute name
 	 * in sTeam. This array is filled, each time the get_attributes() method
 	 * delivers new values for this object from sTeam.
 	 */
-	public $attributes = array();
+    protected $attributes = array();
 
 	/**
 	 * Array of additional values, where some additional information may be
@@ -63,11 +68,6 @@ class steam_object implements Serializable {
 	protected $additional = array();
 
 	private $prefetched = false;
-
-	/**
-	 * ID of steam_connector. Connection to sTeam-server
-	 */
-	public $steam_connectorID;
 
 	/**
 	 * Initialization of steam_object. The arguments are stored
