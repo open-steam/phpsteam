@@ -38,7 +38,9 @@ class FileContentIdPersistence extends FilePersistence {
 		foreach ($dir_array as $subdir) {
 			$target_dir .= $subdir . "/";
 			if (!file_exists($target_dir)) {
-				mkdir($target_dir);
+                if (!mkdir($target_dir) && !is_dir($target_dir)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $target_dir));
+                }
 			}
 		}
 

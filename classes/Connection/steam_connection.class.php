@@ -440,9 +440,9 @@ class steam_connection {
 					$info = stream_get_meta_data($this->socket);
 					fclose($this->socket);
 					if ($info['timed_out']) {
-						throw new steam_exception($this->get_login_user_name(), "Connection timed out! Reading socket.", 300);
+						throw new steam_exception($this->get_login_user_name(), "Connection timed out! Reading socket. " . var_export($info, true), 300);
 					} else {
-						throw new steam_exception($this->get_login_user_name(), "Reading socket.", 300);
+						throw new steam_exception($this->get_login_user_name(), "Reading socket. " . var_export($info, true), 300);
 					}
 				}
 
