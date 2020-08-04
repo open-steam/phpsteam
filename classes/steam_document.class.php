@@ -22,6 +22,8 @@
 class steam_document extends steam_object {
 	private $_persistence;
 
+	private $content;
+
 	public static function getPersistenceById($id) {
 		if (!ENABLE_FILE_PERSISTENCE && $id !== 0) {
 			throw new Exception("file persistence disabled but expected!");
@@ -203,6 +205,7 @@ class steam_document extends steam_object {
 		unset($this->attributes[DOC_SIZE]);
 		unlink($tmpfile);
 
+		$this->content = $pContent;
 		return $result;
 	}
 
@@ -278,7 +281,10 @@ class steam_document extends steam_object {
 		if (!$this->check_access_read()) {
 			throw new steam_exception($this->get_steam_connector()->get_login_name(), 'Access denied for user', 120, false);
 		}
-		return $this->getPersistence()->load($this, $pBuffer);
+		if (empty($this->content)) {
+			$this->content = $this->getPersistence()->load($this, $pBuffer);
+		}
+		return $this->content;
 	}
 
 	public function print_content() {
