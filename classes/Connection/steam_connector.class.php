@@ -496,7 +496,7 @@ class steam_connector implements Serializable {
 	}
 
 	public function is_connected() {
-		return steam_connection::get_instance($this->get_id())->is_connected();
+		return (boolean) steam_connection::get_instance($this->get_id())->is_connected();
 	}
 
 	public function exception($pCode, $pDetails = "", $allow_backtrace = TRUE) {

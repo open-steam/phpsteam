@@ -5,17 +5,3 @@
 .idea
 .buildpath
 nbproject
-
-#composer
-test/deps/vendor
-test/composer/composer.phar
-test/composer/composer.lock
-
-#config
-test/etc/default.def.php
-
-#test-tools
-test/tools/phpunit-skelgen.phar
-
-test/var/temp/*
-test/var/persistence/uid/*

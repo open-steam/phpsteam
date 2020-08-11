@@ -619,16 +619,18 @@ class steam_connection {
 		// do set_values for all objects in object buffer
 		// (used in buffer_attributes_request)
 		if (count($this->object_buffer) > 0) {
-			while (list($transaction_id, $object) = each($this->object_buffer)) {
-				if (isset($this->known_results[$transaction_id])) {
-					$attributes = $this->known_results[$transaction_id];
-				} else {
-					$attributes = $result[$transaction_id];
-				}
+            foreach ($this->object_buffer as $transaction_id => $object) {
+                if (isset($this->known_results[$transaction_id])) {
+                    $attributes = $this->known_results[$transaction_id];
+                } else {
+                    if (isset($result[$transaction_id])) {
+                        $attributes = $result[$transaction_id];
+                    }
+                }
 
-				$object->set_values($attributes);
-			}
-		}
+                $object->set_values($attributes);
+            }
+        }
 		$this->object_buffer = array();
 		$this->reset_known_results();
 		$this->reset_buffer_result_callbacks();
