@@ -1293,7 +1293,7 @@ class steam_object implements Serializable {
 	 * @param $pBuffer 0 = send command now, 1 = buffer command
 	 * @return Int 1 on success, 0 on failure
 	 */
-	public function set_acquire($pObject = FALSE, $pBuffer = 0) {
+	public function set_acquire($pObject = false, $pBuffer = 0) {
 		return $this->steam_command(
 			$this,
 			"set_acquire",

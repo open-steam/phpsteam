@@ -201,6 +201,10 @@ class steam_factory {
 		} catch (NotFoundException $e) {
 			$steam_object = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"), "path_to_object", array($pPath), $pBuffer);
 		}
+
+		if (!$steam_object instanceof steam_object) {
+            $steam_object = steam_connector::get_instance($pSteamConnectorID)->predefined_command(steam_connector::get_instance($pSteamConnectorID)->get_module("filepath:tree"), "path_to_object", array($pPath), $pBuffer);
+        }
 		return $steam_object;
 	}
 
