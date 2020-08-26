@@ -22,7 +22,7 @@
 class steam_document extends steam_object {
 	private $_persistence;
 
-	private $content;
+	private static $contentCache = [];
 
 	public static function getPersistenceById($id) {
 		if (!ENABLE_FILE_PERSISTENCE && $id !== 0) {
@@ -205,7 +205,40 @@ class steam_document extends steam_object {
 		unset($this->attributes[DOC_SIZE]);
 		unlink($tmpfile);
 
-		//$this->content = $pContent;
+		// Remove Versions
+        if ($this->get_attribute('DOC_AUTO_DELETE_VERSIONS') === 1) {
+            $docVersions = $this->get_attribute('DOC_VERSIONS');
+            if (is_array($docVersions)) {
+                if (count($docVersions) < 37) {
+                    $docMaxKeepVersions = $this->get_attribute('DOC_MAX_KEEP_VERSIONS');
+                    if (count($docVersions) > $docMaxKeepVersions) {
+                        ksort($docVersions);
+                        $countDeleteVersions = count($docVersions) - $docMaxKeepVersions;
+                        $i = 0;
+                        foreach ($docVersions as $versionNumber => $version) {
+                            if ($i <= $countDeleteVersions) {
+                                $version->set_attribute("OBJ_VERSIONOF", 0);
+                                $version->set_attribute("DOC_VERSIONS", new \stdClass()	);
+                                $version->delete();
+                                unset($docVersions[$versionNumber]);
+                                error_log("deleted version " . $versionNumber);
+                            } else {
+                                break;
+                            }
+                            $i++;
+                        }
+                        $this->set_attribute('DOC_VERSIONS', $docVersions);
+                    }
+                } else {
+                    error_log("too many versions");
+                }
+            } else {
+                error_log("no versions");
+            }
+        }
+
+
+        self::$contentCache[$this->get_id()] = $pContent;
 		return $result;
 	}
 
@@ -281,10 +314,10 @@ class steam_document extends steam_object {
 		if (!$this->check_access_read()) {
 			throw new steam_exception($this->get_steam_connector()->get_login_name(), 'Access denied for user', 120, false);
 		}
-		//if (empty($this->content)) {
-		//	$this->content = $this->getPersistence()->load($this, $pBuffer);
-		//}
-		return $this->getPersistence()->load($this, $pBuffer);
+		if (!isset(self::$contentCache[$this->get_id()])) {
+            self::$contentCache[$this->get_id()] = $this->getPersistence()->load($this, $pBuffer);
+		}
+		return self::$contentCache[$this->get_id()];
 	}
 
 	public function print_content() {
