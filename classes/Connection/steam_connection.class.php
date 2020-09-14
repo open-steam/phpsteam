@@ -850,7 +850,6 @@ class steam_connection {
 				$e = new steam_exception();
 				break;
 		}
-		$e->backtrace[0] = FALSE;
 
 		return $e;
 	}
