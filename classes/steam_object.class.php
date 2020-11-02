@@ -56,7 +56,7 @@ class steam_object implements Serializable {
 	 * in sTeam. This array is filled, each time the get_attributes() method
 	 * delivers new values for this object from sTeam.
 	 */
-    protected $attributes = array();
+    protected static $attributesCache = array();
 
 	/**
 	 * Array of additional values, where some additional information may be
@@ -85,6 +85,10 @@ class steam_object implements Serializable {
 		$this->steam_connectorID = $steamConnectorId;
 
 		$this->type = $this->get_type();
+
+		if (!isset(self::$attributesCache[$this->id])) {
+            self::$attributesCache[$this->id] = [];
+        }
 	}
 
 	public function get_type() {
@@ -163,16 +167,16 @@ class steam_object implements Serializable {
 	public function get_attributes($pAttributes = array(), $pBuffer = false, $pFollowLinks = false, $decode = false) {
 		if (!$pBuffer) {
 			if (count($pAttributes) == 0) {
-				return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array($this->attributes));
+				return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array(self::$attributesCache[$this->id]));
 			}
 			$known_attributes = array();
 			$unknown_attributes = array();
 			$result = array();
 			foreach ($pAttributes as $key) {
-				if (!array_key_exists($key, $this->attributes)) {
+				if (!array_key_exists($key, self::$attributesCache[$this->id])) {
 					$unknown_attributes[$key] = "";
 				} else {
-					$known_attributes[$key] = $this->attributes[$key];
+					$known_attributes[$key] = self::$attributesCache[$this->id][$key];
 				}
 			}
 			if (count($unknown_attributes) > 0) {
@@ -189,7 +193,7 @@ class steam_object implements Serializable {
 					array($unknown_attributes),
 					0
 				);
-				$this->attributes = array_merge($this->attributes, $result);
+                self::$attributesCache[$this->id] = array_merge(self::$attributesCache[$this->id], $result);
 
 				return \OpenSteam\Helper\HtmlHelper::decode_array($decode, \OpenSteam\Helper\HtmlHelper::strip_tags_array(array_merge($known_attributes, $result)));
 			} else {
@@ -221,7 +225,7 @@ class steam_object implements Serializable {
 	 * @return mixed the local attribute cache for this object
 	 */
 	public function get_cached_attributes() {
-		return $this->attributes;
+		return self::$attributesCache[$this->id];
 	}
 
 	/**
@@ -236,11 +240,11 @@ class steam_object implements Serializable {
 	 * @return mixed the local attribute cache for this object
 	 */
 	public function get_attribute_cached($key) {
-		if (!array_key_exists($key, $this->attributes)) {
+		if (!array_key_exists($key, self::$attributesCache[$this->id])) {
 			return false;
 		}
 
-		return $this->attributes[$key];
+		return self::$attributesCache[$this->id][$key];
 	}
 
 	/**
@@ -266,10 +270,10 @@ class steam_object implements Serializable {
 			$value = \OpenSteam\Helper\HtmlHelper::decode($decode, $value);
 			return $value;
 		} else {
-			if (!$this->is_prefetched() && !isset($this->attributes[$pAttribute])) {
-				$this->attributes[$pAttribute] = $this->steam_command($this, "query_attribute", array($pAttribute), 0);
+			if (!$this->is_prefetched() && !isset(self::$attributesCache[$this->id][$pAttribute])) {
+                self::$attributesCache[$this->id][$pAttribute] = $this->steam_command($this, "query_attribute", array($pAttribute), 0);
 			}
-			$value = isset($this->attributes[$pAttribute]) ? $this->attributes[$pAttribute] : 0;
+			$value = self::$attributesCache[$this->id][$pAttribute] ?? 0;
 			if (is_string($value)) {
 				$value = strip_tags($value);
 			}
@@ -295,7 +299,7 @@ class steam_object implements Serializable {
 	 */
 	public function get_attribute_names($pBuffer = 0) {
 		if ($this->is_prefetched()) {
-			$result = array_keys($this->attributes);
+			$result = array_keys(self::$attributesCache[$this->id]);
 		} else {
 			$result = $this->steam_command($this, "get_attribute_names", array(), $pBuffer);
 		}
@@ -476,7 +480,7 @@ class steam_object implements Serializable {
 	 * @return void
 	 */
 	public function delete_attribute($pAttribute, $pBuffer = 0) {
-		unset($this->attributes[$pAttribute]);
+		unset(self::$attributesCache[$this->id][$pAttribute]);
 
 		return $this->steam_command(
 			$this,
@@ -502,7 +506,7 @@ class steam_object implements Serializable {
 			}
 		}
 		$pAttributes = \OpenSteam\Helper\HtmlHelper::strip_tags_array($pAttributes);
-		$this->attributes = array_merge($this->attributes, $pAttributes);
+        self::$attributesCache[$this->id] = array_merge(self::$attributesCache[$this->id], $pAttributes);
 		return $this->steam_command(
 			$this,
 			"set_attributes",
@@ -538,7 +542,7 @@ class steam_object implements Serializable {
 	 *
 	 */
 	public function get_values() {
-		return $this->attributes;
+		return self::$attributesCache[$this->id];
 	}
 
 	/**
@@ -548,7 +552,7 @@ class steam_object implements Serializable {
 	 *
 	 */
 	public function set_values($pValues) {
-		$this->attributes = array_merge($this->attributes, $pValues);
+        self::$attributesCache[$this->id] = array_merge(self::$attributesCache[$this->id], $pValues);
 	}
 
 	/**
@@ -559,7 +563,7 @@ class steam_object implements Serializable {
 	 *
 	 */
 	public function set_value($pKey, $pValue) {
-		$this->attributes[$pKey] = $pValue;
+        self::$attributesCache[$this->id][$pKey] = $pValue;
 	}
 
 	/**
@@ -570,7 +574,7 @@ class steam_object implements Serializable {
 	 *
 	 */
 	public function delete_value($pKey) {
-		unset($this->attributes[$pKey]);
+		unset(self::$attributesCache[$this->id][$pKey]);
 	}
 
 	/**

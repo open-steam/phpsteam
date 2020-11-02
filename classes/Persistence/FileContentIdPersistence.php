@@ -74,7 +74,7 @@ class FileContentIdPersistence extends FilePersistence {
 			}
 			$success = rename($target_dir . $lastContentId, $versionContentFile);
 			if (!$success) {
-				throw new Exception("could not rename version content " . $target_dir . $lastContentId-" to " . $versionContentFile);
+				throw new Exception("could not rename version content " . $target_dir . $lastContentId . " to " . $versionContentFile);
 			}
 		}
 
