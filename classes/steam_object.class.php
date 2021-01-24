@@ -506,7 +506,12 @@ class steam_object implements Serializable {
 			}
 		}
 		$pAttributes = \OpenSteam\Helper\HtmlHelper::strip_tags_array($pAttributes);
-        self::$attributesCache[$this->id] = array_merge(self::$attributesCache[$this->id], $pAttributes);
+		if (isset(self::$attributesCache[$this->id])) {
+            self::$attributesCache[$this->id] = array_merge(self::$attributesCache[$this->id], $pAttributes);
+        } else {
+            self::$attributesCache[$this->id] = $pAttributes;
+        }
+
 		return $this->steam_command(
 			$this,
 			"set_attributes",
