@@ -66,7 +66,7 @@ class steam_connector implements Serializable {
 			throw new ParameterException("pServerIp", "string");
 		}
 
-		if (!is_integer($pServerPort)) {
+		if (!is_int($pServerPort)) {
 			throw new ParameterException("pServerPort", "integer");
 		}
 
@@ -86,10 +86,10 @@ class steam_connector implements Serializable {
 	}
 
 	public static function connect($pServerIp, $pServerPort, $pLoginName, $pLoginPassword) {
-		if (!isset(self::$instances[$pLoginName . "@" . $pServerIp])) {
+		if (!isset(self::$instances[$pLoginName . ':' . md5($pLoginPassword) . "@" . $pServerIp])) {
 			return new self($pServerIp, $pServerPort, $pLoginName, $pLoginPassword);
 		} else {
-			$instance = self::$instances[$pLoginName . "@" . $pServerIp];
+			$instance = self::$instances[$pLoginName . ':' . md5($pLoginPassword) . "@" . $pServerIp];
 			if (!$instance->get_socket_status()) {
 				$instance->reconnect();
 			}
