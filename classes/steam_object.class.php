@@ -7,11 +7,12 @@
  * The root class steam_object keeps general functions for all subclasses
  * ready. That is, why all other classes derived from steam_object.
  *
- * PHP versions 5
+ * PHP versions 8.1
  *
- * @package	PHPsTeam
- * @license	http://opensource.org/licenses/gpl-license.php GNU Public License
- * @author	Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
+ * @package	    PHPsTeam
+ * @license	    http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @author	    Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
+ * @copyright   2000-2022 Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
  */
 
 /**

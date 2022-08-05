@@ -11,11 +11,12 @@
  * is not supported by lite variant" to indicate that the lite- connector doesnt 
  * support all features.
  * 
- * PHP versions 5
+ * PHP versions 8.1
  *
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author  Daniel Buese <dbuese@upb.de>, Alexander Roth <aroth@it-roth.de>, Henrik Beige <hebeige@gmx.de>, Dominik Niehus <nicke@upb.de>
+ * @copyright 2000-2022 Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
  */
 
 /**

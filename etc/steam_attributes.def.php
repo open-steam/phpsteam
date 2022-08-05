@@ -2,11 +2,12 @@
 /**
  * Definition of all types of objects's attributes
  *
- * PHP versions 5
+ * PHP versions 8.1
  *
- * @package PHPsTeam
- * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @author Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
+ * @package     PHPsTeam
+ * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @author      Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
+ * @copyright   2000-2022 Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
  */
 
 // BEGIN deprecated
@@ -129,4 +130,3 @@ define("CLASS_ANY", 0); // for packages and registering attributes
 
 //login feature
 define("CLIENT_STATUS_CONNECTED", 1);
-?>

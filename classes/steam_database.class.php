@@ -3,11 +3,12 @@
 /**
  * steam_database
  *
- * PHP versions 5
+ * PHP versions 8.1
  *
  * @package     PHPsTeam
  * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author      Dominik Niehus <nicke@upb.de>
+ * @copyright   2000-2022 Dominik Niehus <nicke@upb.de>
  *
  */
 

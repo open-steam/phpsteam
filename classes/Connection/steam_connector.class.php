@@ -6,7 +6,7 @@
  * Thus, a reference of this class is assigned to every instance
  * of steam_object or one of its subclasses through steam_factory::get_object().
  *
- * PHP versions 5 
+ * PHP versions 8.1
  *
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License

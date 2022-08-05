@@ -4,11 +4,12 @@
  *
  * Longer description follows
  *
- * PHP versions 5
+ * PHP versions 8.1
  *
- * @package PHPsTeam
- * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @author Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
+ * @package     PHPsTeam
+ * @license     http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @author      Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
+ * @copyright   2000-2022 Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
  */
 
 /**
