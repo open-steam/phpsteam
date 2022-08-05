@@ -423,14 +423,14 @@ class steam_connection {
 		$data = "";
 		$cbsize = count($pCommandBuffer);
 		if (count($pCommandBuffer) > 1) {
-			$flushing = TRUE;
+			$flushing = true;
 		} else {
-			$flushing = FALSE;
+			$flushing = false;
 		}
 
 		for ($i = 0; $i < $cbsize; $i++) {
-			$tidok = FALSE;
-			while ($tidok != TRUE) {
+			$tidok = false;
+			while ($tidok != true) {
 				// read "-1" and size of package
 				$buffer = fread($this->socket, 1);
 				$size = fread($this->socket, 4);
@@ -466,7 +466,7 @@ class steam_connection {
 				$thetid = hexdec(bin2hex(substr($data_read, 0, 4)));
 				$commandtid = $pCommandBuffer[$i]->get_transactionid();
 				if ($thetid == $commandtid) {
-					$tidok = TRUE;
+					$tidok = true;
 					$res = $buffer . $size . $data_read;
 					if (trim($res) == "") {
 						// Exception: Got no result back
@@ -508,7 +508,7 @@ class steam_connection {
 		if ($method === "" || !is_string($method)) {
 			$method = "Problem2";
 		}
-		$time = microtime(TRUE) - $startTime;
+		$time = microtime(true) - $startTime;
 		if (isset(self::$globalRequestsMap[$method])) {
 			self::$globalRequestsMap[$method]++;
 			self::$globalRequestsTime[$method] = self::$globalRequestsTime[$method] + $time;
@@ -816,8 +816,8 @@ class steam_connection {
 	 * @param  string          $pDetails        Some details about the error (optional)
 	 * @return steam_exception Exception
 	 */
-	public function exception($pCode, $pDetails = "", $allow_backtrace = TRUE) {
-		if (!is_integer($pCode)) {
+	public function exception($pCode, $pDetails = "", $allow_backtrace = true) {
+		if (!is_int($pCode)) {
 			throw new ParameterException("pCode", "integer");
 		}
 
@@ -873,7 +873,19 @@ class steam_connection {
 		return $this->server_config[$pKey];
 	}
 
-	/**
+    /**
+     * function get_uuid:
+     *
+     * returns the server uuid
+     *
+     * @return string server uuid
+     */
+    public function get_uuid() {
+        return $this->get_config_value('uuid');
+    }
+
+
+    /**
 	 * function get_steam_group:
 	 *
 	 * returns the steam group
