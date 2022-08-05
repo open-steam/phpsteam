@@ -17,7 +17,7 @@
 /**
  *
  */
-require_once dirname(dirname(__FILE__)) . "/etc/steam_types.def.php";
+require_once dirname(__FILE__, 2) . "/etc/steam_types.def.php";
 
 /**
  * Root class for all objects in the metaphor of virtual knowledge rooms

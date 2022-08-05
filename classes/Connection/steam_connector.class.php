@@ -6,14 +6,15 @@
  * Thus, a reference of this class is assigned to every instance
  * of steam_object or one of its subclasses through steam_factory::get_object().
  *
- * PHP versions 5
+ * PHP versions 5 
  *
  * @package PHPsTeam
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author  Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
+ * @copyright 2000-2022 Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Daniel Buese <dbuese@upb.de>, Dominik Niehus <nicke@upb.de>
  */
 
-require_once dirname(dirname(dirname(__FILE__))) . "/etc/phpsteam.def.php";
+require_once dirname(__FILE__, 3) . "/etc/phpsteam.def.php";
 
 /**
  * The steam_connector manages all socket functions.
@@ -61,7 +62,7 @@ class steam_connector implements Serializable {
 	 * @param string  $pLogin      user's login
 	 * @param string  $pPassword   user's password
 	 */
-	private function __construct($pServerIp, $pServerPort, $pLoginName, $pLoginPassword) {
+	public function __construct($pServerIp, $pServerPort, $pLoginName, $pLoginPassword) {
 		if (!is_string($pServerIp)) {
 			throw new ParameterException("pServerIp", "string");
 		}
@@ -106,9 +107,7 @@ class steam_connector implements Serializable {
 		if (isset(self::$instances[$id])) {
 			return self::$instances[$id];
 		} else {
-			new Exception("no steam connector found for id: " . $id);
-
-			return null;
+			throw new Exception("no steam connector found for id: " . $id);
 		}
 	}
 
@@ -330,6 +329,17 @@ class steam_connector implements Serializable {
 	public function get_server_version() {
 		return steam_connection::get_instance($this->get_id())->get_server_version();
 	}
+
+    /**
+     * function get_uuid:
+     *
+     * returns the server uuid
+     *
+     * @return string server uuid
+     */
+    public function get_uuid() {
+        return steam_connection::get_instance($this->get_id())->get_uuid();
+    }
 
 	/**
 	 * function get_request_count:
