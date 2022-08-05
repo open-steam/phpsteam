@@ -4,11 +4,12 @@
  * encoding/decoding requests to/from the steam server through the
  * COAL-protocol.
  *
- * PHP versions 5
+ * PHP versions 8.1
  *
  * @package 	PHPsTeam
- * @license	http://opensource.org/licenses/gpl-license.php GNU Public License
- * @author	Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
+ * @license	    http://opensource.org/licenses/gpl-license.php GNU Public License
+ * @author	    Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
+ * @copyright   2000-2022 Henrik Beige <hebeige@gmx.de>, Alexander Roth <aroth@it-roth.de>, Dominik Niehus <nicke@upb.de>
  */
 
 /**

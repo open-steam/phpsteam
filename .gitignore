@@ -5,3 +5,6 @@
 .idea
 .buildpath
 nbproject
+
+/vendor
+/composer.lock

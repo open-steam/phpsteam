@@ -81,11 +81,10 @@ class RangeDownloader extends Downloader {
 			// If the range starts with an '-' we start from the beginning.
 			// If not, we forward the file pointer and make sure to get the end byte
 			// if spesified.
-			if ($range{0} == '-') {
+			if ($range[0] === '-') {
 				// The n-number of the last bytes is requested
 				$c_start = $size - substr($range, 1);
 			} else {
-
 				$range = explode('-', $range);
 				$c_start = $range[0];
 				$c_end = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;

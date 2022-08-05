@@ -1,9 +1,9 @@
 <?php
 
-require_once dirname(dirname(__FILE__)) . "/version.def.php";
-require_once dirname(__FILE__) . "/phpsteam.const.php";
-require_once dirname(__FILE__) . "/steam_attributes.def.php";
-require_once dirname(__FILE__) . "/steam_types.def.php";
+require_once dirname(__FILE__, 2) . "/version.def.php";
+require_once __DIR__ . "/phpsteam.const.php";
+require_once __DIR__ . "/steam_attributes.def.php";
+require_once __DIR__ . "/steam_types.def.php";
 
 defined("STEAM_SOCKET_TIMEOUT_DEFAULT") or define("STEAM_SOCKET_TIMEOUT_DEFAULT", 60);
 
