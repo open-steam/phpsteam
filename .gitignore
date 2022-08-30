@@ -8,3 +8,6 @@ nbproject
 
 /vendor
 /composer.lock
+
+/test/vendor
+/test/composer.lock
