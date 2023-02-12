@@ -1,0 +1,29 @@
+{
+    "name": "phpsteam/test",
+    "description": "test for phpsteam",
+    "autoload": {
+        "psr-4": {
+            "Phpsteam\\Test\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dominik Niehus",
+            "email": "dominik.niehus@coactum.de"
+        }
+    ],
+    "repositories": [{
+        "type": "composer",
+        "url": "https://packages.coactum.de/",
+        "options": {
+            "http": {
+                "header": [
+                    "API-TOKEN: Xfn6QEN9eBmg"
+                ]
+            }
+        }
+    }],
+    "require": {
+        "open-steam/phpsteam": "dev-develop"
+    }
+}

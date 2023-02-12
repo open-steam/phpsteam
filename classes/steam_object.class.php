@@ -34,7 +34,7 @@ require_once dirname(__FILE__, 2) . "/etc/steam_types.def.php";
 use OpenSteam\Helper\DatabaseHelper;
 use OpenSteam\Helper\LoggerHelper;
 
-class steam_object implements Serializable {
+class steam_object  {
 	/**
 	 * Unique id for this object inside the virtual space, which is
 	 * assigned by a sTeam-server.
@@ -110,14 +110,13 @@ class steam_object implements Serializable {
 		return $this->id;
 	}
 
-	public function serialize() {
-		return serialize(array($this->id, $this->steam_connectorID));
+	public function __serialize() {
+		return array($this->id, $this->steam_connectorID);
 	}
 
-	public function unserialize($data) {
-		$values = unserialize($data);
-		$this->id = $values[0];
-		$this->steam_connectorID = $values[1];
+	public function __unserialize($data) {
+		$this->id = $data[0];
+		$this->steam_connectorID = $data[1];
 	}
 
 	/**

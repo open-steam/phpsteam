@@ -41,7 +41,7 @@ require_once dirname(__FILE__, 3) . "/etc/phpsteam.def.php";
  *
  * @package     PHPsTeam
  */
-class steam_connector implements Serializable {
+class steam_connector {
 	private $ServerIp;
 	private $ServerPort;
 	private $LoginName;
@@ -117,15 +117,14 @@ class steam_connector implements Serializable {
 		}
 	}
 
-	public function serialize() {
-		return serialize(array($this->ServerIp, $this->ServerPort, $this->LoginName));
+	public function __serialize() {
+		return array($this->ServerIp, $this->ServerPort, $this->LoginName);
 	}
 
-	public function unserialize($data) {
-		$values = unserialize($data);
-		$this->ServerIp = $values[0];
-		$this->ServerPort = $values[1];
-		$this->LoginName = $values[2];
+	public function __unserialize($data) {
+		$this->ServerIp = $data[0];
+		$this->ServerPort = $data[1];
+		$this->LoginName = $data[2];
 	}
 
 	public function get_id() {
