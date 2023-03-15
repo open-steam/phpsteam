@@ -218,9 +218,11 @@ class steam_document extends steam_object {
                         $i = 0;
                         foreach ($docVersions as $versionNumber => $version) {
                             if ($i <= $countDeleteVersions) {
-                                $version->set_attribute("OBJ_VERSIONOF", 0);
-                                $version->set_attribute("DOC_VERSIONS", new \stdClass()	);
-                                $version->delete();
+								if (isset($version) && $version instanceof steam_object) {
+									$version->set_attribute("OBJ_VERSIONOF", 0);
+									$version->set_attribute("DOC_VERSIONS", new \stdClass()	);
+									$version->delete();
+								}
                                 unset($docVersions[$versionNumber]);
                                 error_log("deleted version " . $versionNumber);
                             } else {
