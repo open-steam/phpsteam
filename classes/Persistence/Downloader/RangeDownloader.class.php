@@ -134,6 +134,7 @@ class RangeDownloader extends Downloader {
 			flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
 
 			$wait = (microtime(true) - $timeStart) * 1000000;
+			$wait = intval(round($wait));
 			// if speedlimit is defined, make sure to only send specified bytes per second
 			$sleeptime = 1000000 - $wait;
 			if (($rate > 0) && ($sleeptime > 0)) {
