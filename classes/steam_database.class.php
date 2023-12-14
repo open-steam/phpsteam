@@ -33,7 +33,7 @@ class steam_database {
 
 	public function __construct($steamFactory, $steamConnectorId, $id) {
 		if (!($steamFactory instanceof steam_factory)) {
-			LoggerHelper::getInstance()->getLogger()->addError("phpsteam error: only steam_factory is allowed to call");
+			LoggerHelper::getInstance()->getLogger()->error("phpsteam error: only steam_factory is allowed to call");
 			throw new Exception("phpsteam error: only steam_factory is allowed to call");
 		}
 		$this->id = $id;

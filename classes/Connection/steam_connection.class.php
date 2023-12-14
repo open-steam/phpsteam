@@ -483,7 +483,7 @@ class steam_connection {
 				} else {
 					// if tid < commandtid skipping may help
 					if ($thetid < $commandtid) {
-						LoggerHelper::getInstance()->getLogger()->addWarning("steam_connector.php, send_command: command tid=" . $commandtid . " answer tid=" . $thetid . " skipping result...");
+						LoggerHelper::getInstance()->getLogger()->warning("steam_connector.php, send_command: command tid=" . $commandtid . " answer tid=" . $thetid . " skipping result...");
 					} // no chance, serious failure in data transfer
 					else {
 						throw new steam_exception($this->get_login_user_name(), "Failure during data transfer commandbuffer=" . $pCommandBuffer, 300);
