@@ -169,11 +169,11 @@ class steam_factory {
 			$objectData = $GLOBALS['STEAM']->predefined_command($clientSupport, "query_object_data", array($pObject, $pIventory, $pDepanding), $pBuffer);
 			$objects = $objectData["objects"];
 			foreach ($objects as $id => $object) {
-				LoggerHelper::getInstance()->getLogger()->addDebug("prefetched: " . $id);
+				LoggerHelper::getInstance()->getLogger()->debug("prefetched: " . $id);
 				$steam_object = self::get_object($pSteamConnectorID, $id, $object["object_class"]);
 				$steam_object->set_values($object["attributes"]);
 				$steam_object->set_prefetched();
-				LoggerHelper::getInstance()->getLogger()->addDebug(count($steam_object->get_values(), true));
+				LoggerHelper::getInstance()->getLogger()->debug(count($steam_object->get_values(), true));
 				if ($steam_object instanceof steam_user) {
 					self::setUserCache($object["attributes"]["OBJ_NAME"], $steam_object);
 				} else if ($steam_object instanceof steam_group) {

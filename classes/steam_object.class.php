@@ -79,7 +79,7 @@ class steam_object  {
 	 */
 	public function __construct($steamFactory, $steamConnectorId, $id) {
 		if (!(($steamFactory instanceof steam_factory) || ($steamFactory instanceof DatabaseHelper))) {
-			LoggerHelper::getInstance()->getLogger()->addError("phpsteam error: only steam_factory is allowed to call");
+			LoggerHelper::getInstance()->getLogger()->error("phpsteam error: only steam_factory is allowed to call");
 			throw new Exception("phpsteam error: only steam_factory is allowed to call");
 		}
 		$this->id = (int) $id;
@@ -868,7 +868,7 @@ class steam_object  {
 		$rename = false;
 
 		if ($pNewEnvironment instanceof steam_container) {
-			API_DEBUG ? $GLOBALS["MONOLOG"]->addDebug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
+			API_DEBUG ? $GLOBALS["MONOLOG"]->debug("steam_object->move %" . $this->get_id() . " to %" . $pNewEnvironment->get_id()) : "";
 
 			if (API_DOUBLE_FILENAME_NOT_ALLOWED) {
 				$name = $this->get_name();
@@ -1246,7 +1246,7 @@ class steam_object  {
 	 * @return int returns 1 if successful
 	 */
 	public function delete() {
-		LoggerHelper::getInstance()->getLogger()->addDebug("steam_object->delete %" . $this->get_id());
+		LoggerHelper::getInstance()->getLogger()->debug("steam_object->delete %" . $this->get_id());
 		if ($this instanceof steam_container) {
 			$steam_documents = array();
 			$iterator = new OpenSteam\Iterators\SteamContainerIterator($this);
@@ -1264,7 +1264,7 @@ class steam_object  {
 	}
 
 	public function low_delete($pBuffer = 0) {
-		LoggerHelper::getInstance()->getLogger()->addDebug("steam_object->low_delete %" . $this->get_id());
+		LoggerHelper::getInstance()->getLogger()->debug("steam_object->low_delete %" . $this->get_id());
 		// TODO: CHECK!!!
 		// TODO: If this was needed it must be moved to a separate function to avoid problems with the buffer !
 		// replace links with source object if source is deleted
